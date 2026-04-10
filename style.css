@@ -210,3 +210,24 @@ body.dark #bottomSheet {
 body.dark #bottomSheet::-webkit-scrollbar-thumb {
     background: #444;
 }
+/* Game list container */
+.game-list-container {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.game-list-title {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.game-list-item {
+    padding: 3px 0;
+}
+
+/* DLC badge */
+#sheetDlcTag {
+    display: none;
+    margin-top: 10px;
+    align-self: flex-end;
+}
