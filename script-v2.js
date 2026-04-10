@@ -9,14 +9,14 @@ const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
 const darkToggle = document.getElementById("darkModeToggle");
 
-/* Bottom Sheet Elements */
+/* Bottom Sheet */
 const bottomSheet = document.getElementById("bottomSheet");
 const sheetSprite = document.getElementById("sheetSprite");
 const sheetName = document.getElementById("sheetName");
 const sheetDex = document.getElementById("sheetDex");
 const sheetTypes = document.getElementById("sheetTypes");
 const sheetEvolution = document.getElementById("sheetEvolution");
-const sheetDlcTag = document.getElementById("sheetDlcTag"); // DLC badge element (must exist in HTML)
+const sheetDlcTag = document.getElementById("sheetDlcTag");
 
 /* Per-generation progress */
 const genProgressEls = {
@@ -42,7 +42,6 @@ let imported = localStorage.getItem("importedFromSheet");
    GAME AVAILABILITY (POKÉAPI → POKEDEX → GAMES)
    ============================================================ */
 
-/* Only the games we discussed */
 const ALLOWED_GAMES = {
     "lets-go-pikachu": "Let's Go Pikachu",
     "lets-go-eevee": "Let's Go Eevee",
@@ -59,60 +58,36 @@ const ALLOWED_GAMES = {
     "the-indigo-disk": "The Indigo Disk"
 };
 
-/* Map Pokédex names from species data → our game keys */
 function mapPokedexToGames(pokedexNames) {
     const games = new Set();
 
-    pokedexNames.forEach(name => {
-        const n = name.toLowerCase();
+    pokedexNames.forEach(n => {
+        n = n.toLowerCase();
 
-        // Let's Go
         if (n.includes("lets-go")) {
             games.add("lets-go-pikachu");
             games.add("lets-go-eevee");
         }
 
-        // Galar base
         if (n === "galar" || n === "galar-pokedex") {
             games.add("sword");
             games.add("shield");
         }
 
-        // Galar DLC
-        if (n.includes("isle-of-armor") || n.includes("galar-isle-of-armor")) {
-            games.add("isle-of-armor");
-        }
-        if (n.includes("crown-tundra") || n.includes("galar-crown-tundra")) {
-            games.add("crown-tundra");
-        }
+        if (n.includes("isle-of-armor")) games.add("isle-of-armor");
+        if (n.includes("crown-tundra")) games.add("crown-tundra");
 
-        // Hisui
-        if (n.includes("hisui")) {
-            games.add("legends-arceus");
-        }
+        if (n.includes("hisui")) games.add("legends-arceus");
 
-        // Paldea base
         if (n === "paldea" || n === "paldea-pokedex") {
             games.add("scarlet");
             games.add("violet");
         }
 
-        // Kitakami (Teal Mask)
-        if (n.includes("kitakami")) {
-            games.add("the-teal-mask");
-        }
+        if (n.includes("kitakami")) games.add("the-teal-mask");
+        if (n.includes("blueberry")) games.add("the-indigo-disk");
 
-        // Blueberry (Indigo Disk)
-        if (n.includes("blueberry")) {
-            games.add("the-indigo-disk");
-        }
-
-        // Sinnoh → BDSP
-        if (
-            n.includes("sinnoh") ||
-            n === "original-sinnoh" ||
-            n === "updated-sinnoh"
-        ) {
+        if (n.includes("sinnoh")) {
             games.add("brilliant-diamond");
             games.add("shining-pearl");
         }
@@ -121,18 +96,16 @@ function mapPokedexToGames(pokedexNames) {
     return [...games].filter(g => ALLOWED_GAMES[g]);
 }
 
-/* DLC-only = appears in DLC games but NOT in base Sword/Shield or Scarlet/Violet */
 function isDlcOnly(gameKeys) {
-    const dlcGames = new Set(["isle-of-armor", "crown-tundra", "the-teal-mask", "the-indigo-disk"]);
-    const baseGames = new Set(["sword", "shield", "scarlet", "violet"]);
+    const dlc = ["isle-of-armor", "crown-tundra", "the-teal-mask", "the-indigo-disk"];
+    const base = ["sword", "shield", "scarlet", "violet"];
 
-    const hasDlc = gameKeys.some(g => dlcGames.has(g));
-    const hasBase = gameKeys.some(g => baseGames.has(g));
+    const hasDlc = gameKeys.some(g => dlc.includes(g));
+    const hasBase = gameKeys.some(g => base.includes(g));
 
     return hasDlc && !hasBase;
 }
 
-/* Fetch game availability from PokéAPI species → pokedex_numbers */
 async function fetchGameAvailability(dexNumber) {
     try {
         const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`);
@@ -142,57 +115,46 @@ async function fetchGameAvailability(dexNumber) {
             .map(entry => entry.pokedex.name.toLowerCase());
 
         return mapPokedexToGames(pokedexNames);
-    } catch (err) {
-        console.error("Error fetching game availability for Dex", dexNumber, err);
+    } catch {
         return [];
     }
 }
 
-/* Remove any existing game list from the bottom sheet */
 function clearGameList() {
-    if (!bottomSheet) return;
-    const existing = bottomSheet.querySelector(".game-list-container");
-    if (existing) existing.remove();
+    const old = bottomSheet.querySelector(".game-list-container");
+    if (old) old.remove();
 }
 
-/* Insert game list above the evolution section */
 function insertGameList(gameKeys) {
-    if (!bottomSheet || !sheetEvolution) return;
-    if (!gameKeys || gameKeys.length === 0) return;
+    if (!gameKeys.length) return;
 
     const container = document.createElement("div");
     container.className = "game-list-container";
 
     const title = document.createElement("div");
     title.className = "game-list-title";
-    title.textContent = "Games:";
+    title.textContent = "Appears In:";
     container.appendChild(title);
 
     gameKeys.forEach(key => {
-        const label = ALLOWED_GAMES[key];
-        if (!label) return;
         const row = document.createElement("div");
         row.className = "game-list-item";
-        row.textContent = label;
+        row.textContent = ALLOWED_GAMES[key];
         container.appendChild(row);
     });
 
     bottomSheet.insertBefore(container, sheetEvolution);
 }
 
-/* Update the gold [DLC-ONLY] badge at the very bottom, right-aligned */
 function updateDlcBadge(isDlc) {
-    if (!sheetDlcTag) return;
-
     if (!isDlc) {
         sheetDlcTag.style.display = "none";
-        sheetDlcTag.textContent = "";
         return;
     }
 
     sheetDlcTag.style.display = "block";
-    sheetDlcTag.textContent = "[DLC-ONLY]";
-    sheetDlcTag.style.backgroundColor = "#FFD700";
+    sheetDlcTag.textContent = "[DLC‑ONLY]";
+    sheetDlcTag.style.background = "#FFD700";
     sheetDlcTag.style.color = "black";
     sheetDlcTag.style.fontWeight = "bold";
     sheetDlcTag.style.padding = "4px 10px";
@@ -208,8 +170,8 @@ function padDex(num) {
     return num.toString().padStart(3, "0");
 }
 
-function getGeneration(dexNum) {
-    const n = parseInt(dexNum, 10);
+function getGeneration(n) {
+    n = parseInt(n);
     if (n <= 151) return 1;
     if (n <= 251) return 2;
     if (n <= 386) return 3;
@@ -221,34 +183,25 @@ function getGeneration(dexNum) {
     return 9;
 }
 
-/* Type icons from CDN */
 function typeIconSrc(type) {
-    if (!type) return null;
-    const key = type.toLowerCase();
-    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
+    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${type.toLowerCase()}.svg`;
 }
+
 /* ============================================================
    FETCH TYPES
    ============================================================ */
 async function fetchTypesFromPokeAPI(dexNumber) {
     try {
-        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
-        const data = await response.json();
-
-        const types = data.types.map(t => {
-            const name = t.type.name;
-            return name.charAt(0).toUpperCase() + name.slice(1);
-        });
-
-        return types.join("/");
-    } catch (error) {
-        console.error("Error fetching types for Dex", dexNumber, error);
-        return null;
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
+        const data = await res.json();
+        return data.types.map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)).join("/");
+    } catch {
+        return "";
     }
 }
 
 /* ============================================================
-   FETCH EVOLUTION INFO
+   EVOLUTION
    ============================================================ */
 async function fetchEvolutionData(dexNumber) {
     try {
@@ -259,36 +212,24 @@ async function fetchEvolutionData(dexNumber) {
         const evoData = await evoRes.json();
 
         return parseEvolutionChain(evoData.chain, dexNumber);
-    } catch (err) {
-        console.error("Evolution fetch error:", err);
+    } catch {
         return { prev: null, next: null };
     }
 }
 
-/* Parse evolution chain to find prev + next only */
 function parseEvolutionChain(chain, dexNumber) {
-    let prev = null;
-    let next = null;
+    let prev = null, next = null;
 
-    function search(node, parent) {
-        const url = node.species.url;
-        const id = url.split("/").slice(-2, -1)[0];
+    function walk(node, parent) {
+        const id = node.species.url.split("/").slice(-2, -1)[0];
 
         if (id === dexNumber) {
-            if (parent) {
-                prev = {
-                    id: parent.id,
-                    name: parent.name,
-                    method: parent.method
-                };
-            }
+            if (parent) prev = parent;
 
             if (node.evolves_to.length > 0) {
                 const evo = node.evolves_to[0];
-                const evoId = evo.species.url.split("/").slice(-2, -1)[0];
-
                 next = {
-                    id: evoId,
+                    id: evo.species.url.split("/").slice(-2, -1)[0],
                     name: evo.species.name,
                     method: evo.evolution_details[0]
                 };
@@ -296,19 +237,18 @@ function parseEvolutionChain(chain, dexNumber) {
         }
 
         node.evolves_to.forEach(evo => {
-            const evoId = evo.species.url.split("/").slice(-2, -1)[0];
-            const evoName = evo.species.name;
-            const evoMethod = evo.evolution_details[0];
-
-            search(evo, { id: id, name: node.species.name, method: evoMethod });
+            walk(evo, {
+                id,
+                name: node.species.name,
+                method: evo.evolution_details[0]
+            });
         });
     }
 
-    search(chain, null);
+    walk(chain, null);
     return { prev, next };
 }
 
-/* Convert evolution method to readable text */
 function formatEvolutionMethod(method) {
     if (!method) return "Unknown";
 
@@ -319,13 +259,11 @@ function formatEvolutionMethod(method) {
         return "Level up";
     }
 
-    if (method.trigger.name === "use-item") {
+    if (method.trigger.name === "use-item")
         return `Use ${method.item.name.replace("-", " ")}`;
-    }
 
-    if (method.trigger.name === "trade") {
+    if (method.trigger.name === "trade")
         return "Trade";
-    }
 
     return method.trigger.name.replace("-", " ");
 }
@@ -341,7 +279,7 @@ function closeBottomSheet() {
     bottomSheet.style.bottom = "-100%";
 }
 
-bottomSheet.addEventListener("click", (e) => {
+bottomSheet.addEventListener("click", e => {
     if (e.target === bottomSheet) closeBottomSheet();
 });
 
@@ -353,8 +291,7 @@ function saveTasks() {
 }
 
 function loadTasks() {
-    const saved = localStorage.getItem("tasks");
-    tasks = saved ? JSON.parse(saved) : [];
+    tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
 }
 
 /* ============================================================
@@ -363,33 +300,23 @@ function loadTasks() {
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
-    const percent = total === 0 ? "0.00" : ((caught / total) * 100).toFixed(2);
+    const percent = total ? ((caught / total) * 100).toFixed(2) : "0.00";
     progressDisplay.textContent = `${percent}% complete`;
 }
 
 function updateGenProgress() {
-    const genTotals = {};
-    const genCaught = {};
+    const totals = {}, caught = {};
 
-    tasks.forEach(task => {
-        const g = task.gen;
-        if (!genTotals[g]) {
-            genTotals[g] = 0;
-            genCaught[g] = 0;
-        }
-        genTotals[g]++;
-        if (task.completed) genCaught[g]++;
+    tasks.forEach(t => {
+        totals[t.gen] = (totals[t.gen] || 0) + 1;
+        if (t.completed) caught[t.gen] = (caught[t.gen] || 0) + 1;
     });
 
-    Object.keys(genProgressEls).forEach(genStr => {
-        const g = parseInt(genStr, 10);
-        const el = genProgressEls[g];
-        if (!el) return;
-
-        const total = genTotals[g] || 0;
-        const caught = genCaught[g] || 0;
-        const percent = total === 0 ? "0.00" : ((caught / total) * 100).toFixed(2);
-        el.textContent = `Gen ${g}: ${percent}%`;
+    Object.keys(genProgressEls).forEach(g => {
+        const total = totals[g] || 0;
+        const c = caught[g] || 0;
+        const percent = total ? ((c / total) * 100).toFixed(2) : "0.00";
+        genProgressEls[g].textContent = `Gen ${g}: ${percent}%`;
     });
 }
 
@@ -397,6 +324,7 @@ function updateAllProgress() {
     updateOverallProgress();
     updateGenProgress();
 }
+
 /* ============================================================
    SORTING
    ============================================================ */
@@ -407,21 +335,11 @@ function getSortedTasks() {
     if (mode === "name") {
         arr.sort((a, b) => a.name.localeCompare(b.name));
     } else if (mode === "caught") {
-        arr.sort((a, b) => {
-            if (a.completed === b.completed) {
-                return parseInt(a.dexRaw) - parseInt(b.dexRaw);
-            }
-            return a.completed ? -1 : 1;
-        });
+        arr.sort((a, b) => b.completed - a.completed || a.dexRaw - b.dexRaw);
     } else if (mode === "uncaught") {
-        arr.sort((a, b) => {
-            if (a.completed === b.completed) {
-                return parseInt(a.dexRaw) - parseInt(b.dexRaw);
-            }
-            return a.completed ? 1 : -1;
-        });
+        arr.sort((a, b) => a.completed - b.completed || a.dexRaw - b.dexRaw);
     } else {
-        arr.sort((a, b) => parseInt(a.dexRaw) - parseInt(b.dexRaw));
+        arr.sort((a, b) => a.dexRaw - b.dexRaw);
     }
 
     return arr;
@@ -434,12 +352,10 @@ function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
 
-    const fragment = document.createDocumentFragment();
     const shiny = shinyToggle.checked;
+    const sorted = getSortedTasks();
 
-    const sortedTasks = getSortedTasks();
-
-    sortedTasks.forEach(task => {
+    sorted.forEach(task => {
         if (
             !task.name.toLowerCase().includes(search) &&
             !task.dex.includes(search) &&
@@ -449,39 +365,30 @@ function renderTasks() {
         const li = document.createElement("li");
         li.className = task.completed ? "completed" : "";
 
-        const dexNum = parseInt(task.dexRaw, 10);
-        const spriteURL = shiny
-            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${dexNum}.png`
-            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexNum}.png`;
+        const sprite = shiny
+            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${task.dexRaw}.png`
+            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png`;
 
         const img = document.createElement("img");
         img.className = "sprite";
-        img.src = spriteURL;
+        img.src = sprite;
 
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        /* Three dots button */
         const moreBtn = document.createElement("button");
         moreBtn.className = "more-btn";
         moreBtn.textContent = "⋮";
 
-        moreBtn.addEventListener("click", async (e) => {
+        moreBtn.addEventListener("click", async e => {
             e.stopPropagation();
             await loadBottomSheet(task);
             openBottomSheet();
         });
 
         li.addEventListener("click", () => {
-            const realIndex = tasks.findIndex(t => t.dexRaw === task.dexRaw);
-            if (realIndex === -1) return;
-
-            tasks[realIndex].completed = !tasks[realIndex].completed;
+            task.completed = !task.completed;
             saveTasks();
-
-            li.classList.add("caught-anim");
-            setTimeout(() => li.classList.remove("caught-anim"), 250);
-
             renderTasks();
         });
 
@@ -489,10 +396,9 @@ function renderTasks() {
         li.appendChild(label);
         li.appendChild(moreBtn);
 
-        fragment.appendChild(li);
+        taskList.appendChild(li);
     });
 
-    taskList.appendChild(fragment);
     updateAllProgress();
 }
 
@@ -500,38 +406,27 @@ function renderTasks() {
    LOAD BOTTOM SHEET CONTENT
    ============================================================ */
 async function loadBottomSheet(task) {
-    const dexNum = parseInt(task.dexRaw, 10);
-
     sheetSprite.src =
-        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexNum}.png`;
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png`;
 
     sheetName.textContent = task.name;
     sheetDex.textContent = `#${task.dex}`;
 
-    /* Types */
     sheetTypes.innerHTML = "";
-    if (task.type) {
-        task.type.split("/").forEach(t => {
-            const icon = document.createElement("img");
-            icon.src = typeIconSrc(t);
-            sheetTypes.appendChild(icon);
-        });
-    }
+    task.type.split("/").forEach(t => {
+        const icon = document.createElement("img");
+        icon.src = typeIconSrc(t);
+        sheetTypes.appendChild(icon);
+    });
 
-    /* Games (from PokéAPI species → pokedex_numbers) */
     clearGameList();
-    if (sheetDlcTag) {
-        sheetDlcTag.style.display = "none";
-        sheetDlcTag.textContent = "";
-    }
+    sheetDlcTag.style.display = "none";
 
     const gameKeys = await fetchGameAvailability(task.dexRaw);
     insertGameList(gameKeys);
 
-    const dlcOnly = isDlcOnly(gameKeys);
-    updateDlcBadge(dlcOnly);
+    updateDlcBadge(isDlcOnly(gameKeys));
 
-    /* Evolution */
     sheetEvolution.innerHTML = "";
     const evo = await fetchEvolutionData(task.dexRaw);
 
@@ -567,6 +462,7 @@ async function loadBottomSheet(task) {
         sheetEvolution.appendChild(row);
     }
 }
+
 /* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
@@ -589,7 +485,6 @@ async function importFromSheet() {
 
             const dex = padDex(dexRaw);
             const gen = getGeneration(dexRaw);
-
             const type = await fetchTypesFromPokeAPI(dexRaw);
 
             tasks.push({
@@ -618,11 +513,11 @@ resetBtn.addEventListener("click", async () => {
     imported = null;
     tasks = [];
     progressDisplay.textContent = "0.00% complete";
+
     Object.values(genProgressEls).forEach(el => {
-        if (!el) return;
-        const txt = el.textContent;
-        el.textContent = txt.replace(/(\d+(\.\d+)?)%/, "0.00%");
+        el.textContent = el.textContent.replace(/(\d+(\.\d+)?)%/, "0.00%");
     });
+
     await importFromSheet();
 });
 
@@ -633,25 +528,4 @@ sortSelect.addEventListener("change", renderTasks);
 if (darkToggle) {
     darkToggle.addEventListener("change", () => {
         document.body.classList.toggle("dark", darkToggle.checked);
-        localStorage.setItem("darkMode", darkToggle.checked ? "1" : "0");
-    });
-
-    if (localStorage.getItem("darkMode") === "1") {
-        document.body.classList.add("dark");
-        darkToggle.checked = true;
-    }
-}
-
-/* ============================================================
-   INITIAL LOAD
-   ============================================================ */
-loadTasks();
-
-if (!imported) {
-    importFromSheet();
-} else {
-    tasks.forEach(t => {
-        if (!t.gen) t.gen = getGeneration(t.dexRaw);
-    });
-    renderTasks();
-}
+        localStorage.setItem("darkMode", dark
