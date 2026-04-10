@@ -19,8 +19,9 @@ const genProgressEls = {
     9: document.getElementById("gen9Progress"),
 };
 
-// 👉 Replace with your published Google Sheets CSV link
-const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
+// Your Google Sheets CSV link
+const GOOGLE_SHEET_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
@@ -44,31 +45,11 @@ function getGeneration(dexNum) {
     return 9;
 }
 
-// Map type name → Sword/Shield icon path
+// ⭐ NEW: CDN Type Icons (no folder needed)
 function typeIconSrc(type) {
     if (!type) return null;
     const key = type.toLowerCase();
-    const map = {
-        normal: "types/normal.png",
-        fire: "types/fire.png",
-        water: "types/water.png",
-        grass: "types/grass.png",
-        electric: "types/electric.png",
-        ice: "types/ice.png",
-        fighting: "types/fighting.png",
-        poison: "types/poison.png",
-        ground: "types/ground.png",
-        flying: "types/flying.png",
-        psychic: "types/psychic.png",
-        bug: "types/bug.png",
-        rock: "types/rock.png",
-        ghost: "types/ghost.png",
-        dragon: "types/dragon.png",
-        dark: "types/dark.png",
-        steel: "types/steel.png",
-        fairy: "types/fairy.png"
-    };
-    return map[key] || null;
+    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
 }
 
 // Fetch type(s) from PokéAPI for a given Dex number
@@ -135,13 +116,12 @@ function updateGenProgress() {
     });
 }
 
-// Combined progress update
 function updateAllProgress() {
     updateOverallProgress();
     updateGenProgress();
 }
 
-// Sort tasks based on current sort selection
+// Sorting logic
 function getSortedTasks() {
     const mode = sortSelect.value;
     const arr = [...tasks];
@@ -201,7 +181,7 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        // Type icons (supports dual types)
+        // ⭐ NEW: Type icons from CDN
         const typeContainer = document.createElement("span");
         typeContainer.className = "type-icon-container";
 
@@ -262,68 +242,4 @@ async function importFromSheet() {
             if (!dexRaw || !name) continue;
 
             const dex = padDex(dexRaw);
-            const gen = getGeneration(dexRaw);
-
-            const type = await fetchTypesFromPokeAPI(dexRaw);
-
-            tasks.push({
-                dex,
-                dexRaw,
-                name,
-                gen,
-                type,
-                completed: false
-            });
-        }
-
-        saveTasks();
-        localStorage.setItem("importedFromSheet", "true");
-        renderTasks();
-    } catch (error) {
-        console.error("Error importing from Google Sheets:", error);
-    }
-}
-
-// Reset button
-resetBtn.addEventListener("click", async () => {
-    localStorage.clear();
-    imported = null;
-    tasks = [];
-    progressDisplay.textContent = "0.00% complete";
-    Object.values(genProgressEls).forEach(el => {
-        if (!el) return;
-        const txt = el.textContent;
-        el.textContent = txt.replace(/(\d+(\.\d+)?)%/, "0.00%");
-    });
-    await importFromSheet();
-});
-
-// Listeners
-searchBar.addEventListener("input", renderTasks);
-shinyToggle.addEventListener("change", renderTasks);
-sortSelect.addEventListener("change", renderTasks);
-
-// Dark mode toggle
-if (darkToggle) {
-    darkToggle.addEventListener("change", () => {
-        document.body.classList.toggle("dark", darkToggle.checked);
-        localStorage.setItem("darkMode", darkToggle.checked ? "1" : "0");
-    });
-
-    if (localStorage.getItem("darkMode") === "1") {
-        document.body.classList.add("dark");
-        darkToggle.checked = true;
-    }
-}
-
-// INITIAL LOAD
-loadTasks();
-
-if (!imported) {
-    importFromSheet();
-} else {
-    tasks.forEach(t => {
-        if (!t.gen) t.gen = getGeneration(t.dexRaw);
-    });
-    renderTasks();
-}
+            const gen = get
