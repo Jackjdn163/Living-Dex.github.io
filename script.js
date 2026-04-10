@@ -20,8 +20,7 @@ const genProgressEls = {
 };
 
 // 👉 Replace with your published Google Sheets CSV link
-// Sheet should have at least: Dex,Name
-const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
+const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
@@ -79,11 +78,11 @@ async function fetchTypesFromPokeAPI(dexNumber) {
         const data = await response.json();
 
         const types = data.types.map(t => {
-            const name = t.type.name; // e.g. "grass"
-            return name.charAt(0).toUpperCase() + name.slice(1); // "Grass"
+            const name = t.type.name;
+            return name.charAt(0).toUpperCase() + name.slice(1);
         });
 
-        return types.join("/"); // "Grass/Poison"
+        return types.join("/");
     } catch (error) {
         console.error("Error fetching types for Dex", dexNumber, error);
         return null;
@@ -154,17 +153,17 @@ function getSortedTasks() {
             if (a.completed === b.completed) {
                 return parseInt(a.dexRaw) - parseInt(b.dexRaw);
             }
-            return a.completed ? -1 : 1; // caught first
+            return a.completed ? -1 : 1;
         });
     } else if (mode === "uncaught") {
         arr.sort((a, b) => {
             if (a.completed === b.completed) {
                 return parseInt(a.dexRaw) - parseInt(b.dexRaw);
             }
-            return a.completed ? 1 : -1; // uncaught first
+            return a.completed ? 1 : -1;
         });
     } else {
-        arr.sort((a, b) => parseInt(a.dexRaw) - parseInt(b.dexRaw)); // dex
+        arr.sort((a, b) => parseInt(a.dexRaw) - parseInt(b.dexRaw));
     }
 
     return arr;
@@ -202,11 +201,129 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        // Type icons (support dual types)
+        // Type icons (supports dual types)
         const typeContainer = document.createElement("span");
         typeContainer.className = "type-icon-container";
 
         if (task.type) {
-            const typeParts = task.type.split("/"); // e.g. ["Grass","Poison"]
+            const typeParts = task.type.split("/");
             typeParts.forEach(tName => {
+                const src = typeIconSrc(tName);
+                if (!src) return;
+                const typeImg = document.createElement("img");
+                typeImg.className = "type-icon";
+                typeImg.src = src;
+                typeImg.alt = tName;
+                typeImg.title = tName;
+                typeContainer.appendChild(typeImg);
+            });
+        }
 
+        li.addEventListener("click", () => {
+            const realIndex = tasks.findIndex(t => t.dexRaw === task.dexRaw);
+            if (realIndex === -1) return;
+
+            tasks[realIndex].completed = !tasks[realIndex].completed;
+            saveTasks();
+
+            li.classList.add("caught-anim");
+            setTimeout(() => li.classList.remove("caught-anim"), 250);
+
+            renderTasks();
+        });
+
+        li.appendChild(img);
+        li.appendChild(label);
+        li.appendChild(typeContainer);
+
+        fragment.appendChild(li);
+    });
+
+    taskList.appendChild(fragment);
+    updateAllProgress();
+}
+
+// Import Pokédex data (Dex + Name, types auto from PokéAPI)
+async function importFromSheet() {
+    try {
+        const response = await fetch(GOOGLE_SHEET_URL);
+        const csv = await response.text();
+        const rows = csv.split("\n").slice(1);
+
+        tasks = [];
+
+        for (const row of rows) {
+            if (!row.trim()) continue;
+
+            const cols = row.split(",");
+            const dexRaw = cols[0]?.trim();
+            const name = cols[1]?.trim();
+
+            if (!dexRaw || !name) continue;
+
+            const dex = padDex(dexRaw);
+            const gen = getGeneration(dexRaw);
+
+            const type = await fetchTypesFromPokeAPI(dexRaw);
+
+            tasks.push({
+                dex,
+                dexRaw,
+                name,
+                gen,
+                type,
+                completed: false
+            });
+        }
+
+        saveTasks();
+        localStorage.setItem("importedFromSheet", "true");
+        renderTasks();
+    } catch (error) {
+        console.error("Error importing from Google Sheets:", error);
+    }
+}
+
+// Reset button
+resetBtn.addEventListener("click", async () => {
+    localStorage.clear();
+    imported = null;
+    tasks = [];
+    progressDisplay.textContent = "0.00% complete";
+    Object.values(genProgressEls).forEach(el => {
+        if (!el) return;
+        const txt = el.textContent;
+        el.textContent = txt.replace(/(\d+(\.\d+)?)%/, "0.00%");
+    });
+    await importFromSheet();
+});
+
+// Listeners
+searchBar.addEventListener("input", renderTasks);
+shinyToggle.addEventListener("change", renderTasks);
+sortSelect.addEventListener("change", renderTasks);
+
+// Dark mode toggle
+if (darkToggle) {
+    darkToggle.addEventListener("change", () => {
+        document.body.classList.toggle("dark", darkToggle.checked);
+        localStorage.setItem("darkMode", darkToggle.checked ? "1" : "0");
+    });
+
+    if (localStorage.getItem("darkMode") === "1") {
+        document.body.classList.add("dark");
+        darkToggle.checked = true;
+    }
+}
+
+// INITIAL LOAD
+loadTasks();
+
+if (!imported) {
+    importFromSheet();
+} else {
+    tasks.forEach(t => {
+        if (!t.gen) t.gen = getGeneration(t.dexRaw);
+    });
+    renderTasks();
+}
