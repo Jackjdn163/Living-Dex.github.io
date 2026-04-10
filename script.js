@@ -1,3 +1,6 @@
+/* ============================================================
+   ELEMENT REFERENCES
+   ============================================================ */
 const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
 const progressDisplay = document.getElementById("progress");
@@ -6,6 +9,16 @@ const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
 const darkToggle = document.getElementById("darkModeToggle");
 
+/* Bottom Sheet Elements */
+const bottomSheet = document.getElementById("bottomSheet");
+const sheetSprite = document.getElementById("sheetSprite");
+const sheetName = document.getElementById("sheetName");
+const sheetDex = document.getElementById("sheetDex");
+const sheetTypes = document.getElementById("sheetTypes");
+const sheetGames = document.getElementById("sheetGames");
+const sheetEvolution = document.getElementById("sheetEvolution");
+
+/* Per-generation progress */
 const genProgressEls = {
     1: document.getElementById("gen1Progress"),
     2: document.getElementById("gen2Progress"),
@@ -18,12 +31,16 @@ const genProgressEls = {
     9: document.getElementById("gen9Progress"),
 };
 
+/* Google Sheet */
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
 
+/* ============================================================
+   HELPERS
+   ============================================================ */
 function padDex(num) {
     return num.toString().padStart(3, "0");
 }
@@ -41,12 +58,29 @@ function getGeneration(dexNum) {
     return 9;
 }
 
+/* Type icons from CDN */
 function typeIconSrc(type) {
     if (!type) return null;
     const key = type.toLowerCase();
     return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
 }
 
+/* Switch-only game mapping */
+const SWITCH_GAMES = {
+    "scarlet": "Scarlet/Violet",
+    "violet": "Scarlet/Violet",
+    "sword": "Sword/Shield",
+    "shield": "Sword/Shield",
+    "lets-go-pikachu": "Let's Go Pikachu/Eevee",
+    "lets-go-eevee": "Let's Go Pikachu/Eevee",
+    "legends-arceus": "Legends Arceus",
+    "brilliant-diamond": "BDSP",
+    "shining-pearl": "BDSP"
+};
+
+/* ============================================================
+   FETCH TYPES
+   ============================================================ */
 async function fetchTypesFromPokeAPI(dexNumber) {
     try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
@@ -64,6 +98,133 @@ async function fetchTypesFromPokeAPI(dexNumber) {
     }
 }
 
+/* ============================================================
+   FETCH EVOLUTION INFO
+   ============================================================ */
+async function fetchEvolutionData(dexNumber) {
+    try {
+        const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`);
+        const speciesData = await speciesRes.json();
+
+        const evoRes = await fetch(speciesData.evolution_chain.url);
+        const evoData = await evoRes.json();
+
+        return parseEvolutionChain(evoData.chain, dexNumber);
+    } catch (err) {
+        console.error("Evolution fetch error:", err);
+        return { prev: null, next: null };
+    }
+}
+
+/* Parse evolution chain to find prev + next only */
+function parseEvolutionChain(chain, dexNumber) {
+    let prev = null;
+    let next = null;
+
+    function search(node, parent) {
+        const url = node.species.url;
+        const id = url.split("/").slice(-2, -1)[0];
+
+        if (id === dexNumber) {
+            if (parent) {
+                prev = {
+                    id: parent.id,
+                    name: parent.name,
+                    method: parent.method
+                };
+            }
+
+            if (node.evolves_to.length > 0) {
+                const evo = node.evolves_to[0];
+                const evoId = evo.species.url.split("/").slice(-2, -1)[0];
+
+                next = {
+                    id: evoId,
+                    name: evo.species.name,
+                    method: evo.evolution_details[0]
+                };
+            }
+        }
+
+        node.evolves_to.forEach(evo => {
+            const evoId = evo.species.url.split("/").slice(-2, -1)[0];
+            const evoName = evo.species.name;
+            const evoMethod = evo.evolution_details[0];
+
+            search(evo, { id: id, name: node.species.name, method: evoMethod });
+        });
+    }
+
+    search(chain, null);
+    return { prev, next };
+}
+
+/* Convert evolution method to readable text */
+function formatEvolutionMethod(method) {
+    if (!method) return "Unknown";
+
+    if (method.trigger.name === "level-up") {
+        if (method.min_level) return `Level ${method.min_level}`;
+        if (method.min_happiness) return "Friendship";
+        if (method.time_of_day) return `Level up at ${method.time_of_day}`;
+        return "Level up";
+    }
+
+    if (method.trigger.name === "use-item") {
+        return `Use ${method.item.name.replace("-", " ")}`;
+    }
+
+    if (method.trigger.name === "trade") {
+        return "Trade";
+    }
+
+    return method.trigger.name.replace("-", " ");
+}
+
+/* ============================================================
+   FETCH GAME APPEARANCES
+   ============================================================ */
+async function fetchGameAppearances(dexNumber) {
+    try {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
+        const data = await res.json();
+
+        const games = new Set();
+
+        data.game_indices.forEach(entry => {
+            const game = entry.version.name;
+            if (SWITCH_GAMES[game]) {
+                games.add(SWITCH_GAMES[game]);
+            }
+        });
+
+        games.add("Legends Z-A (Not available yet)");
+
+        return [...games];
+    } catch (err) {
+        console.error("Game fetch error:", err);
+        return [];
+    }
+}
+
+/* ============================================================
+   BOTTOM SHEET
+   ============================================================ */
+function openBottomSheet() {
+    bottomSheet.style.bottom = "0";
+}
+
+function closeBottomSheet() {
+    bottomSheet.style.bottom = "-100%";
+}
+
+bottomSheet.addEventListener("click", (e) => {
+    if (e.target === bottomSheet) closeBottomSheet();
+});
+
+/* ============================================================
+   SAVE / LOAD
+   ============================================================ */
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
@@ -73,6 +234,9 @@ function loadTasks() {
     tasks = saved ? JSON.parse(saved) : [];
 }
 
+/* ============================================================
+   PROGRESS
+   ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
@@ -111,6 +275,9 @@ function updateAllProgress() {
     updateGenProgress();
 }
 
+/* ============================================================
+   SORTING
+   ============================================================ */
 function getSortedTasks() {
     const mode = sortSelect.value;
     const arr = [...tasks];
@@ -138,6 +305,9 @@ function getSortedTasks() {
     return arr;
 }
 
+/* ============================================================
+   RENDER LIST
+   ============================================================ */
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
@@ -169,22 +339,16 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        const typeContainer = document.createElement("span");
-        typeContainer.className = "type-icon-container";
+        /* Three dots button */
+        const moreBtn = document.createElement("button");
+        moreBtn.className = "more-btn";
+        moreBtn.textContent = "⋮";
 
-        if (task.type) {
-            const typeParts = task.type.split("/");
-            typeParts.forEach(tName => {
-                const src = typeIconSrc(tName);
-                if (!src) return;
-                const typeImg = document.createElement("img");
-                typeImg.className = "type-icon";
-                typeImg.src = src;
-                typeImg.alt = tName;
-                typeImg.title = tName;
-                typeContainer.appendChild(typeImg);
-            });
-        }
+        moreBtn.addEventListener("click", async (e) => {
+            e.stopPropagation();
+            await loadBottomSheet(task);
+            openBottomSheet();
+        });
 
         li.addEventListener("click", () => {
             const realIndex = tasks.findIndex(t => t.dexRaw === task.dexRaw);
@@ -201,7 +365,7 @@ function renderTasks() {
 
         li.appendChild(img);
         li.appendChild(label);
-        li.appendChild(typeContainer);
+        li.appendChild(moreBtn);
 
         fragment.appendChild(li);
     });
@@ -210,6 +374,77 @@ function renderTasks() {
     updateAllProgress();
 }
 
+/* ============================================================
+   LOAD BOTTOM SHEET CONTENT
+   ============================================================ */
+async function loadBottomSheet(task) {
+    const dexNum = parseInt(task.dexRaw, 10);
+
+    sheetSprite.src =
+        `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexNum}.png`;
+
+    sheetName.textContent = task.name;
+    sheetDex.textContent = `#${task.dex}`;
+
+    /* Types */
+    sheetTypes.innerHTML = "";
+    if (task.type) {
+        task.type.split("/").forEach(t => {
+            const icon = document.createElement("img");
+            icon.src = typeIconSrc(t);
+            sheetTypes.appendChild(icon);
+        });
+    }
+
+    /* Games */
+    sheetGames.innerHTML = "";
+    const games = await fetchGameAppearances(task.dexRaw);
+    games.forEach(g => {
+        const li = document.createElement("li");
+        li.textContent = g;
+        sheetGames.appendChild(li);
+    });
+
+    /* Evolution */
+    sheetEvolution.innerHTML = "";
+    const evo = await fetchEvolutionData(task.dexRaw);
+
+    if (evo.prev) {
+        const row = document.createElement("div");
+        row.className = "evoRow";
+
+        const img = document.createElement("img");
+        img.src =
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.prev.id}.png`;
+
+        const txt = document.createElement("div");
+        txt.textContent = `${evo.prev.name} — ${formatEvolutionMethod(evo.prev.method)}`;
+
+        row.appendChild(img);
+        row.appendChild(txt);
+        sheetEvolution.appendChild(row);
+    }
+
+    if (evo.next) {
+        const row = document.createElement("div");
+        row.className = "evoRow";
+
+        const img = document.createElement("img");
+        img.src =
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.next.id}.png`;
+
+        const txt = document.createElement("div");
+        txt.textContent = `${evo.next.name} — ${formatEvolutionMethod(evo.next.method)}`;
+
+        row.appendChild(img);
+        row.appendChild(txt);
+        sheetEvolution.appendChild(row);
+    }
+}
+
+/* ============================================================
+   IMPORT FROM SHEET
+   ============================================================ */
 async function importFromSheet() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL);
@@ -250,6 +485,9 @@ async function importFromSheet() {
     }
 }
 
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
 resetBtn.addEventListener("click", async () => {
     localStorage.clear();
     imported = null;
@@ -279,6 +517,9 @@ if (darkToggle) {
     }
 }
 
+/* ============================================================
+   INITIAL LOAD
+   ============================================================ */
 loadTasks();
 
 if (!imported) {
