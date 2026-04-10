@@ -90,7 +90,6 @@ body.dark li:hover {
     text-decoration: line-through;
 }
 
-/* Caught animation */
 .caught-anim {
     animation: pop 0.25s ease-out;
 }
@@ -101,7 +100,6 @@ body.dark li:hover {
     100% { transform: scale(1); }
 }
 
-/* Type icons */
 .type-icon {
     width: 24px;
     height: 24px;
