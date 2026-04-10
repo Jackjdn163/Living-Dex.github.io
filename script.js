@@ -481,3 +481,138 @@ if (!imported) {
     });
     renderTasks();
 }
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
+
+const ALLOWED_GAMES = {
+    "lets-go-pikachu": "Let's Go Pikachu",
+    "lets-go-eevee": "Let's Go Eevee",
+    "sword": "Sword",
+    "shield": "Shield",
+    "isle-of-armor": "Isle of Armor",
+    "crown-tundra": "Crown Tundra",
+    "brilliant-diamond": "Brilliant Diamond",
+    "shining-pearl": "Shining Pearl",
+    "legends-arceus": "Legends Arceus",
+    "scarlet": "Scarlet",
+    "violet": "Violet",
+    "the-teal-mask": "The Teal Mask",
+    "the-indigo-disk": "The Indigo Disk"
+};
+
+function createElement(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text) el.textContent = text;
+    return el;
+}
+async function fetchPokemonData(id) {
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+    return await res.json();
+}
+
+async function fetchSpeciesData(id) {
+    const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${id}`);
+    return await res.json();
+}
+
+async function fetchPokedexEntries(speciesData) {
+    const entries = speciesData.pokedex_numbers || [];
+    return entries.map(e => e.pokedex.name.toLowerCase());
+}
+function mapPokedexToGames(pokedexList) {
+    const games = new Set();
+
+    for (const dex of pokedexList) {
+        if (dex.includes("lets-go")) {
+            games.add("lets-go-pikachu");
+            games.add("lets-go-eevee");
+        }
+        if (dex.includes("galar")) {
+            games.add("sword");
+            games.add("shield");
+        }
+        if (dex.includes("isle-of-armor")) games.add("isle-of-armor");
+        if (dex.includes("crown-tundra")) games.add("crown-tundra");
+        if (dex.includes("hisui")) games.add("legends-arceus");
+        if (dex.includes("paldea")) {
+            games.add("scarlet");
+            games.add("violet");
+        }
+        if (dex.includes("kitakami")) games.add("the-teal-mask");
+        if (dex.includes("blueberry")) games.add("the-indigo-disk");
+        if (dex.includes("sinnoh")) {
+            games.add("brilliant-diamond");
+            games.add("shining-pearl");
+        }
+    }
+
+    return [...games].filter(g => ALLOWED_GAMES[g]);
+}
+
+function isDlcOnly(gameList) {
+    const dlcGames = ["isle-of-armor", "crown-tundra", "the-teal-mask", "the-indigo-disk"];
+    const baseGames = ["sword", "shield", "scarlet", "violet"];
+
+    const hasDlc = gameList.some(g => dlcGames.includes(g));
+    const hasBase = gameList.some(g => baseGames.includes(g));
+
+    return hasDlc && !hasBase;
+}
+function insertGameList(gameList) {
+    const sheet = document.getElementById("bottomSheet");
+    const evoFrom = document.getElementById("sheetEvoFrom");
+    const evoTo = document.getElementById("sheetEvoTo");
+
+    const anchor = evoFrom || evoTo || document.getElementById("sheetDlcTag");
+
+    const container = createElement("div", "game-list-container");
+    const title = createElement("div", "game-list-title", "Games:");
+    container.appendChild(title);
+
+    gameList.forEach(g => {
+        const item = createElement("div", "game-list-item", ALLOWED_GAMES[g]);
+        container.appendChild(item);
+    });
+
+    sheet.insertBefore(container, anchor);
+}
+function updateDlcBadge(isDlc) {
+    const tag = document.getElementById("sheetDlcTag");
+
+    if (!isDlc) {
+        tag.textContent = "";
+        tag.style.display = "none";
+        return;
+    }
+
+    tag.style.display = "block";
+    tag.textContent = "[DLC‑ONLY]";
+    tag.style.background = "#FFD700";
+    tag.style.color = "black";
+    tag.style.fontWeight = "bold";
+    tag.style.padding = "4px 10px";
+    tag.style.borderRadius = "20px";
+    tag.style.float = "right";
+    tag.style.marginTop = "10px";
+}
+async function openSheet(id) {
+    const data = await fetchPokemonData(id);
+    const species = await fetchSpeciesData(id);
+    const pokedexList = await fetchPokedexEntries(species);
+
+    const gameList = mapPokedexToGames(pokedexList);
+    const dlcOnly = isDlcOnly(gameList);
+
+    document.getElementById("sheetName").textContent = data.name.toUpperCase();
+    document.getElementById("sheetNumber").textContent = "#" + id;
+
+    document.querySelectorAll(".game-list-container").forEach(e => e.remove());
+    insertGameList(gameList);
+
+    updateDlcBadge(dlcOnly);
+
+    document.getElementById("bottomSheet").classList.add("open");
+}
+function closeSheet() {
+    document.getElementById("bottomSheet").classList.remove("open");
+}
