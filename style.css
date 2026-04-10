@@ -3,6 +3,12 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
+    transition: background 0.3s, color 0.3s;
+}
+
+body.dark {
+    background: #1a1a1a;
+    color: white;
 }
 
 .container {
@@ -22,15 +28,27 @@ h1 {
     border: 1px solid #ccc;
 }
 
-#progress {
-    font-size: 20px;
-    font-weight: bold;
+.toggle {
+    display: block;
     margin-bottom: 10px;
 }
 
-#genProgress div {
-    margin-bottom: 4px;
+#floatingStats {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    background: rgba(255,255,255,0.9);
+    padding: 15px;
+    border-radius: 10px;
+    width: 160px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 9999;
     font-size: 14px;
+}
+
+body.dark #floatingStats {
+    background: rgba(30,30,30,0.9);
+    color: white;
 }
 
 ul {
@@ -50,8 +68,16 @@ li {
     transition: 0.2s;
 }
 
+body.dark li {
+    background: #2a2a2a;
+}
+
 li:hover {
     background: #e9e9e9;
+}
+
+body.dark li:hover {
+    background: #333;
 }
 
 .sprite {
@@ -75,20 +101,15 @@ li:hover {
     100% { transform: scale(1); }
 }
 
-/* Optional type colors */
-.type-grass { background: #d8f5d0; }
-.type-fire { background: #ffd6c9; }
-.type-water { background: #d0e7ff; }
-.type-bug { background: #e3f2c1; }
-.type-normal { background: #f0f0f0; }
-.type-poison { background: #e8d0ff; }
-.type-electric { background: #fff7c2; }
-.type-ground { background: #f3e2c0; }
-.type-fairy { background: #ffe0f7; }
-.type-fighting { background: #ffd1d1; }
-.type-psychic { background: #ffd1f0; }
-.type-rock { background: #e6d8b8; }
-.type-ghost { background: #dcd0ff; }
-.type-ice { background: #d0f7ff; }
-.type-dragon { background: #d0c8ff; }
+/* Type icons */
+.type-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
+}
 
+.type-icon-container {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+}
