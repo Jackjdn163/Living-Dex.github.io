@@ -15,7 +15,6 @@ const sheetSprite = document.getElementById("sheetSprite");
 const sheetName = document.getElementById("sheetName");
 const sheetDex = document.getElementById("sheetDex");
 const sheetTypes = document.getElementById("sheetTypes");
-const sheetGames = document.getElementById("sheetGames");
 const sheetEvolution = document.getElementById("sheetEvolution");
 
 /* Per-generation progress */
@@ -64,19 +63,6 @@ function typeIconSrc(type) {
     const key = type.toLowerCase();
     return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
 }
-
-/* Switch-only game mapping */
-const SWITCH_GAMES = {
-    "scarlet": "Scarlet/Violet",
-    "violet": "Scarlet/Violet",
-    "sword": "Sword/Shield",
-    "shield": "Sword/Shield",
-    "lets-go-pikachu": "Let's Go Pikachu/Eevee",
-    "lets-go-eevee": "Let's Go Pikachu/Eevee",
-    "legends-arceus": "Legends Arceus",
-    "brilliant-diamond": "BDSP",
-    "shining-pearl": "BDSP"
-};
 
 /* ============================================================
    FETCH TYPES
@@ -179,32 +165,6 @@ function formatEvolutionMethod(method) {
     }
 
     return method.trigger.name.replace("-", " ");
-}
-
-/* ============================================================
-   FETCH GAME APPEARANCES
-   ============================================================ */
-async function fetchGameAppearances(dexNumber) {
-    try {
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
-        const data = await res.json();
-
-        const games = new Set();
-
-        data.game_indices.forEach(entry => {
-            const game = entry.version.name;
-            if (SWITCH_GAMES[game]) {
-                games.add(SWITCH_GAMES[game]);
-            }
-        });
-
-        games.add("Legends Z-A (Not available yet)");
-
-        return [...games];
-    } catch (err) {
-        console.error("Game fetch error:", err);
-        return [];
-    }
 }
 
 /* ============================================================
@@ -395,15 +355,6 @@ async function loadBottomSheet(task) {
             sheetTypes.appendChild(icon);
         });
     }
-
-    /* Games */
-    sheetGames.innerHTML = "";
-    const games = await fetchGameAppearances(task.dexRaw);
-    games.forEach(g => {
-        const li = document.createElement("li");
-        li.textContent = g;
-        sheetGames.appendChild(li);
-    });
 
     /* Evolution */
     sheetEvolution.innerHTML = "";
