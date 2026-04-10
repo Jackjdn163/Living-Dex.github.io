@@ -6,7 +6,6 @@ const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
 const darkToggle = document.getElementById("darkModeToggle");
 
-// Per-generation progress elements
 const genProgressEls = {
     1: document.getElementById("gen1Progress"),
     2: document.getElementById("gen2Progress"),
@@ -19,19 +18,16 @@ const genProgressEls = {
     9: document.getElementById("gen9Progress"),
 };
 
-// Your Google Sheets CSV link
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
 
-// Pad dex numbers to 3 digits (1 → 001)
 function padDex(num) {
     return num.toString().padStart(3, "0");
 }
 
-// Determine generation from dex number
 function getGeneration(dexNum) {
     const n = parseInt(dexNum, 10);
     if (n <= 151) return 1;
@@ -45,14 +41,12 @@ function getGeneration(dexNum) {
     return 9;
 }
 
-// ⭐ NEW: CDN Type Icons (no folder needed)
 function typeIconSrc(type) {
     if (!type) return null;
     const key = type.toLowerCase();
     return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
 }
 
-// Fetch type(s) from PokéAPI for a given Dex number
 async function fetchTypesFromPokeAPI(dexNumber) {
     try {
         const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
@@ -70,18 +64,15 @@ async function fetchTypesFromPokeAPI(dexNumber) {
     }
 }
 
-// Save tasks
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Load tasks from storage
 function loadTasks() {
     const saved = localStorage.getItem("tasks");
     tasks = saved ? JSON.parse(saved) : [];
 }
 
-// Update overall % complete (2 decimals)
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
@@ -89,7 +80,6 @@ function updateOverallProgress() {
     progressDisplay.textContent = `${percent}% complete`;
 }
 
-// Update per-generation percentages (2 decimals)
 function updateGenProgress() {
     const genTotals = {};
     const genCaught = {};
@@ -121,7 +111,6 @@ function updateAllProgress() {
     updateGenProgress();
 }
 
-// Sorting logic
 function getSortedTasks() {
     const mode = sortSelect.value;
     const arr = [...tasks];
@@ -149,7 +138,6 @@ function getSortedTasks() {
     return arr;
 }
 
-// Render tasks
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
@@ -181,7 +169,6 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        // ⭐ NEW: Type icons from CDN
         const typeContainer = document.createElement("span");
         typeContainer.className = "type-icon-container";
 
@@ -223,7 +210,6 @@ function renderTasks() {
     updateAllProgress();
 }
 
-// Import Pokédex data (Dex + Name, types auto from PokéAPI)
 async function importFromSheet() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL);
@@ -242,4 +228,64 @@ async function importFromSheet() {
             if (!dexRaw || !name) continue;
 
             const dex = padDex(dexRaw);
-            const gen = get
+            const gen = getGeneration(dexRaw);
+
+            const type = await fetchTypesFromPokeAPI(dexRaw);
+
+            tasks.push({
+                dex,
+                dexRaw,
+                name,
+                gen,
+                type,
+                completed: false
+            });
+        }
+
+        saveTasks();
+        localStorage.setItem("importedFromSheet", "true");
+        renderTasks();
+    } catch (error) {
+        console.error("Error importing from Google Sheets:", error);
+    }
+}
+
+resetBtn.addEventListener("click", async () => {
+    localStorage.clear();
+    imported = null;
+    tasks = [];
+    progressDisplay.textContent = "0.00% complete";
+    Object.values(genProgressEls).forEach(el => {
+        if (!el) return;
+        const txt = el.textContent;
+        el.textContent = txt.replace(/(\d+(\.\d+)?)%/, "0.00%");
+    });
+    await importFromSheet();
+});
+
+searchBar.addEventListener("input", renderTasks);
+shinyToggle.addEventListener("change", renderTasks);
+sortSelect.addEventListener("change", renderTasks);
+
+if (darkToggle) {
+    darkToggle.addEventListener("change", () => {
+        document.body.classList.toggle("dark", darkToggle.checked);
+        localStorage.setItem("darkMode", darkToggle.checked ? "1" : "0");
+    });
+
+    if (localStorage.getItem("darkMode") === "1") {
+        document.body.classList.add("dark");
+        darkToggle.checked = true;
+    }
+}
+
+loadTasks();
+
+if (!imported) {
+    importFromSheet();
+} else {
+    tasks.forEach(t => {
+        if (!t.gen) t.gen = getGeneration(t.dexRaw);
+    });
+    renderTasks();
+}
