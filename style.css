@@ -101,9 +101,11 @@ body.dark li:hover {
 }
 
 .type-icon {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    aspect-ratio: 1 / 1;
     margin-left: 4px;
+}
+
 }
 
 .type-icon-container {
