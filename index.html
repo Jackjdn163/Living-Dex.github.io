@@ -8,27 +8,27 @@
 </head>
 <body>
 
+    <!-- Floating Stats Box -->
+    <div id="floatingStats">
+        <div id="progress">0.00% complete</div>
+        <div id="genProgress">
+            <div id="gen1Progress">Gen 1: 0.00%</div>
+            <div id="gen2Progress">Gen 2: 0.00%</div>
+            <div id="gen3Progress">Gen 3: 0.00%</div>
+            <div id="gen4Progress">Gen 4: 0.00%</div>
+            <div id="gen5Progress">Gen 5: 0.00%</div>
+            <div id="gen6Progress">Gen 6: 0.00%</div>
+            <div id="gen7Progress">Gen 7: 0.00%</div>
+            <div id="gen8Progress">Gen 8: 0.00%</div>
+            <div id="gen9Progress">Gen 9: 0.00%</div>
+        </div>
+    </div>
+
     <div class="container">
         <h1>Living Dex Checklist</h1>
 
         <!-- Search bar -->
         <input id="searchBar" type="text" placeholder="Search Pokémon...">
-
-        <!-- Overall percentage -->
-        <div id="progress">0% complete</div>
-
-        <!-- Per-generation percentages -->
-        <div id="genProgress">
-            <div id="gen1Progress">Gen 1: 0%</div>
-            <div id="gen2Progress">Gen 2: 0%</div>
-            <div id="gen3Progress">Gen 3: 0%</div>
-            <div id="gen4Progress">Gen 4: 0%</div>
-            <div id="gen5Progress">Gen 5: 0%</div>
-            <div id="gen6Progress">Gen 6: 0%</div>
-            <div id="gen7Progress">Gen 7: 0%</div>
-            <div id="gen8Progress">Gen 8: 0%</div>
-            <div id="gen9Progress">Gen 9: 0%</div>
-        </div>
 
         <!-- Shiny toggle -->
         <label class="toggle">
@@ -36,11 +36,18 @@
             Shiny sprites
         </label>
 
+        <!-- Dark mode toggle -->
+        <label class="toggle">
+            <input type="checkbox" id="darkModeToggle">
+            Dark Mode
+        </label>
+
         <!-- Sorting -->
         <select id="sortSelect">
             <option value="dex">Sort by Dex</option>
             <option value="name">Sort by Name</option>
             <option value="caught">Sort by Caught</option>
+            <option value="uncaught">Sort by Uncaught</option>
         </select>
 
         <!-- Reset button -->
