@@ -21,7 +21,7 @@ const genProgressEls = {
 
 // 👉 Replace with your published Google Sheets CSV link
 // Sheet should have at least: Dex,Name
-const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
