@@ -26,46 +26,50 @@ function updateProgress() {
     progressDisplay.textContent = `${percent}% complete`;
 }
 
-// Render tasks
+// Render tasks (optimized)
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
 
-    tasks
-        .filter(t => 
-            t.name.toLowerCase().includes(search) ||
-            t.dex.includes(search) ||
-            t.dexRaw.includes(search)
-        )
-        .forEach((task, index) => {
-            const li = document.createElement("li");
-            li.className = task.completed ? "completed" : "";
+    const fragment = document.createDocumentFragment();
 
-            // Sprite uses RAW number (1, 25, 151)
-            const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${parseInt(task.dexRaw)}.png`;
+    tasks.forEach((task, index) => {
+        if (
+            !task.name.toLowerCase().includes(search) &&
+            !task.dex.includes(search) &&
+            !task.dexRaw.includes(search)
+        ) return;
 
-            li.innerHTML = `
-                <img class="sprite" src="${spriteURL}" alt="${task.name}">
-                <strong>#${task.dex} — ${task.name}</strong>
-                <button class="delete-btn">X</button>
-            `;
+        const li = document.createElement("li");
+        li.className = task.completed ? "completed" : "";
 
-            li.addEventListener("click", () => {
-                tasks[index].completed = !tasks[index].completed;
-                saveTasks();
-                renderTasks();
-            });
+        const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${parseInt(task.dexRaw)}.png`;
 
-            li.querySelector(".delete-btn").addEventListener("click", (e) => {
-                e.stopPropagation();
-                tasks.splice(index, 1);
-                saveTasks();
-                renderTasks();
-            });
+        li.innerHTML = `
+            <img class="sprite" src="${spriteURL}" alt="${task.name}">
+            <strong>#${task.dex} — ${task.name}</strong>
+            <button class="delete-btn">X</button>
+        `;
 
-            taskList.appendChild(li);
+        // Toggle completion
+        li.addEventListener("click", () => {
+            tasks[index].completed = !tasks[index].completed;
+            saveTasks();
+            renderTasks();
         });
 
+        // Delete button
+        li.querySelector(".delete-btn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            tasks.splice(index, 1);
+            saveTasks();
+            renderTasks();
+        });
+
+        fragment.appendChild(li);
+    });
+
+    taskList.appendChild(fragment);
     updateProgress();
 }
 
@@ -76,19 +80,19 @@ async function importFromSheet() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL);
         const csv = await response.text();
-        const rows = csv.split("\n").slice(1); // Skip header row
+        const rows = csv.split("\n").slice(1);
 
         rows.forEach(row => {
             const cols = row.split(",");
-            const dexRaw = cols[0]?.trim();   // e.g. "1"
+            const dexRaw = cols[0]?.trim();
             const name = cols[1]?.trim();
 
             if (dexRaw && name) {
-                const dex = padDex(dexRaw);   // "001"
+                const dex = padDex(dexRaw);
 
                 tasks.push({
-                    dex,          // padded for display
-                    dexRaw,       // raw number for sprite
+                    dex,
+                    dexRaw,
                     name,
                     completed: false
                 });
