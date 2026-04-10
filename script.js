@@ -2,7 +2,7 @@ const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
 const progressDisplay = document.getElementById("progress");
 
-// 👉 Replace with your published Google Sheets CSV link
+https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv
 const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
