@@ -4,6 +4,7 @@ const progressDisplay = document.getElementById("progress");
 const resetBtn = document.getElementById("resetBtn");
 const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
+const darkToggle = document.getElementById("darkModeToggle");
 
 // Per-generation progress elements
 const genProgressEls = {
@@ -19,7 +20,8 @@ const genProgressEls = {
 };
 
 // 👉 Replace with your published Google Sheets CSV link
-const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
+// Sheet should have at least: Dex,Name
+const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
@@ -43,6 +45,51 @@ function getGeneration(dexNum) {
     return 9;
 }
 
+// Map type name → Sword/Shield icon path
+function typeIconSrc(type) {
+    if (!type) return null;
+    const key = type.toLowerCase();
+    const map = {
+        normal: "types/normal.png",
+        fire: "types/fire.png",
+        water: "types/water.png",
+        grass: "types/grass.png",
+        electric: "types/electric.png",
+        ice: "types/ice.png",
+        fighting: "types/fighting.png",
+        poison: "types/poison.png",
+        ground: "types/ground.png",
+        flying: "types/flying.png",
+        psychic: "types/psychic.png",
+        bug: "types/bug.png",
+        rock: "types/rock.png",
+        ghost: "types/ghost.png",
+        dragon: "types/dragon.png",
+        dark: "types/dark.png",
+        steel: "types/steel.png",
+        fairy: "types/fairy.png"
+    };
+    return map[key] || null;
+}
+
+// Fetch type(s) from PokéAPI for a given Dex number
+async function fetchTypesFromPokeAPI(dexNumber) {
+    try {
+        const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
+        const data = await response.json();
+
+        const types = data.types.map(t => {
+            const name = t.type.name; // e.g. "grass"
+            return name.charAt(0).toUpperCase() + name.slice(1); // "Grass"
+        });
+
+        return types.join("/"); // "Grass/Poison"
+    } catch (error) {
+        console.error("Error fetching types for Dex", dexNumber, error);
+        return null;
+    }
+}
+
 // Save tasks
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -54,15 +101,15 @@ function loadTasks() {
     tasks = saved ? JSON.parse(saved) : [];
 }
 
-// Update overall % complete
+// Update overall % complete (2 decimals)
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
-    const percent = total === 0 ? 0 : Math.round((caught / total) * 100);
+    const percent = total === 0 ? "0.00" : ((caught / total) * 100).toFixed(2);
     progressDisplay.textContent = `${percent}% complete`;
 }
 
-// Update per-generation percentages
+// Update per-generation percentages (2 decimals)
 function updateGenProgress() {
     const genTotals = {};
     const genCaught = {};
@@ -84,7 +131,7 @@ function updateGenProgress() {
 
         const total = genTotals[g] || 0;
         const caught = genCaught[g] || 0;
-        const percent = total === 0 ? 0 : Math.round((caught / total) * 100);
+        const percent = total === 0 ? "0.00" : ((caught / total) * 100).toFixed(2);
         el.textContent = `Gen ${g}: ${percent}%`;
     });
 }
@@ -107,10 +154,17 @@ function getSortedTasks() {
             if (a.completed === b.completed) {
                 return parseInt(a.dexRaw) - parseInt(b.dexRaw);
             }
-            return a.completed ? -1 : 1;
+            return a.completed ? -1 : 1; // caught first
+        });
+    } else if (mode === "uncaught") {
+        arr.sort((a, b) => {
+            if (a.completed === b.completed) {
+                return parseInt(a.dexRaw) - parseInt(b.dexRaw);
+            }
+            return a.completed ? 1 : -1; // uncaught first
         });
     } else {
-        arr.sort((a, b) => parseInt(a.dexRaw) - parseInt(b.dexRaw));
+        arr.sort((a, b) => parseInt(a.dexRaw) - parseInt(b.dexRaw)); // dex
     }
 
     return arr;
@@ -136,11 +190,7 @@ function renderTasks() {
         const li = document.createElement("li");
         li.className = task.completed ? "completed" : "";
 
-        if (task.type) {
-            li.classList.add(`type-${task.type.toLowerCase()}`);
-        }
-
-        const dexNum = parseInt(task.dexRaw);
+        const dexNum = parseInt(task.dexRaw, 10);
         const spriteURL = shiny
             ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${dexNum}.png`
             : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${dexNum}.png`;
@@ -152,91 +202,11 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        li.addEventListener("click", () => {
-            const realIndex = tasks.findIndex(t => t.dexRaw === task.dexRaw);
-            if (realIndex === -1) return;
+        // Type icons (support dual types)
+        const typeContainer = document.createElement("span");
+        typeContainer.className = "type-icon-container";
 
-            tasks[realIndex].completed = !tasks[realIndex].completed;
-            saveTasks();
+        if (task.type) {
+            const typeParts = task.type.split("/"); // e.g. ["Grass","Poison"]
+            typeParts.forEach(tName => {
 
-            li.classList.add("caught-anim");
-            setTimeout(() => li.classList.remove("caught-anim"), 250);
-
-            renderTasks();
-        });
-
-        li.appendChild(img);
-        li.appendChild(label);
-
-        fragment.appendChild(li);
-    });
-
-    taskList.appendChild(fragment);
-    updateAllProgress();
-}
-
-// Import Pokédex data
-async function importFromSheet() {
-    try {
-        const response = await fetch(GOOGLE_SHEET_URL);
-        const csv = await response.text();
-        const rows = csv.split("\n").slice(1);
-
-        tasks = [];
-
-        rows.forEach(row => {
-            if (!row.trim()) return;
-            const cols = row.split(",");
-            const dexRaw = cols[0]?.trim();
-            const name = cols[1]?.trim();
-            const type = cols[2]?.trim() || null;
-
-            if (dexRaw && name) {
-                const dex = padDex(dexRaw);
-                const gen = getGeneration(dexRaw);
-
-                tasks.push({
-                    dex,
-                    dexRaw,
-                    name,
-                    gen,
-                    type,
-                    completed: false
-                });
-            }
-        });
-
-        saveTasks();
-        localStorage.setItem("importedFromSheet", "true");
-        renderTasks();
-    } catch (error) {
-        console.error("Error importing from Google Sheets:", error);
-    }
-}
-
-// Reset button
-resetBtn.addEventListener("click", async () => {
-    localStorage.clear();
-    imported = null;
-    tasks = [];
-    progressDisplay.textContent = "0% complete";
-    Object.values(genProgressEls).forEach(el => el.textContent = el.textContent.replace(/\d+%/, "0%"));
-    await importFromSheet();
-});
-
-// Listeners
-searchBar.addEventListener("input", renderTasks);
-shinyToggle.addEventListener("change", renderTasks);
-sortSelect.addEventListener("change", renderTasks);
-
-// INITIAL LOAD
-loadTasks();
-
-if (!imported) {
-    importFromSheet();
-} else {
-    tasks.forEach(t => {
-        if (!t.gen) t.gen = getGeneration(t.dexRaw);
-    });
-    renderTasks();
-}
