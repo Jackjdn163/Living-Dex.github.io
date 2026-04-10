@@ -1,9 +1,10 @@
 const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
 const progressDisplay = document.getElementById("progress");
+const resetBtn = document.getElementById("resetBtn");
 
 // 👉 Replace with your published Google Sheets CSV link
-const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
+const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let imported = localStorage.getItem("importedFromSheet");
@@ -26,7 +27,7 @@ function updateProgress() {
     progressDisplay.textContent = `${percent}% complete`;
 }
 
-// Render tasks (optimized)
+// Render tasks (optimized + fixed disappearing bug)
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
@@ -45,71 +46,24 @@ function renderTasks() {
 
         const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${parseInt(task.dexRaw)}.png`;
 
-        li.innerHTML = `
-            <img class="sprite" src="${spriteURL}" alt="${task.name}">
-            <strong>#${task.dex} — ${task.name}</strong>
-            <button class="delete-btn">X</button>
-        `;
+        // Build DOM elements manually to avoid event bubbling issues
+        const img = document.createElement("img");
+        img.className = "sprite";
+        img.src = spriteURL;
 
-        // Toggle completion
+        const label = document.createElement("strong");
+        label.textContent = `#${task.dex} — ${task.name}`;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "X";
+
+        // Toggle completion ONLY when clicking the row (not delete)
         li.addEventListener("click", () => {
             tasks[index].completed = !tasks[index].completed;
             saveTasks();
             renderTasks();
         });
 
-        // Delete button
-        li.querySelector(".delete-btn").addEventListener("click", (e) => {
-            e.stopPropagation();
-            tasks.splice(index, 1);
-            saveTasks();
-            renderTasks();
-        });
-
-        fragment.appendChild(li);
-    });
-
-    taskList.appendChild(fragment);
-    updateProgress();
-}
-
-// Import Pokédex data (Dex + Name)
-async function importFromSheet() {
-    if (imported) return;
-
-    try {
-        const response = await fetch(GOOGLE_SHEET_URL);
-        const csv = await response.text();
-        const rows = csv.split("\n").slice(1);
-
-        rows.forEach(row => {
-            const cols = row.split(",");
-            const dexRaw = cols[0]?.trim();
-            const name = cols[1]?.trim();
-
-            if (dexRaw && name) {
-                const dex = padDex(dexRaw);
-
-                tasks.push({
-                    dex,
-                    dexRaw,
-                    name,
-                    completed: false
-                });
-            }
-        });
-
-        saveTasks();
-        localStorage.setItem("importedFromSheet", "true");
-        renderTasks();
-    } catch (error) {
-        console.error("Error importing from Google Sheets:", error);
-    }
-}
-
-// Search bar listener
-searchBar.addEventListener("input", renderTasks);
-
-// Load tasks
-renderTasks();
-importFromSheet();
+        // Delete button (stops propagation so it doesn't toggle)
+        delete
