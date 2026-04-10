@@ -2,10 +2,16 @@ const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
 const progressDisplay = document.getElementById("progress");
 
-const GOOGLE_SHEET_URL = https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pubhtml;
+// 👉 Replace with your published Google Sheets CSV link
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let imported = localStorage.getItem("importedFromSheet");
+
+// Pad dex numbers to 3 digits (1 → 001)
+function padDex(num) {
+    return num.toString().padStart(3, "0");
+}
 
 // Save tasks
 function saveTasks() {
@@ -26,12 +32,17 @@ function renderTasks() {
     taskList.innerHTML = "";
 
     tasks
-        .filter(t => t.name.toLowerCase().includes(search) || t.dex.includes(search))
+        .filter(t => 
+            t.name.toLowerCase().includes(search) ||
+            t.dex.includes(search) ||
+            t.dexRaw.includes(search)
+        )
         .forEach((task, index) => {
             const li = document.createElement("li");
             li.className = task.completed ? "completed" : "";
 
-            const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${parseInt(task.dex)}.png`;
+            // Sprite uses RAW number (1, 25, 151)
+            const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${parseInt(task.dexRaw)}.png`;
 
             li.innerHTML = `
                 <img class="sprite" src="${spriteURL}" alt="${task.name}">
@@ -65,16 +76,19 @@ async function importFromSheet() {
     try {
         const response = await fetch(GOOGLE_SHEET_URL);
         const csv = await response.text();
-        const rows = csv.split("\n").slice(1);
+        const rows = csv.split("\n").slice(1); // Skip header row
 
         rows.forEach(row => {
             const cols = row.split(",");
-            const dex = cols[0]?.trim();
+            const dexRaw = cols[0]?.trim();   // e.g. "1"
             const name = cols[1]?.trim();
 
-            if (dex && name) {
+            if (dexRaw && name) {
+                const dex = padDex(dexRaw);   // "001"
+
                 tasks.push({
-                    dex,
+                    dex,          // padded for display
+                    dexRaw,       // raw number for sprite
                     name,
                     completed: false
                 });
