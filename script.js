@@ -16,6 +16,7 @@ const sheetName = document.getElementById("sheetName");
 const sheetDex = document.getElementById("sheetDex");
 const sheetTypes = document.getElementById("sheetTypes");
 const sheetEvolution = document.getElementById("sheetEvolution");
+const sheetDlcTag = document.getElementById("sheetDlcTag"); // DLC badge element (must exist in HTML)
 
 /* Per-generation progress */
 const genProgressEls = {
@@ -36,6 +37,169 @@ const GOOGLE_SHEET_URL =
 
 let tasks = [];
 let imported = localStorage.getItem("importedFromSheet");
+
+/* ============================================================
+   GAME AVAILABILITY (POKÉAPI → POKEDEX → GAMES)
+   ============================================================ */
+
+/* Only the games we discussed */
+const ALLOWED_GAMES = {
+    "lets-go-pikachu": "Let's Go Pikachu",
+    "lets-go-eevee": "Let's Go Eevee",
+    "sword": "Sword",
+    "shield": "Shield",
+    "isle-of-armor": "Isle of Armor",
+    "crown-tundra": "Crown Tundra",
+    "brilliant-diamond": "Brilliant Diamond",
+    "shining-pearl": "Shining Pearl",
+    "legends-arceus": "Legends Arceus",
+    "scarlet": "Scarlet",
+    "violet": "Violet",
+    "the-teal-mask": "The Teal Mask",
+    "the-indigo-disk": "The Indigo Disk"
+};
+
+/* Map Pokédex names from species data → our game keys */
+function mapPokedexToGames(pokedexNames) {
+    const games = new Set();
+
+    pokedexNames.forEach(name => {
+        const n = name.toLowerCase();
+
+        // Let's Go
+        if (n.includes("lets-go")) {
+            games.add("lets-go-pikachu");
+            games.add("lets-go-eevee");
+        }
+
+        // Galar base
+        if (n === "galar" || n === "galar-pokedex") {
+            games.add("sword");
+            games.add("shield");
+        }
+
+        // Galar DLC
+        if (n.includes("isle-of-armor") || n.includes("galar-isle-of-armor")) {
+            games.add("isle-of-armor");
+        }
+        if (n.includes("crown-tundra") || n.includes("galar-crown-tundra")) {
+            games.add("crown-tundra");
+        }
+
+        // Hisui
+        if (n.includes("hisui")) {
+            games.add("legends-arceus");
+        }
+
+        // Paldea base
+        if (n === "paldea" || n === "paldea-pokedex") {
+            games.add("scarlet");
+            games.add("violet");
+        }
+
+        // Kitakami (Teal Mask)
+        if (n.includes("kitakami")) {
+            games.add("the-teal-mask");
+        }
+
+        // Blueberry (Indigo Disk)
+        if (n.includes("blueberry")) {
+            games.add("the-indigo-disk");
+        }
+
+        // Sinnoh → BDSP
+        if (
+            n.includes("sinnoh") ||
+            n === "original-sinnoh" ||
+            n === "updated-sinnoh"
+        ) {
+            games.add("brilliant-diamond");
+            games.add("shining-pearl");
+        }
+    });
+
+    return [...games].filter(g => ALLOWED_GAMES[g]);
+}
+
+/* DLC-only = appears in DLC games but NOT in base Sword/Shield or Scarlet/Violet */
+function isDlcOnly(gameKeys) {
+    const dlcGames = new Set(["isle-of-armor", "crown-tundra", "the-teal-mask", "the-indigo-disk"]);
+    const baseGames = new Set(["sword", "shield", "scarlet", "violet"]);
+
+    const hasDlc = gameKeys.some(g => dlcGames.has(g));
+    const hasBase = gameKeys.some(g => baseGames.has(g));
+
+    return hasDlc && !hasBase;
+}
+
+/* Fetch game availability from PokéAPI species → pokedex_numbers */
+async function fetchGameAvailability(dexNumber) {
+    try {
+        const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`);
+        const speciesData = await speciesRes.json();
+
+        const pokedexNames = (speciesData.pokedex_numbers || [])
+            .map(entry => entry.pokedex.name.toLowerCase());
+
+        return mapPokedexToGames(pokedexNames);
+    } catch (err) {
+        console.error("Error fetching game availability for Dex", dexNumber, err);
+        return [];
+    }
+}
+
+/* Remove any existing game list from the bottom sheet */
+function clearGameList() {
+    if (!bottomSheet) return;
+    const existing = bottomSheet.querySelector(".game-list-container");
+    if (existing) existing.remove();
+}
+
+/* Insert game list above the evolution section */
+function insertGameList(gameKeys) {
+    if (!bottomSheet || !sheetEvolution) return;
+    if (!gameKeys || gameKeys.length === 0) return;
+
+    const container = document.createElement("div");
+    container.className = "game-list-container";
+
+    const title = document.createElement("div");
+    title.className = "game-list-title";
+    title.textContent = "Games:";
+    container.appendChild(title);
+
+    gameKeys.forEach(key => {
+        const label = ALLOWED_GAMES[key];
+        if (!label) return;
+        const row = document.createElement("div");
+        row.className = "game-list-item";
+        row.textContent = label;
+        container.appendChild(row);
+    });
+
+    bottomSheet.insertBefore(container, sheetEvolution);
+}
+
+/* Update the gold [DLC-ONLY] badge at the very bottom, right-aligned */
+function updateDlcBadge(isDlc) {
+    if (!sheetDlcTag) return;
+
+    if (!isDlc) {
+        sheetDlcTag.style.display = "none";
+        sheetDlcTag.textContent = "";
+        return;
+    }
+
+    sheetDlcTag.style.display = "block";
+    sheetDlcTag.textContent = "[DLC-ONLY]";
+    sheetDlcTag.style.backgroundColor = "#FFD700";
+    sheetDlcTag.style.color = "black";
+    sheetDlcTag.style.fontWeight = "bold";
+    sheetDlcTag.style.padding = "4px 10px";
+    sheetDlcTag.style.borderRadius = "999px";
+    sheetDlcTag.style.marginTop = "10px";
+    sheetDlcTag.style.alignSelf = "flex-end";
+}
 
 /* ============================================================
    HELPERS
@@ -63,7 +227,6 @@ function typeIconSrc(type) {
     const key = type.toLowerCase();
     return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
 }
-
 /* ============================================================
    FETCH TYPES
    ============================================================ */
@@ -234,7 +397,6 @@ function updateAllProgress() {
     updateOverallProgress();
     updateGenProgress();
 }
-
 /* ============================================================
    SORTING
    ============================================================ */
@@ -356,6 +518,19 @@ async function loadBottomSheet(task) {
         });
     }
 
+    /* Games (from PokéAPI species → pokedex_numbers) */
+    clearGameList();
+    if (sheetDlcTag) {
+        sheetDlcTag.style.display = "none";
+        sheetDlcTag.textContent = "";
+    }
+
+    const gameKeys = await fetchGameAvailability(task.dexRaw);
+    insertGameList(gameKeys);
+
+    const dlcOnly = isDlcOnly(gameKeys);
+    updateDlcBadge(dlcOnly);
+
     /* Evolution */
     sheetEvolution.innerHTML = "";
     const evo = await fetchEvolutionData(task.dexRaw);
@@ -392,7 +567,6 @@ async function loadBottomSheet(task) {
         sheetEvolution.appendChild(row);
     }
 }
-
 /* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
