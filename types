@@ -1,23 +1,18 @@
-Living-Dex.github.io/
-    index.html
-    style.css
-    script.js
-    types/
-        normal.png
-        fire.png
-        water.png
-        grass.png
-        electric.png
-        ice.png
-        fighting.png
-        poison.png
-        ground.png
-        flying.png
-        psychic.png
-        bug.png
-        rock.png
-        ghost.png
-        dragon.png
-        dark.png
-        steel.png
-        fairy.png
+normal.png
+fighting.png
+flying.png
+poison.png
+ground.png
+rock.png
+bug.png
+ghost.png
+steel.png
+fire.png
+water.png
+grass.png
+electric.png
+psychic.png
+ice.png
+dragon.png
+dark.png
+fairy.png
