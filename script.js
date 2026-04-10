@@ -1,6 +1,6 @@
-const taskInput = document.getElementById("taskInput");
-const addBtn = document.getElementById("addBtn");
 const taskList = document.getElementById("taskList");
+const searchBar = document.getElementById("searchBar");
+const progressDisplay = document.getElementById("progress");
 
 // 👉 Replace with your published Google Sheets CSV link
 const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
@@ -8,50 +8,65 @@ const GOOGLE_SHEET_URL = "YOUR_CSV_LINK_HERE";
 let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let imported = localStorage.getItem("importedFromSheet");
 
-// Save tasks to localStorage
+// Save tasks
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-// Render tasks to the page
+// Update % complete
+function updateProgress() {
+    const total = tasks.length;
+    const caught = tasks.filter(t => t.completed).length;
+    const percent = total === 0 ? 0 : Math.round((caught / total) * 100);
+    progressDisplay.textContent = `${percent}% complete`;
+}
+
+// Render tasks
 function renderTasks() {
+    const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
-    tasks.forEach((task, index) => {
-        const li = document.createElement("li");
-        li.className = task.completed ? "completed" : "";
 
-        li.innerHTML = `
-            <div>
+    tasks
+        .filter(t => t.name.toLowerCase().includes(search) || t.dex.includes(search))
+        .forEach((task, index) => {
+            const li = document.createElement("li");
+            li.className = task.completed ? "completed" : "";
+
+            const spriteURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${parseInt(task.dex)}.png`;
+
+            li.innerHTML = `
+                <img class="sprite" src="${spriteURL}" alt="${task.name}">
                 <strong>#${task.dex} — ${task.name}</strong>
-            </div>
-            <button class="delete-btn">X</button>
-        `;
+                <button class="delete-btn">X</button>
+            `;
 
-        li.addEventListener("click", () => {
-            tasks[index].completed = !tasks[index].completed;
-            saveTasks();
-            renderTasks();
+            li.addEventListener("click", () => {
+                tasks[index].completed = !tasks[index].completed;
+                saveTasks();
+                renderTasks();
+            });
+
+            li.querySelector(".delete-btn").addEventListener("click", (e) => {
+                e.stopPropagation();
+                tasks.splice(index, 1);
+                saveTasks();
+                renderTasks();
+            });
+
+            taskList.appendChild(li);
         });
 
-        li.querySelector(".delete-btn").addEventListener("click", (e) => {
-            e.stopPropagation();
-            tasks.splice(index, 1);
-            saveTasks();
-            renderTasks();
-        });
-
-        taskList.appendChild(li);
-    });
+    updateProgress();
 }
 
 // Import Pokédex data (Dex + Name)
 async function importFromSheet() {
-    if (imported) return; // Only import once
+    if (imported) return;
 
     try {
         const response = await fetch(GOOGLE_SHEET_URL);
         const csv = await response.text();
-        const rows = csv.split("\n").slice(1); // Skip header row
+        const rows = csv.split("\n").slice(1);
 
         rows.forEach(row => {
             const cols = row.split(",");
@@ -75,16 +90,8 @@ async function importFromSheet() {
     }
 }
 
-addBtn.addEventListener("click", () => {
-    const text = taskInput.value.trim();
-    if (text === "") return;
-
-    // If user manually adds something, treat it as a name-only entry
-    tasks.push({ dex: "—", name: text, completed: false });
-    saveTasks();
-    renderTasks();
-    taskInput.value = "";
-});
+// Search bar listener
+searchBar.addEventListener("input", renderTasks);
 
 // Load tasks
 renderTasks();
