@@ -14,8 +14,34 @@
         <!-- Search bar -->
         <input id="searchBar" type="text" placeholder="Search Pokémon...">
 
-        <!-- Percentage always visible -->
+        <!-- Overall percentage -->
         <div id="progress">0% complete</div>
+
+        <!-- Per-generation percentages -->
+        <div id="genProgress">
+            <div id="gen1Progress">Gen 1: 0%</div>
+            <div id="gen2Progress">Gen 2: 0%</div>
+            <div id="gen3Progress">Gen 3: 0%</div>
+            <div id="gen4Progress">Gen 4: 0%</div>
+            <div id="gen5Progress">Gen 5: 0%</div>
+            <div id="gen6Progress">Gen 6: 0%</div>
+            <div id="gen7Progress">Gen 7: 0%</div>
+            <div id="gen8Progress">Gen 8: 0%</div>
+            <div id="gen9Progress">Gen 9: 0%</div>
+        </div>
+
+        <!-- Shiny toggle -->
+        <label class="toggle">
+            <input type="checkbox" id="shinyToggle">
+            Shiny sprites
+        </label>
+
+        <!-- Sorting -->
+        <select id="sortSelect">
+            <option value="dex">Sort by Dex</option>
+            <option value="name">Sort by Name</option>
+            <option value="caught">Sort by Caught</option>
+        </select>
 
         <!-- Reset button -->
         <button id="resetBtn">Reset Checklist</button>
@@ -27,4 +53,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
