@@ -1,115 +1,73 @@
-body {
-    background: #f2f2f2;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    transition: background 0.3s, color 0.3s;
-}
-
-body.dark {
-    background: #1a1a1a;
-    color: white;
-}
-
-.container {
-    max-width: 500px;
-    margin: auto;
-}
-
-h1 {
-    text-align: center;
-}
-
-#searchBar, #sortSelect, #resetBtn {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-.toggle {
-    display: block;
-    margin-bottom: 10px;
-}
-
-#floatingStats {
+/* Bottom Sheet */
+#bottomSheet {
     position: fixed;
-    right: 20px;
-    top: 20px;
-    background: rgba(255,255,255,0.9);
-    padding: 15px;
-    border-radius: 10px;
-    width: 160px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 9999;
-    font-size: 14px;
+    left: 0;
+    right: 0;
+    bottom: -100%;
+    height: 60%;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+    transition: bottom 0.3s ease;
+    padding: 20px;
+    z-index: 99999;
 }
 
-body.dark #floatingStats {
-    background: rgba(30,30,30,0.9);
+body.dark #bottomSheet {
+    background: #222;
     color: white;
 }
 
-ul {
+#sheetHandle {
+    width: 60px;
+    height: 6px;
+    background: #ccc;
+    border-radius: 3px;
+    margin: 0 auto 15px auto;
+}
+
+#sheetHeader {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#sheetSprite {
+    width: 80px;
+    height: 80px;
+}
+
+#sheetTypes img {
+    width: 32px;
+    height: 32px;
+    margin-right: 6px;
+}
+
+#sheetGames {
     list-style: none;
     padding: 0;
 }
 
-li {
-    background: white;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 6px;
+#sheetEvolution {
+    margin-top: 10px;
+}
+
+.evoRow {
     display: flex;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
-    transition: 0.2s;
+    margin-bottom: 8px;
 }
 
-body.dark li {
-    background: #2a2a2a;
-}
-
-li:hover {
-    background: #e9e9e9;
-}
-
-body.dark li:hover {
-    background: #333;
-}
-
-.sprite {
+.evoRow img {
     width: 50px;
     height: 50px;
 }
 
-.completed {
-    opacity: 0.5;
-    text-decoration: line-through;
-}
-
-.caught-anim {
-    animation: pop 0.25s ease-out;
-}
-
-@keyframes pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.07); }
-    100% { transform: scale(1); }
-}
-
-.type-icon {
-    width: 28px;
-    height: auto;
-    margin-left: 4px;
-}
-
-}
-
-.type-icon-container {
-    display: flex;
-    gap: 4px;
+.more-btn {
     margin-left: auto;
+    font-size: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
