@@ -81,6 +81,7 @@ function loadTasksFromStorage() {
         tasks = [];
     }
 }
+
 /* ============================================================
    PROGRESS
    ============================================================ */
@@ -167,6 +168,16 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
+        // Three dots button
+        const moreBtn = document.createElement("button");
+        moreBtn.className = "more-btn";
+        moreBtn.textContent = "⋮";
+
+        moreBtn.addEventListener("click", (event) => {
+            event.stopPropagation();
+            openInfoPanel(task);
+        });
+
         li.addEventListener("click", () => {
             task.completed = !task.completed;
             saveTasks();
@@ -175,13 +186,13 @@ function renderTasks() {
 
         li.appendChild(img);
         li.appendChild(label);
+        li.appendChild(moreBtn);
 
         taskList.appendChild(li);
     });
 
     updateAllProgress();
 }
-
 /* ============================================================
    LOADING SCREEN LOGIC
    ============================================================ */
@@ -220,6 +231,7 @@ async function finishLoadingAnimation() {
         loadingScreen.style.pointerEvents = "none";
     }, 900);
 }
+
 /* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
@@ -284,7 +296,7 @@ confirmReset.addEventListener("click", async () => {
 });
 
 /* ============================================================
-   DARK MODE INSTANT UPDATE FOR LOADING SCREEN
+   DARK MODE INSTANT UPDATE
    ============================================================ */
 
 darkToggle.addEventListener("change", () => {
@@ -292,22 +304,20 @@ darkToggle.addEventListener("change", () => {
     document.body.classList.toggle("dark", isDark);
     localStorage.setItem("darkMode", isDark ? "1" : "0");
 
-    // Update loading screen instantly
     if (!loadingScreen.classList.contains("fade-out")) {
         loadingScreen.style.background = isDark ? "#1a1a1a" : "#ffffff";
     }
 
-    renderTasks(); // ensure list updates immediately
+    renderTasks();
 });
 
-// Load saved dark mode
 if (localStorage.getItem("darkMode") === "1") {
     document.body.classList.add("dark");
     darkToggle.checked = true;
 }
 
 /* ============================================================
-   EVENT LISTENERS (INSTANT UPDATES)
+   EVENT LISTENERS
    ============================================================ */
 
 searchBar.addEventListener("input", renderTasks);
@@ -319,6 +329,27 @@ shinyToggle.addEventListener("change", () => {
 sortSelect.addEventListener("change", () => {
     renderTasks();
 });
+
+/* ============================================================
+   RIGHT-SIDE INFO PANEL
+   ============================================================ */
+
+function openInfoPanel(task) {
+    const panel = document.getElementById("infoPanel");
+    const content = document.getElementById("infoContent");
+
+    content.innerHTML = `
+        <h2>#${task.dex} — ${task.name}</h2>
+        <p>More info coming soon...</p>
+    `;
+
+    panel.classList.add("open");
+}
+
+document.getElementById("closeInfoPanel").addEventListener("click", () => {
+    document.getElementById("infoPanel").classList.remove("open");
+});
+
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
@@ -333,14 +364,12 @@ async function init() {
     if (tasks.length === 0) {
         await importFromSheet();
     } else {
-        // Ensure older saves still have generation data
         tasks.forEach(t => {
             if (!t.gen) t.gen = getGeneration(t.dexRaw);
         });
         renderTasks();
     }
 
-    // Enforce minimum 5-second loading animation
     const elapsed = Date.now() - startTime;
     const minDuration = 5000;
 
