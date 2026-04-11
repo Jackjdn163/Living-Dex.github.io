@@ -12,7 +12,7 @@
 body {
     background: #f5f5f5;
     color: #222;
-    padding-bottom: 120px; /* space for floating toggles */
+    padding-bottom: 120px;
     transition: background 0.3s ease, color 0.3s ease;
 }
 
@@ -42,7 +42,6 @@ h1 {
 
 #searchBar {
     width: 100%;
-    max-width: 100%;
     padding: 12px 14px;
     font-size: 16px;
     border-radius: 10px;
@@ -63,7 +62,7 @@ body.dark #searchBar {
 }
 
 /* ============================================================
-   SORT DROPDOWN + RESET BUTTON
+   SORT + RESET
    ============================================================ */
 
 #sortSelect {
@@ -128,7 +127,7 @@ body.dark #taskList li {
 }
 
 /* ============================================================
-   FLOATING STATS BOX (TOP RIGHT)
+   FLOATING STATS BOX
    ============================================================ */
 
 #floatingStats {
@@ -153,7 +152,7 @@ body.dark #floatingStats {
 }
 
 /* ============================================================
-   FLOATING TOGGLE BOX (BOTTOM LEFT)
+   FLOATING TOGGLE BOX
    ============================================================ */
 
 #floatingToggles {
@@ -176,7 +175,7 @@ body.dark #floatingToggles {
 }
 
 /* ============================================================
-   BEAUTIFUL SLIDING TOGGLE SWITCHES
+   SLIDER SWITCHES
    ============================================================ */
 
 .switch {
@@ -191,7 +190,6 @@ body.dark #floatingToggles {
     display: none;
 }
 
-/* Track */
 .slider {
     width: 52px;
     height: 28px;
@@ -201,7 +199,6 @@ body.dark #floatingToggles {
     transition: background 0.3s ease;
 }
 
-/* Knob */
 .slider::before {
     content: "";
     position: absolute;
@@ -211,11 +208,10 @@ body.dark #floatingToggles {
     border-radius: 50%;
     top: 3px;
     left: 3px;
-    transition: transform 0.3s ease, background 0.3s ease;
+    transition: transform 0.3s ease;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-/* ON state */
 .switch input:checked + .slider {
     background: #4ade80;
     box-shadow: 0 0 8px #4ade80;
@@ -227,4 +223,63 @@ body.dark #floatingToggles {
 
 .switch-label {
     font-size: 15px;
+}
+
+/* ============================================================
+   RESET POPUP
+   ============================================================ */
+
+.popup.hidden {
+    display: none;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+
+.popup-box {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+body.dark .popup-box {
+    background: #2a2a2a;
+    color: white;
+}
+
+.popup-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-buttons button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.popup-buttons .danger {
+    background: #ef4444;
+    color: white;
+}
+
+.popup-buttons #cancelReset {
+    background: #ccc;
 }
