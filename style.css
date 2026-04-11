@@ -106,7 +106,8 @@ body.dark .pokeball-center {
 /* Green flash when loading finishes */
 .pokeball-center.catch {
     background: #4ade80;
-    box-shadow: 0 0 12px #4ade80;
+    box-shadow: 0 0 20px 10px #4ade80;
+    border-color: #4ade80;
 }
 
 /* Spin animation */
@@ -144,6 +145,17 @@ body.dark #loadingText {
     display: inline-block;
     width: 24px;
     text-align: left;
+}
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+.pokeball.shake {
+    animation: shake 0.35s ease;
 }
 
 /* ============================================================
