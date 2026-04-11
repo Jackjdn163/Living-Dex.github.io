@@ -221,7 +221,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (UNICODE-SAFE)
+   EVOLUTION FETCHING
    ============================================================ */
 async function getEvolutionData(task) {
     const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
@@ -232,37 +232,22 @@ async function getEvolutionData(task) {
     const evoRes = await fetch(evoURL);
     const evoData = await evoRes.json();
 
-    const cleanName = task.name
-        .normalize("NFKD")
-        .replace(/[\u200B-\u200F\u00A0]/g, "")
-        .trim()
-        .toLowerCase();
-
-    return parseEvolutionChain(evoData.chain, cleanName);
+    return parseEvolutionChain(evoData.chain, task.name.toLowerCase());
 }
 
 function parseEvolutionChain(chain, targetName) {
     let prev = null;
     let next = null;
 
-    function walk(node, parent) {
-        const name = node.species.name
-            .normalize("NFKD")
-            .replace(/[\u200B-\u200F\u00A0]/g, "")
-            .trim()
-            .toLowerCase();
-
-        if (name === targetName) {
+    function search(node, parent) {
+        if (node.species.name === targetName) {
             if (parent) prev = parent;
             if (node.evolves_to.length > 0) next = node.evolves_to[0];
         }
-
-        for (const child of node.evolves_to) {
-            walk(child, node);
-        }
+        node.evolves_to.forEach(child => search(child, node));
     }
 
-    walk(chain, null);
+    search(chain, null);
 
     return { prev, next };
 }
@@ -370,7 +355,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (SPRITE + NAME + GAMES + EVOLUTIONS)
+   INFO PANEL (SPRITE + NAME + GAMES PLACEHOLDER + EVOLUTIONS)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -395,7 +380,6 @@ async function openInfoPanel(task) {
         const method = formatEvolutionMethod(p.evolution_details);
 
         evoBox.innerHTML += `
-            <h3 style="margin:0; margin-bottom:6px;">Evolves From</h3>
             <div class="evoBox">
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.species.url.split('/')[6]}.png">
                 <div>
@@ -411,7 +395,6 @@ async function openInfoPanel(task) {
         const method = formatEvolutionMethod(n.evolution_details);
 
         evoBox.innerHTML += `
-            <h3 style="margin-top:14px; margin-bottom:6px;">Evolves Into</h3>
             <div class="evoBox">
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${n.species.url.split('/')[6]}.png">
                 <div>
