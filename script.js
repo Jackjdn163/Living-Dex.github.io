@@ -221,7 +221,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (FIXED)
+   EVOLUTION FETCHING (UNICODE-SAFE)
    ============================================================ */
 async function getEvolutionData(task) {
     const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
@@ -232,8 +232,13 @@ async function getEvolutionData(task) {
     const evoRes = await fetch(evoURL);
     const evoData = await evoRes.json();
 
-    const targetName = task.name.trim().toLowerCase();
-    return parseEvolutionChain(evoData.chain, targetName);
+    const cleanName = task.name
+        .normalize("NFKD")
+        .replace(/[\u200B-\u200F\u00A0]/g, "")
+        .trim()
+        .toLowerCase();
+
+    return parseEvolutionChain(evoData.chain, cleanName);
 }
 
 function parseEvolutionChain(chain, targetName) {
@@ -241,7 +246,11 @@ function parseEvolutionChain(chain, targetName) {
     let next = null;
 
     function walk(node, parent) {
-        const name = node.species.name.trim().toLowerCase();
+        const name = node.species.name
+            .normalize("NFKD")
+            .replace(/[\u200B-\u200F\u00A0]/g, "")
+            .trim()
+            .toLowerCase();
 
         if (name === targetName) {
             if (parent) prev = parent;
