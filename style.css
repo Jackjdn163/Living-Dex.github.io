@@ -22,6 +22,111 @@ body.dark {
 }
 
 /* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    transition: opacity 0.6s ease;
+}
+
+#loadingScreen.fade-out {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+/* Pokéball container */
+.pokeball {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 6px solid black;
+    animation: spin 1.2s linear infinite;
+}
+
+/* Top half */
+.pokeball-top {
+    background: #ff0000;
+    width: 100%;
+    height: 50%;
+}
+
+/* Bottom half */
+.pokeball-bottom {
+    background: #ffffff;
+    width: 100%;
+    height: 50%;
+}
+
+/* Center button */
+.pokeball-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border: 6px solid black;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Green flash when loading finishes */
+.pokeball-center.catch {
+    background: #4ade80;
+    box-shadow: 0 0 12px #4ade80;
+}
+
+/* Spin animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Stop spinning + rotate upright */
+.pokeball.finish-spin {
+    animation: none;
+    transform: rotate(0deg);
+    transition: transform 0.4s ease;
+}
+
+/* Loading text */
+#loadingText {
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+#loadingText.fade-out {
+    opacity: 0;
+}
+
+/* Animated dots */
+#loadingDots {
+    display: inline-block;
+    width: 24px;
+    text-align: left;
+}
+
+/* ============================================================
    MAIN CONTAINER
    ============================================================ */
 
