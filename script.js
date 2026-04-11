@@ -194,7 +194,9 @@ async function fetchTypesFromPokeAPI(dexNumber) {
     try {
         const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
         const data = await res.json();
-        return data.types.map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1)).join("/");
+        return data.types
+            .map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1))
+            .join("/");
     } catch {
         return "";
     }
@@ -335,11 +337,11 @@ function getSortedTasks() {
     if (mode === "name") {
         arr.sort((a, b) => a.name.localeCompare(b.name));
     } else if (mode === "caught") {
-        arr.sort((a, b) => b.completed - a.completed || a.dexRaw - b.dexRaw);
+        arr.sort((a, b) => (b.completed - a.completed) || (Number(a.dexRaw) - Number(b.dexRaw)));
     } else if (mode === "uncaught") {
-        arr.sort((a, b) => a.completed - b.completed || a.dexRaw - b.dexRaw);
+        arr.sort((a, b) => (a.completed - b.completed) || (Number(a.dexRaw) - Number(b.dexRaw)));
     } else {
-        arr.sort((a, b) => a.dexRaw - b.dexRaw);
+        arr.sort((a, b) => Number(a.dexRaw) - Number(b.dexRaw));
     }
 
     return arr;
@@ -413,18 +415,19 @@ async function loadBottomSheet(task) {
     sheetDex.textContent = `#${task.dex}`;
 
     sheetTypes.innerHTML = "";
-    task.type.split("/").forEach(t => {
-        const icon = document.createElement("img");
-        icon.src = typeIconSrc(t);
-        sheetTypes.appendChild(icon);
-    });
+    if (task.type) {
+        task.type.split("/").forEach(t => {
+            const icon = document.createElement("img");
+            icon.src = typeIconSrc(t);
+            sheetTypes.appendChild(icon);
+        });
+    }
 
     clearGameList();
     sheetDlcTag.style.display = "none";
 
     const gameKeys = await fetchGameAvailability(task.dexRaw);
     insertGameList(gameKeys);
-
     updateDlcBadge(isDlcOnly(gameKeys));
 
     sheetEvolution.innerHTML = "";
@@ -436,4 +439,118 @@ async function loadBottomSheet(task) {
 
         const img = document.createElement("img");
         img.src =
-            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.prev.id}.png`;
+
+        const txt = document.createElement("div");
+        txt.textContent = `${evo.prev.name} — ${formatEvolutionMethod(evo.prev.method)}`;
+
+        row.appendChild(img);
+        row.appendChild(txt);
+        sheetEvolution.appendChild(row);
+    }
+
+    if (evo.next) {
+        const row = document.createElement("div");
+        row.className = "evoRow";
+
+        const img = document.createElement("img");
+        img.src =
+            `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.next.id}.png`;
+
+        const txt = document.createElement("div");
+        txt.textContent = `${evo.next.name} — ${formatEvolutionMethod(evo.next.method)}`;
+
+        row.appendChild(img);
+        row.appendChild(txt);
+        sheetEvolution.appendChild(row);
+    }
+}
+
+/* ============================================================
+   IMPORT FROM SHEET
+   ============================================================ */
+async function importFromSheet() {
+    try {
+        const response = await fetch(GOOGLE_SHEET_URL);
+        const csv = await response.text();
+        const rows = csv.split("\n").slice(1);
+
+        tasks = [];
+
+        for (const row of rows) {
+            if (!row.trim()) continue;
+
+            const cols = row.split(",");
+            const dexRaw = cols[0]?.trim();
+            const name = cols[1]?.trim();
+
+            if (!dexRaw || !name) continue;
+
+            const dex = padDex(dexRaw);
+            const gen = getGeneration(dexRaw);
+            const type = await fetchTypesFromPokeAPI(dexRaw);
+
+            tasks.push({
+                dex,
+                dexRaw,
+                name,
+                gen,
+                type,
+                completed: false
+            });
+        }
+
+        saveTasks();
+        localStorage.setItem("importedFromSheet", "true");
+        renderTasks();
+    } catch (error) {
+        console.error("Error importing from Google Sheets:", error);
+    }
+}
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+resetBtn.addEventListener("click", async () => {
+    localStorage.clear();
+    imported = null;
+    tasks = [];
+    progressDisplay.textContent = "0.00% complete";
+
+    Object.values(genProgressEls).forEach(el => {
+        if (!el) return;
+        el.textContent = el.textContent.replace(/(\d+(\.\d+)?)%/, "0.00%");
+    });
+
+    await importFromSheet();
+});
+
+searchBar.addEventListener("input", renderTasks);
+shinyToggle.addEventListener("change", renderTasks);
+sortSelect.addEventListener("change", renderTasks);
+
+if (darkToggle) {
+    darkToggle.addEventListener("change", () => {
+        document.body.classList.toggle("dark", darkToggle.checked);
+        localStorage.setItem("darkMode", darkToggle.checked ? "1" : "0");
+    });
+
+    if (localStorage.getItem("darkMode") === "1") {
+        document.body.classList.add("dark");
+        darkToggle.checked = true;
+    }
+}
+
+/* ============================================================
+   INITIAL LOAD
+   ============================================================ */
+loadTasks();
+
+if (!imported) {
+    importFromSheet();
+} else {
+    tasks.forEach(t => {
+        if (!t.gen) t.gen = getGeneration(t.dexRaw);
+    });
+    renderTasks();
+}
