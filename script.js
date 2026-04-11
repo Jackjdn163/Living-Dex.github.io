@@ -232,7 +232,8 @@ async function getEvolutionData(task) {
     const evoRes = await fetch(evoURL);
     const evoData = await evoRes.json();
 
-    return parseEvolutionChain(evoData.chain, task.name.toLowerCase());
+    const targetName = task.name.trim().toLowerCase();
+    return parseEvolutionChain(evoData.chain, targetName);
 }
 
 function parseEvolutionChain(chain, targetName) {
@@ -240,7 +241,7 @@ function parseEvolutionChain(chain, targetName) {
     let next = null;
 
     function walk(node, parent) {
-        const name = node.species.name.toLowerCase();
+        const name = node.species.name.trim().toLowerCase();
 
         if (name === targetName) {
             if (parent) prev = parent;
