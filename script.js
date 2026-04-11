@@ -240,14 +240,16 @@ function parseEvolutionChain(chain, targetName) {
     let next = null;
 
     function walk(node, parent) {
-        const name = node.species.name;
+        const name = node.species.name.toLowerCase();
 
         if (name === targetName) {
             if (parent) prev = parent;
             if (node.evolves_to.length > 0) next = node.evolves_to[0];
         }
 
-        node.evolves_to.forEach(child => walk(child, node));
+        for (const child of node.evolves_to) {
+            walk(child, node);
+        }
     }
 
     walk(chain, null);
@@ -358,7 +360,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (SPRITE + NAME + GAMES PLACEHOLDER + EVOLUTIONS)
+   INFO PANEL (SPRITE + NAME + GAMES + EVOLUTIONS)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -383,6 +385,7 @@ async function openInfoPanel(task) {
         const method = formatEvolutionMethod(p.evolution_details);
 
         evoBox.innerHTML += `
+            <h3 style="margin:0; margin-bottom:6px;">Evolves From</h3>
             <div class="evoBox">
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.species.url.split('/')[6]}.png">
                 <div>
@@ -398,6 +401,7 @@ async function openInfoPanel(task) {
         const method = formatEvolutionMethod(n.evolution_details);
 
         evoBox.innerHTML += `
+            <h3 style="margin-top:14px; margin-bottom:6px;">Evolves Into</h3>
             <div class="evoBox">
                 <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${n.species.url.split('/')[6]}.png">
                 <div>
