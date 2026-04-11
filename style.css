@@ -1,23 +1,34 @@
 /* ============================================================
-   BASE PAGE STYLING (Restored Original Look)
+   GLOBAL RESET + BASE
    ============================================================ */
-body {
-    background: #f2f2f2;
-    font-family: Arial, sans-serif;
+
+* {
     margin: 0;
-    padding: 20px;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f5f5f5;
     color: #222;
-    transition: background 0.3s, color 0.3s;
+    padding-bottom: 120px; /* space for floating toggles */
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 body.dark {
     background: #1a1a1a;
-    color: #f5f5f5;
+    color: #eee;
 }
 
+/* ============================================================
+   MAIN CONTAINER
+   ============================================================ */
+
 .container {
-    max-width: 500px;
-    margin: auto;
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
 h1 {
@@ -25,73 +36,90 @@ h1 {
     margin-bottom: 20px;
 }
 
-/* Inputs */
-#searchBar, #sortSelect, #resetBtn {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-}
-
-.toggle {
-    display: block;
-    margin-bottom: 10px;
-    font-size: 15px;
-}
-
 /* ============================================================
-   FLOATING STATS BOX (Original Style)
+   SEARCH BAR
    ============================================================ */
-#floatingStats {
-    position: fixed;
-    right: 20px;
-    top: 20px;
-    background: rgba(255,255,255,0.95);
-    padding: 15px;
+
+#searchBar {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
     border-radius: 10px;
-    width: 160px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 9999;
-    font-size: 14px;
+    border: 2px solid #ccc;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border 0.2s ease;
 }
 
-body.dark #floatingStats {
-    background: rgba(30,30,30,0.95);
+#searchBar:focus {
+    border-color: #4ade80;
+}
+
+body.dark #searchBar {
+    background: #2a2a2a;
+    border-color: #555;
     color: white;
 }
 
 /* ============================================================
-   LIST ITEMS (Restored Original Look)
+   SORT DROPDOWN + RESET BUTTON
    ============================================================ */
-ul {
-    list-style: none;
-    padding: 0;
+
+#sortSelect {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    margin-bottom: 15px;
 }
 
-li {
+#resetBtn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s ease;
+}
+
+#resetBtn:hover {
+    background: #dc2626;
+}
+
+/* ============================================================
+   TASK LIST
+   ============================================================ */
+
+#taskList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#taskList li {
     background: white;
-    padding: 10px;
-    margin-bottom: 8px;
-    border-radius: 8px;
+    padding: 12px 14px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 14px;
     cursor: pointer;
-    transition: background 0.2s, transform 0.1s;
+    transition: background 0.2s ease, opacity 0.2s ease;
 }
 
-body.dark li {
+body.dark #taskList li {
     background: #2a2a2a;
 }
 
-li:hover {
-    background: #e9e9e9;
-}
-
-body.dark li:hover {
-    background: #333;
+#taskList li.completed {
+    opacity: 0.45;
 }
 
 .sprite {
@@ -99,194 +127,31 @@ body.dark li:hover {
     height: 50px;
 }
 
-.completed {
-    opacity: 0.5;
-    text-decoration: line-through;
-}
-
-.caught-anim {
-    animation: pop 0.25s ease-out;
-}
-
-@keyframes pop {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.07); }
-    100% { transform: scale(1); }
-}
-
-/* Three dots button */
-.more-btn {
-    margin-left: auto;
-    font-size: 22px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: inherit;
-}
-
 /* ============================================================
-   BOTTOM SHEET (New Feature, Styled to Match Original)
+   FLOATING STATS BOX (TOP RIGHT)
    ============================================================ */
-#bottomSheet {
+
+#floatingStats {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: -100%;
-    height: 65%;
-    background: white;
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
-    transition: bottom 0.3s ease;
-    padding: 20px;
-    z-index: 99999;
-    overflow-y: auto;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
 }
 
-body.dark #bottomSheet {
-    background: #222;
+body.dark #floatingStats {
+    background: rgba(30, 30, 30, 0.9);
     color: white;
 }
 
-#sheetHandle {
-    width: 60px;
-    height: 6px;
-    background: #ccc;
-    border-radius: 3px;
-    margin: 0 auto 15px auto;
+#genProgress div {
+    margin-top: 4px;
+    font-size: 14px;
 }
 
-#sheetHeader {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-#sheetSprite {
-    width: 80px;
-    height: 80px;
-}
-
-#sheetTypes img {
-    width: 32px;
-    height: 32px;
-    margin-right: 6px;
-}
-
-/* Game list */
-#sheetGames {
-    list-style: none;
-    padding: 0;
-    margin-bottom: 20px;
-}
-
-#sheetGames li {
-    padding: 4px 0;
-}
-
-/* Evolution rows */
-.evoRow {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 10px;
-}
-
-.evoRow img {
-    width: 55px;
-    height: 55px;
-}
-
-/* Make bottom sheet scroll smoothly */
-#bottomSheet::-webkit-scrollbar {
-    width: 8px;
-}
-
-#bottomSheet::-webkit-scrollbar-thumb {
-    background: #ccc;
-    border-radius: 4px;
-}
-
-body.dark #bottomSheet::-webkit-scrollbar-thumb {
-    background: #444;
-}
-/* Game list container */
-.game-list-container {
-    margin-top: 10px;
-    margin-bottom: 15px;
-}
-
-.game-list-title {
-    font-weight: bold;
-    margin-bottom: 6px;
-}
-
-.game-list-item {
-    padding: 3px 0;
-}
-
-/* DLC badge */
-#sheetDlcTag {
-    display: none;
-    margin-top: 10px;
-    align-self: flex-end;
-}
-/* ============================================================
-   BEAUTIFUL SLIDING TOGGLE SWITCHES
-   ============================================================ */
-
-.switch {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    cursor: pointer;
-    user-select: none;
-}
-
-.switch input {
-    display: none;
-}
-
-/* Track */
-.slider {
-    width: 52px;
-    height: 28px;
-    background: #ccc;
-    border-radius: 50px;
-    position: relative;
-    transition: background 0.3s ease;
-}
-
-/* Knob */
-.slider::before {
-    content: "";
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    background: white;
-    border-radius: 50%;
-    top: 3px;
-    left: 3px;
-    transition: transform 0.3s ease, background 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-}
-
-/* ON state */
-.switch input:checked + .slider {
-    background: #4ade80; /* green glow */
-    box-shadow: 0 0 8px #4ade80;
-}
-
-.switch input:checked + .slider::before {
-    transform: translateX(24px);
-    background: white;
-}
-
-/* Label text */
-.switch-label {
-    font-size: 15px;
-}
 /* ============================================================
    FLOATING TOGGLE BOX (BOTTOM LEFT)
    ============================================================ */
