@@ -8,7 +8,7 @@
 </head>
 <body>
 
-    <!-- Floating Stats Box -->
+    <!-- Floating Stats Box (Top Right) -->
     <div id="floatingStats">
         <div id="progress">0.00% complete</div>
         <div id="genProgress">
@@ -24,24 +24,25 @@
         </div>
     </div>
 
-    <div class="container">
-        <h1>Living Dex Checklist</h1>
-
-        <input id="searchBar" type="text" placeholder="Search Pokémon...">
-
-        <!-- Shiny Toggle -->
+    <!-- Floating Toggle Box (Bottom Left) -->
+    <div id="floatingToggles">
         <label class="switch">
             <input type="checkbox" id="shinyToggle">
             <span class="slider"></span>
-            <span class="switch-label">Shiny sprites</span>
+            <span class="switch-label">Shiny</span>
         </label>
 
-        <!-- Dark Mode Toggle -->
         <label class="switch">
             <input type="checkbox" id="darkModeToggle">
             <span class="slider"></span>
             <span class="switch-label">Dark Mode</span>
         </label>
+    </div>
+
+    <div class="container">
+        <h1>Living Dex Checklist</h1>
+
+        <input id="searchBar" type="text" placeholder="Search Pokémon...">
 
         <select id="sortSelect">
             <option value="dex">Sort by Dex</option>
