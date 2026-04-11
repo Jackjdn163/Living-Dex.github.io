@@ -472,3 +472,54 @@ body.dark #infoPanel {
     float: right;
     margin-bottom: 10px;
 }
+#infoSprite img {
+    width: 120px;
+    height: 120px;
+    display: block;
+    margin: 0 auto 10px auto;
+}
+
+#infoName {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#infoGames {
+    margin-bottom: 25px;
+    min-height: 40px; /* reserved space */
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding-bottom: 10px;
+}
+
+body.dark #infoGames {
+    border-color: rgba(255,255,255,0.2);
+}
+
+#infoEvolutions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.evoBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0,0,0,0.05);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+body.dark .evoBox {
+    background: rgba(255,255,255,0.08);
+}
+
+.evoBox img {
+    width: 60px;
+    height: 60px;
+}
+
+.evoMethod {
+    font-size: 14px;
+    opacity: 0.8;
+}
