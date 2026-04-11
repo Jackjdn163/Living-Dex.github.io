@@ -81,7 +81,6 @@ function loadTasksFromStorage() {
         tasks = [];
     }
 }
-
 /* ============================================================
    PROGRESS
    ============================================================ */
@@ -203,22 +202,24 @@ async function finishLoadingAnimation() {
     stopLoadingDots();
 
     loadingText.classList.add("fade-out");
-
     pokeball.classList.add("finish-spin");
-   
-setTimeout(() => {
-    pokeball.classList.add("shake");
-}, 200);
 
+    // Shake animation
+    setTimeout(() => {
+        pokeball.classList.add("shake");
+    }, 200);
+
+    // Green flash
     setTimeout(() => {
         pokeballCenter.classList.add("catch");
     }, 300);
 
+    // Fade out loading screen
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
+        loadingScreen.style.pointerEvents = "none";
     }, 900);
 }
-
 /* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
@@ -291,16 +292,33 @@ darkToggle.addEventListener("change", () => {
     document.body.classList.toggle("dark", isDark);
     localStorage.setItem("darkMode", isDark ? "1" : "0");
 
+    // Update loading screen instantly
     if (!loadingScreen.classList.contains("fade-out")) {
         loadingScreen.style.background = isDark ? "#1a1a1a" : "#ffffff";
     }
+
+    renderTasks(); // ensure list updates immediately
 });
 
+// Load saved dark mode
 if (localStorage.getItem("darkMode") === "1") {
     document.body.classList.add("dark");
     darkToggle.checked = true;
 }
 
+/* ============================================================
+   EVENT LISTENERS (INSTANT UPDATES)
+   ============================================================ */
+
+searchBar.addEventListener("input", renderTasks);
+
+shinyToggle.addEventListener("change", () => {
+    renderTasks();
+});
+
+sortSelect.addEventListener("change", () => {
+    renderTasks();
+});
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
@@ -315,12 +333,14 @@ async function init() {
     if (tasks.length === 0) {
         await importFromSheet();
     } else {
+        // Ensure older saves still have generation data
         tasks.forEach(t => {
             if (!t.gen) t.gen = getGeneration(t.dexRaw);
         });
         renderTasks();
     }
 
+    // Enforce minimum 5-second loading animation
     const elapsed = Date.now() - startTime;
     const minDuration = 5000;
 
