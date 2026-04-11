@@ -8,7 +8,24 @@
 </head>
 <body>
 
-    <!-- Floating Stats Box (Top Right) -->
+    <!-- ============================================================
+         LOADING SCREEN
+    ============================================================ -->
+    <div id="loadingScreen">
+        <div class="loading-content">
+            <div class="pokeball">
+                <div class="pokeball-top"></div>
+                <div class="pokeball-bottom"></div>
+                <div class="pokeball-center"></div>
+            </div>
+
+            <div id="loadingText">Loading<span id="loadingDots">.</span></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         FLOATING STATS BOX (TOP RIGHT)
+    ============================================================ -->
     <div id="floatingStats">
         <div id="progress">0.00% complete</div>
         <div id="genProgress">
@@ -24,7 +41,9 @@
         </div>
     </div>
 
-    <!-- Floating Toggle Box (Bottom Left) -->
+    <!-- ============================================================
+         FLOATING TOGGLE BOX (BOTTOM LEFT)
+    ============================================================ -->
     <div id="floatingToggles">
         <label class="switch">
             <input type="checkbox" id="shinyToggle">
@@ -39,6 +58,9 @@
         </label>
     </div>
 
+    <!-- ============================================================
+         MAIN CONTENT
+    ============================================================ -->
     <div class="container">
         <h1>Living Dex Checklist</h1>
 
@@ -56,7 +78,9 @@
         <ul id="taskList"></ul>
     </div>
 
-    <!-- Reset Confirmation Popup -->
+    <!-- ============================================================
+         RESET CONFIRMATION POPUP
+    ============================================================ -->
     <div id="resetPopup" class="popup hidden">
         <div class="popup-box">
             <h2>Reset Checklist?</h2>
