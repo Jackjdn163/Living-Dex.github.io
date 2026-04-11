@@ -14,6 +14,13 @@ const resetPopup = document.getElementById("resetPopup");
 const confirmReset = document.getElementById("confirmReset");
 const cancelReset = document.getElementById("cancelReset");
 
+/* Loading screen */
+const loadingScreen = document.getElementById("loadingScreen");
+const loadingText = document.getElementById("loadingText");
+const loadingDots = document.getElementById("loadingDots");
+const pokeball = document.querySelector(".pokeball");
+const pokeballCenter = document.querySelector(".pokeball-center");
+
 /* Per-generation progress */
 const genProgressEls = {
     1: document.getElementById("gen1Progress"),
@@ -32,6 +39,7 @@ const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = [];
+let dotInterval;
 
 /* ============================================================
    HELPERS
@@ -176,7 +184,39 @@ function renderTasks() {
 }
 
 /* ============================================================
-   IMPORT FROM SHEET (FAST, NO API CALLS)
+   LOADING SCREEN LOGIC
+   ============================================================ */
+
+function startLoadingDots() {
+    let count = 1;
+    dotInterval = setInterval(() => {
+        loadingDots.textContent = ".".repeat(count);
+        count = count === 3 ? 1 : count + 1;
+    }, 400);
+}
+
+function stopLoadingDots() {
+    clearInterval(dotInterval);
+}
+
+async function finishLoadingAnimation() {
+    stopLoadingDots();
+
+    loadingText.classList.add("fade-out");
+
+    pokeball.classList.add("finish-spin");
+
+    setTimeout(() => {
+        pokeballCenter.classList.add("catch");
+    }, 300);
+
+    setTimeout(() => {
+        loadingScreen.classList.add("fade-out");
+    }, 900);
+}
+
+/* ============================================================
+   IMPORT FROM SHEET
    ============================================================ */
 
 async function importFromSheet() {
@@ -263,6 +303,8 @@ if (darkToggle) {
    ============================================================ */
 
 async function init() {
+    startLoadingDots();
+
     loadTasksFromStorage();
 
     if (tasks.length === 0) {
@@ -273,6 +315,8 @@ async function init() {
         });
         renderTasks();
     }
+
+    await finishLoadingAnimation();
 }
 
 init();
