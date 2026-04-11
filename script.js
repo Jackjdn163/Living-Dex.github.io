@@ -279,23 +279,22 @@ confirmReset.addEventListener("click", async () => {
 });
 
 /* ============================================================
-   EVENT LISTENERS
+   DARK MODE INSTANT UPDATE FOR LOADING SCREEN
    ============================================================ */
 
-searchBar.addEventListener("input", renderTasks);
-shinyToggle.addEventListener("change", renderTasks);
-sortSelect.addEventListener("change", renderTasks);
+darkToggle.addEventListener("change", () => {
+    const isDark = darkToggle.checked;
+    document.body.classList.toggle("dark", isDark);
+    localStorage.setItem("darkMode", isDark ? "1" : "0");
 
-if (darkToggle) {
-    darkToggle.addEventListener("change", () => {
-        document.body.classList.toggle("dark", darkToggle.checked);
-        localStorage.setItem("darkMode", darkToggle.checked ? "1" : "0");
-    });
-
-    if (localStorage.getItem("darkMode") === "1") {
-        document.body.classList.add("dark");
-        darkToggle.checked = true;
+    if (!loadingScreen.classList.contains("fade-out")) {
+        loadingScreen.style.background = isDark ? "#1a1a1a" : "#ffffff";
     }
+});
+
+if (localStorage.getItem("darkMode") === "1") {
+    document.body.classList.add("dark");
+    darkToggle.checked = true;
 }
 
 /* ============================================================
@@ -304,6 +303,8 @@ if (darkToggle) {
 
 async function init() {
     startLoadingDots();
+
+    const startTime = Date.now();
 
     loadTasksFromStorage();
 
@@ -314,6 +315,13 @@ async function init() {
             if (!t.gen) t.gen = getGeneration(t.dexRaw);
         });
         renderTasks();
+    }
+
+    const elapsed = Date.now() - startTime;
+    const minDuration = 5000;
+
+    if (elapsed < minDuration) {
+        await new Promise(resolve => setTimeout(resolve, minDuration - elapsed));
     }
 
     await finishLoadingAnimation();
