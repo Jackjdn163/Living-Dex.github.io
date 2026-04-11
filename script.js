@@ -221,7 +221,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING
+   EVOLUTION FETCHING (FIXED)
    ============================================================ */
 async function getEvolutionData(task) {
     const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
@@ -239,15 +239,18 @@ function parseEvolutionChain(chain, targetName) {
     let prev = null;
     let next = null;
 
-    function search(node, parent) {
-        if (node.species.name === targetName) {
+    function walk(node, parent) {
+        const name = node.species.name;
+
+        if (name === targetName) {
             if (parent) prev = parent;
             if (node.evolves_to.length > 0) next = node.evolves_to[0];
         }
-        node.evolves_to.forEach(child => search(child, node));
+
+        node.evolves_to.forEach(child => walk(child, node));
     }
 
-    search(chain, null);
+    walk(chain, null);
 
     return { prev, next };
 }
