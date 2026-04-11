@@ -281,7 +281,7 @@ body.dark #taskList li {
 #floatingStats {
     position: fixed;
     top: 20px;
-    right: 20px;
+    left: 20px;   /* moved from right to left */
     background: rgba(255, 255, 255, 0.9);
     padding: 14px 18px;
     border-radius: 12px;
@@ -293,6 +293,7 @@ body.dark #floatingStats {
     background: rgba(30, 30, 30, 0.9);
     color: white;
 }
+
 
 #genProgress div {
     margin-top: 4px;
