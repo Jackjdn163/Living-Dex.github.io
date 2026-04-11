@@ -1,15 +1,19 @@
 /* ============================================================
-   BASE PAGE STYLING
+   GLOBAL RESET + BASE
    ============================================================ */
-body {
+
+* {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    background: #f5f5f5;
     color: #222;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding-bottom: 120px;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 body.dark {
@@ -17,275 +21,22 @@ body.dark {
     color: #eee;
 }
 
-header {
-    width: 100%;
-    max-width: 900px;
-    padding: 20px;
-    text-align: center;
-}
-
-.controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-}
-
-.toggle {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
 /* ============================================================
-   FLOATING BOXES
+   LOADING SCREEN
    ============================================================ */
 
-/* Floating Stats Box — TOP LEFT */
-#floatingStats {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    padding: 14px 18px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 9999;
-}
-
-body.dark #floatingStats {
-    background: rgba(30, 30, 30, 0.85);
-    color: white;
-}
-
-/* Floating Toggles Box — BOTTOM LEFT */
-#floatingToggles {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    padding: 14px 18px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    z-index: 9999;
-}
-
-body.dark #floatingToggles {
-    background: rgba(30, 30, 30, 0.85);
-    color: white;
-}
-
-/* Toggle Switches */
-.switch {
-    position: relative;
-    width: 50px;
-    height: 26px;
-    display: inline-block;
-}
-
-.switch input {
-    display: none;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    background: #ccc;
-    border-radius: 26px;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    transition: 0.3s;
-}
-
-.slider:before {
-    content: "";
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    left: 2px;
-    top: 2px;
-    background: white;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-input:checked + .slider {
-    background: #4caf50;
-}
-
-input:checked + .slider:before {
-    transform: translateX(24px);
-}
-
-/* ============================================================
-   LIST STYLING
-   ============================================================ */
-#taskList {
-    list-style: none;
-    padding: 0;
-    margin: 20px 0;
-    width: 100%;
-    max-width: 900px;
-}
-
-#taskList li {
-    background: white;
-    margin: 6px 0;
-    padding: 10px 14px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-body.dark #taskList li {
-    background: #2b2b2b;
-}
-
-#taskList li.completed {
-    opacity: 0.5;
-}
-
-.sprite {
-    width: 50px;
-    height: 50px;
-}
-
-.more-btn {
-    margin-left: auto;
-    background: none;
-    border: none;
-    font-size: 22px;
-    cursor: pointer;
-    opacity: 0.6;
-}
-
-.more-btn:hover {
-    opacity: 1;
-}
-
-/* ============================================================
-   PROGRESS
-   ============================================================ */
-#progressSection {
-    text-align: center;
-    margin-top: 10px;
-}
-
-#genProgress p {
-    margin: 4px 0;
-}
-
-/* ============================================================
-   RESET POPUP
-   ============================================================ */
-.popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.6);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.popup.hidden {
-    display: none;
-}
-
-.popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-body.dark .popup-content {
-    background: #2b2b2b;
-}
-
-/* ============================================================
-   INFO PANEL
-   ============================================================ */
-#infoPanel {
-    position: fixed;
-    top: 0;
-    right: -400px;
-    width: 350px;
-    height: 100%;
-    background: white;
-    border-left: 3px solid #ccc;
-    transition: right 0.3s ease;
-    padding: 20px;
-    overflow-y: auto;
-    z-index: 9999;
-}
-
-body.dark #infoPanel {
-    background: #2b2b2b;
-    border-color: #444;
-}
-
-#infoPanel.open {
-    right: 0;
-}
-
-#closeInfoPanel {
-    background: none;
-    border: none;
-    font-size: 26px;
-    cursor: pointer;
-    float: right;
-}
-
-#infoSprite img {
-    width: 120px;
-    display: block;
-    margin: 0 auto;
-}
-
-.evoBox {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #f5f5f5;
-    padding: 10px;
-    border-radius: 8px;
-}
-
-body.dark .evoBox {
-    background: #3a3a3a;
-}
-
-.evoBox img {
-    width: 60px;
-}
-
-/* ============================================================
-   LOADING SCREEN + POKÉBALL ANIMATION
-   ============================================================ */
 #loadingScreen {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: white;
+    background: #ffffff;
     display: flex;
-    flex-direction: column;
     justify-content: center;
     align-items: center;
-    z-index: 999;
-    transition: opacity 0.5s ease;
+    z-index: 999999;
+    transition: opacity 0.6s ease;
 }
 
 body.dark #loadingScreen {
@@ -294,87 +45,481 @@ body.dark #loadingScreen {
 
 #loadingScreen.fade-out {
     opacity: 0;
-    pointer-events: none;
+    pointer-events: none !important;
 }
 
+.loading-content {
+    text-align: center;
+}
+
+/* Pokéball container */
 .pokeball {
     width: 120px;
     height: 120px;
-    border: 6px solid black;
-    border-radius: 50%;
     position: relative;
-    overflow: hidden;
-    animation: spin 1.5s linear infinite;
-}
-
-.pokeball::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    width: 100%;
-    height: 50%;
-    background: red;
-}
-
-.pokeball::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 50%;
-    background: white;
-}
-
-.pokeball-center {
-    width: 40px;
-    height: 40px;
-    background: white;
-    border: 6px solid black;
     border-radius: 50%;
+    overflow: hidden;
+    border: 6px solid black;
+    animation: spin 1.2s linear infinite;
+}
+
+/* Top half */
+.pokeball-top {
+    background: #ff0000;
+    width: 100%;
+    height: 50%;
+}
+
+body.dark .pokeball-top {
+    background: #cc0000;
+}
+
+/* Bottom half */
+.pokeball-bottom {
+    background: #ffffff;
+    width: 100%;
+    height: 50%;
+}
+
+body.dark .pokeball-bottom {
+    background: #e5e5e5;
+}
+
+/* Center button */
+.pokeball-center {
     position: absolute;
     top: 50%;
     left: 50%;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border: 6px solid black;
+    border-radius: 50%;
     transform: translate(-50%, -50%);
+    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+body.dark .pokeball-center {
+    background: #dddddd;
+}
+
+/* Green flash when loading finishes */
 .pokeball-center.catch {
-    background: #00ff00;
-    box-shadow: 0 0 20px #00ff00;
+    background: #4ade80;
+    box-shadow: 0 0 20px 10px #4ade80;
+    border-color: #4ade80;
 }
 
-.pokeball.finish-spin {
-    animation: none;
-}
-
-.pokeball.shake {
-    animation: shake 0.4s ease-in-out 3;
-}
-
+/* Spin animation */
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 
+/* Stop spinning + rotate upright */
+.pokeball.finish-spin {
+    animation: none;
+    transform: rotate(0deg);
+    transition: transform 0.4s ease;
+}
+
+/* Shake animation */
 @keyframes shake {
     0% { transform: translateX(0); }
-    25% { transform: translateX(-8px); }
-    50% { transform: translateX(8px); }
-    75% { transform: translateX(-8px); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
     100% { transform: translateX(0); }
 }
 
+.pokeball.shake {
+    animation: shake 0.35s ease;
+}
+
+/* Loading text */
 #loadingText {
     margin-top: 20px;
     font-size: 22px;
+    font-weight: bold;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+body.dark #loadingText {
+    color: #ffffff;
 }
 
 #loadingText.fade-out {
     opacity: 0;
 }
 
+/* Animated dots */
+#loadingDots {
+    display: inline-block;
+    width: 24px;
+    text-align: left;
+}
+
 /* ============================================================
-   UTILITY
+   MAIN CONTAINER
    ============================================================ */
-.hidden {
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+
+#searchBar {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+#searchBar:focus {
+    border-color: #4ade80;
+}
+
+body.dark #searchBar {
+    background: #2a2a2a;
+    border-color: #555;
+    color: white;
+}
+
+/* ============================================================
+   SORT + RESET
+   ============================================================ */
+
+#sortSelect {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    margin-bottom: 15px;
+}
+
+#resetBtn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s ease;
+}
+
+#resetBtn:hover {
+    background: #dc2626;
+}
+
+/* ============================================================
+   TASK LIST
+   ============================================================ */
+
+#taskList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#taskList li {
+    background: white;
+    padding: 12px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+body.dark #taskList li {
+    background: #2a2a2a;
+}
+
+#taskList li.completed {
+    opacity: 0.45;
+}
+
+.sprite {
+    width: 50px;
+    height: 50px;
+}
+
+/* ============================================================
+   THREE DOTS BUTTON
+   ============================================================ */
+
+.more-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 8px;
+    color: inherit;
+}
+
+/* ============================================================
+   FLOATING STATS BOX (TOP LEFT)
+   ============================================================ */
+
+#floatingStats {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
+}
+
+body.dark #floatingStats {
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+}
+
+#genProgress div {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+/* ============================================================
+   FLOATING TOGGLE BOX
+   ============================================================ */
+
+#floatingToggles {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 9999;
+}
+
+body.dark #floatingToggles {
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+}
+
+/* ============================================================
+   SLIDER SWITCHES
+   ============================================================ */
+
+.switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch input {
     display: none;
+}
+
+.slider {
+    width: 52px;
+    height: 28px;
+    background: #ccc;
+    border-radius: 50px;
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.switch input:checked + .slider {
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(24px);
+}
+
+.switch-label {
+    font-size: 15px;
+}
+
+/* ============================================================
+   RESET POPUP
+   ============================================================ */
+
+.popup.hidden {
+    display: none;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+
+.popup-box {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+body.dark .popup-box {
+    background: #2a2a2a;
+    color: white;
+}
+
+.popup-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-buttons button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.popup-buttons .danger {
+    background: #ef4444;
+    color: white;
+}
+
+.popup-buttons #cancelReset {
+    background: #ccc;
+}
+
+/* ============================================================
+   RIGHT-SIDE INFO PANEL
+   ============================================================ */
+
+#infoPanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background: rgba(255,255,255,0.95);
+    box-shadow: -4px 0 12px rgba(0,0,0,0.25);
+    padding: 20px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 99999;
+}
+
+body.dark #infoPanel {
+    background: rgba(30,30,30,0.95);
+    color: white;
+}
+
+#infoPanel.open {
+    transform: translateX(0);
+}
+
+#closeInfoPanel {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    float: right;
+    margin-bottom: 10px;
+}
+#infoSprite img {
+    width: 120px;
+    height: 120px;
+    display: block;
+    margin: 0 auto 10px auto;
+}
+
+#infoName {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#infoGames {
+    margin-bottom: 25px;
+    min-height: 40px; /* reserved space */
+    border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding-bottom: 10px;
+}
+
+body.dark #infoGames {
+    border-color: rgba(255,255,255,0.2);
+}
+
+#infoEvolutions {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.evoBox {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0,0,0,0.05);
+    padding: 10px;
+    border-radius: 10px;
+}
+
+body.dark .evoBox {
+    background: rgba(255,255,255,0.08);
+}
+
+.evoBox img {
+    width: 60px;
+    height: 60px;
+}
+
+.evoMethod {
+    font-size: 14px;
+    opacity: 0.8;
 }
