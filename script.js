@@ -9,19 +9,16 @@ const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
 const darkToggle = document.getElementById("darkModeToggle");
 
-/* Reset popup */
 const resetPopup = document.getElementById("resetPopup");
 const confirmReset = document.getElementById("confirmReset");
 const cancelReset = document.getElementById("cancelReset");
 
-/* Loading screen */
 const loadingScreen = document.getElementById("loadingScreen");
 const loadingText = document.getElementById("loadingText");
 const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
 const pokeballCenter = document.querySelector(".pokeball-center");
 
-/* Per-generation progress */
 const genProgressEls = {
     1: document.getElementById("gen1Progress"),
     2: document.getElementById("gen2Progress"),
@@ -34,7 +31,6 @@ const genProgressEls = {
     9: document.getElementById("gen9Progress"),
 };
 
-/* Google Sheet */
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
@@ -64,7 +60,6 @@ function getGeneration(n) {
 /* ============================================================
    STORAGE
    ============================================================ */
-
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
@@ -85,7 +80,6 @@ function loadTasksFromStorage() {
 /* ============================================================
    PROGRESS
    ============================================================ */
-
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
@@ -118,7 +112,6 @@ function updateAllProgress() {
 /* ============================================================
    SORTING
    ============================================================ */
-
 function getSortedTasks() {
     const mode = sortSelect.value;
     const arr = [...tasks];
@@ -139,7 +132,6 @@ function getSortedTasks() {
 /* ============================================================
    RENDER LIST
    ============================================================ */
-
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
@@ -168,7 +160,6 @@ function renderTasks() {
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${task.name}`;
 
-        // Three dots button
         const moreBtn = document.createElement("button");
         moreBtn.className = "more-btn";
         moreBtn.textContent = "⋮";
@@ -193,10 +184,10 @@ function renderTasks() {
 
     updateAllProgress();
 }
+
 /* ============================================================
    LOADING SCREEN LOGIC
    ============================================================ */
-
 function startLoadingDots() {
     let count = 1;
     dotInterval = setInterval(() => {
@@ -215,17 +206,14 @@ async function finishLoadingAnimation() {
     loadingText.classList.add("fade-out");
     pokeball.classList.add("finish-spin");
 
-    // Shake animation
     setTimeout(() => {
         pokeball.classList.add("shake");
     }, 200);
 
-    // Green flash
     setTimeout(() => {
         pokeballCenter.classList.add("catch");
     }, 300);
 
-    // Fade out loading screen
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
         loadingScreen.style.pointerEvents = "none";
@@ -233,9 +221,54 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
+   EVOLUTION FETCHING
+   ============================================================ */
+async function getEvolutionData(task) {
+    const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
+    const speciesRes = await fetch(speciesURL);
+    const speciesData = await speciesRes.json();
+
+    const evoURL = speciesData.evolution_chain.url;
+    const evoRes = await fetch(evoURL);
+    const evoData = await evoRes.json();
+
+    return parseEvolutionChain(evoData.chain, task.name.toLowerCase());
+}
+
+function parseEvolutionChain(chain, targetName) {
+    let prev = null;
+    let next = null;
+
+    function search(node, parent) {
+        if (node.species.name === targetName) {
+            if (parent) prev = parent;
+            if (node.evolves_to.length > 0) next = node.evolves_to[0];
+        }
+        node.evolves_to.forEach(child => search(child, node));
+    }
+
+    search(chain, null);
+
+    return { prev, next };
+}
+
+function formatEvolutionMethod(details) {
+    if (!details) return "";
+
+    const d = details[0];
+
+    if (d.min_level) return `Level ${d.min_level}`;
+    if (d.item) return `Use ${d.item.name}`;
+    if (d.trigger.name === "trade") return "Trade";
+    if (d.min_happiness) return "High Friendship";
+    if (d.min_beauty) return "High Beauty";
+    if (d.min_affection) return "High Affection";
+
+    return d.trigger.name.replace(/-/g, " ");
+}
+/* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
-
 async function importFromSheet() {
     const response = await fetch(GOOGLE_SHEET_URL);
     const csv = await response.text();
@@ -272,7 +305,6 @@ async function importFromSheet() {
 /* ============================================================
    RESET POPUP LOGIC
    ============================================================ */
-
 resetBtn.addEventListener("click", () => {
     resetPopup.classList.remove("hidden");
 });
@@ -296,9 +328,8 @@ confirmReset.addEventListener("click", async () => {
 });
 
 /* ============================================================
-   DARK MODE INSTANT UPDATE
+   DARK MODE
    ============================================================ */
-
 darkToggle.addEventListener("change", () => {
     const isDark = darkToggle.checked;
     document.body.classList.toggle("dark", isDark);
@@ -319,29 +350,60 @@ if (localStorage.getItem("darkMode") === "1") {
 /* ============================================================
    EVENT LISTENERS
    ============================================================ */
-
 searchBar.addEventListener("input", renderTasks);
-
-shinyToggle.addEventListener("change", () => {
-    renderTasks();
-});
-
-sortSelect.addEventListener("change", () => {
-    renderTasks();
-});
+shinyToggle.addEventListener("change", renderTasks);
+sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   RIGHT-SIDE INFO PANEL
+   INFO PANEL (SPRITE + NAME + GAMES PLACEHOLDER + EVOLUTIONS)
    ============================================================ */
-
-function openInfoPanel(task) {
+async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
-    const content = document.getElementById("infoContent");
 
-    content.innerHTML = `
-        <h2>#${task.dex} — ${task.name}</h2>
-        <p>More info coming soon...</p>
+    document.getElementById("infoSprite").innerHTML = `
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
     `;
+
+    document.getElementById("infoName").textContent = `#${task.dex} — ${task.name}`;
+
+    document.getElementById("infoGames").innerHTML = `
+        <p style="opacity:0.5; text-align:center;">Games will appear here</p>
+    `;
+
+    const evo = await getEvolutionData(task);
+
+    const evoBox = document.getElementById("infoEvolutions");
+    evoBox.innerHTML = "";
+
+    if (evo.prev) {
+        const p = evo.prev;
+        const method = formatEvolutionMethod(p.evolution_details);
+
+        evoBox.innerHTML += `
+            <div class="evoBox">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.species.url.split('/')[6]}.png">
+                <div>
+                    <strong>${p.species.name}</strong><br>
+                    <span class="evoMethod">${method}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    if (evo.next) {
+        const n = evo.next;
+        const method = formatEvolutionMethod(n.evolution_details);
+
+        evoBox.innerHTML += `
+            <div class="evoBox">
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${n.species.url.split('/')[6]}.png">
+                <div>
+                    <strong>${n.species.name}</strong><br>
+                    <span class="evoMethod">${method}</span>
+                </div>
+            </div>
+        `;
+    }
 
     panel.classList.add("open");
 }
@@ -353,7 +415,6 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
-
 async function init() {
     startLoadingDots();
 
