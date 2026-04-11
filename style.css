@@ -1,106 +1,474 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Dex Checklist</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+/* ============================================================
+   GLOBAL RESET + BASE
+   ============================================================ */
 
-    <!-- ============================================================
-         LOADING SCREEN
-    ============================================================ -->
-    <div id="loadingScreen">
-        <div class="loading-content">
-            <div class="pokeball">
-                <div class="pokeball-top"></div>
-                <div class="pokeball-bottom"></div>
-                <div class="pokeball-center"></div>
-            </div>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
 
-            <div id="loadingText">Loading<span id="loadingDots">.</span></div>
-        </div>
-    </div>
+body {
+    background: #f5f5f5;
+    color: #222;
+    padding-bottom: 120px;
+    transition: background 0.3s ease, color 0.3s ease;
+}
 
-    <!-- ============================================================
-         FLOATING STATS BOX (TOP LEFT)
-    ============================================================ -->
-    <div id="floatingStats">
-        <div id="progress">0.00% complete</div>
-        <div id="genProgress">
-            <div id="gen1Progress">Gen 1: 0.00%</div>
-            <div id="gen2Progress">Gen 2: 0.00%</div>
-            <div id="gen3Progress">Gen 3: 0.00%</div>
-            <div id="gen4Progress">Gen 4: 0.00%</div>
-            <div id="gen5Progress">Gen 5: 0.00%</div>
-            <div id="gen6Progress">Gen 6: 0.00%</div>
-            <div id="gen7Progress">Gen 7: 0.00%</div>
-            <div id="gen8Progress">Gen 8: 0.00%</div>
-            <div id="gen9Progress">Gen 9: 0.00%</div>
-        </div>
-    </div>
+body.dark {
+    background: #1a1a1a;
+    color: #eee;
+}
 
-    <!-- ============================================================
-         FLOATING TOGGLE BOX (BOTTOM LEFT)
-    ============================================================ -->
-    <div id="floatingToggles">
-        <label class="switch">
-            <input type="checkbox" id="shinyToggle">
-            <span class="slider"></span>
-            <span class="switch-label">Shiny</span>
-        </label>
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
 
-        <label class="switch">
-            <input type="checkbox" id="darkModeToggle">
-            <span class="slider"></span>
-            <span class="switch-label">Dark Mode</span>
-        </label>
-    </div>
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    transition: opacity 0.6s ease;
+}
 
-    <!-- ============================================================
-         MAIN CONTENT
-    ============================================================ -->
-    <div class="container">
-        <h1>Living Dex Checklist</h1>
+body.dark #loadingScreen {
+    background: #1a1a1a;
+}
 
-        <input id="searchBar" type="text" placeholder="Search Pokémon...">
+#loadingScreen.fade-out {
+    opacity: 0;
+    pointer-events: none !important;
+}
 
-        <select id="sortSelect">
-            <option value="dex">Sort by Dex</option>
-            <option value="name">Sort by Name</option>
-            <option value="caught">Sort by Caught</option>
-            <option value="uncaught">Sort by Uncaught</option>
-        </select>
+.loading-content {
+    text-align: center;
+}
 
-        <button id="resetBtn">Reset Checklist</button>
+/* Pokéball container */
+.pokeball {
+    width: 120px;
+    height: 120px;
+    position: relative;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 6px solid black;
+    animation: spin 1.2s linear infinite;
+}
 
-        <ul id="taskList"></ul>
-    </div>
+/* Top half */
+.pokeball-top {
+    background: #ff0000;
+    width: 100%;
+    height: 50%;
+}
 
-    <!-- ============================================================
-         RESET CONFIRMATION POPUP
-    ============================================================ -->
-    <div id="resetPopup" class="popup hidden">
-        <div class="popup-box">
-            <h2>Reset Checklist?</h2>
-            <p>This will clear all progress. Are you sure?</p>
+body.dark .pokeball-top {
+    background: #cc0000;
+}
 
-            <div class="popup-buttons">
-                <button id="confirmReset" class="danger">Yes, Reset</button>
-                <button id="cancelReset">Cancel</button>
-            </div>
-        </div>
-    </div>
+/* Bottom half */
+.pokeball-bottom {
+    background: #ffffff;
+    width: 100%;
+    height: 50%;
+}
 
-    <!-- ============================================================
-         RIGHT-SIDE INFO PANEL
-    ============================================================ -->
-    <div id="infoPanel" class="hidden">
-        <button id="closeInfoPanel">✕</button>
-        <div id="infoContent">Select a Pokémon</div>
-    </div>
+body.dark .pokeball-bottom {
+    background: #e5e5e5;
+}
 
-    <script src="script.js"></script>
-</body>
-</html>
+/* Center button */
+.pokeball-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 38px;
+    height: 38px;
+    background: white;
+    border: 6px solid black;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+body.dark .pokeball-center {
+    background: #dddddd;
+}
+
+/* Green flash when loading finishes */
+.pokeball-center.catch {
+    background: #4ade80;
+    box-shadow: 0 0 20px 10px #4ade80;
+    border-color: #4ade80;
+}
+
+/* Spin animation */
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Stop spinning + rotate upright */
+.pokeball.finish-spin {
+    animation: none;
+    transform: rotate(0deg);
+    transition: transform 0.4s ease;
+}
+
+/* Shake animation */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    50% { transform: translateX(6px); }
+    75% { transform: translateX(-4px); }
+    100% { transform: translateX(0); }
+}
+
+.pokeball.shake {
+    animation: shake 0.35s ease;
+}
+
+/* Loading text */
+#loadingText {
+    margin-top: 20px;
+    font-size: 22px;
+    font-weight: bold;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+}
+
+body.dark #loadingText {
+    color: #ffffff;
+}
+
+#loadingText.fade-out {
+    opacity: 0;
+}
+
+/* Animated dots */
+#loadingDots {
+    display: inline-block;
+    width: 24px;
+    text-align: left;
+}
+
+/* ============================================================
+   MAIN CONTAINER
+   ============================================================ */
+
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+
+#searchBar {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    margin-bottom: 15px;
+    outline: none;
+    transition: border 0.2s ease;
+}
+
+#searchBar:focus {
+    border-color: #4ade80;
+}
+
+body.dark #searchBar {
+    background: #2a2a2a;
+    border-color: #555;
+    color: white;
+}
+
+/* ============================================================
+   SORT + RESET
+   ============================================================ */
+
+#sortSelect {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 10px;
+    border: 2px solid #ccc;
+    margin-bottom: 15px;
+}
+
+#resetBtn {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background 0.2s ease;
+}
+
+#resetBtn:hover {
+    background: #dc2626;
+}
+
+/* ============================================================
+   TASK LIST
+   ============================================================ */
+
+#taskList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+#taskList li {
+    background: white;
+    padding: 12px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+body.dark #taskList li {
+    background: #2a2a2a;
+}
+
+#taskList li.completed {
+    opacity: 0.45;
+}
+
+.sprite {
+    width: 50px;
+    height: 50px;
+}
+
+/* ============================================================
+   THREE DOTS BUTTON
+   ============================================================ */
+
+.more-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 0 8px;
+    color: inherit;
+}
+
+/* ============================================================
+   FLOATING STATS BOX (TOP LEFT)
+   ============================================================ */
+
+#floatingStats {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
+}
+
+body.dark #floatingStats {
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+}
+
+#genProgress div {
+    margin-top: 4px;
+    font-size: 14px;
+}
+
+/* ============================================================
+   FLOATING TOGGLE BOX
+   ============================================================ */
+
+#floatingToggles {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 9999;
+}
+
+body.dark #floatingToggles {
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+}
+
+/* ============================================================
+   SLIDER SWITCHES
+   ============================================================ */
+
+.switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    width: 52px;
+    height: 28px;
+    background: #ccc;
+    border-radius: 50px;
+    position: relative;
+    transition: background 0.3s ease;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    top: 3px;
+    left: 3px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.switch input:checked + .slider {
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(24px);
+}
+
+.switch-label {
+    font-size: 15px;
+}
+
+/* ============================================================
+   RESET POPUP
+   ============================================================ */
+
+.popup.hidden {
+    display: none;
+}
+
+.popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+}
+
+.popup-box {
+    background: white;
+    padding: 25px;
+    border-radius: 14px;
+    width: 90%;
+    max-width: 350px;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+}
+
+body.dark .popup-box {
+    background: #2a2a2a;
+    color: white;
+}
+
+.popup-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.popup-buttons button {
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.popup-buttons .danger {
+    background: #ef4444;
+    color: white;
+}
+
+.popup-buttons #cancelReset {
+    background: #ccc;
+}
+
+/* ============================================================
+   RIGHT-SIDE INFO PANEL
+   ============================================================ */
+
+#infoPanel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 320px;
+    height: 100%;
+    background: rgba(255,255,255,0.95);
+    box-shadow: -4px 0 12px rgba(0,0,0,0.25);
+    padding: 20px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 99999;
+}
+
+body.dark #infoPanel {
+    background: rgba(30,30,30,0.95);
+    color: white;
+}
+
+#infoPanel.open {
+    transform: translateX(0);
+}
+
+#closeInfoPanel {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    float: right;
+    margin-bottom: 10px;
+}
