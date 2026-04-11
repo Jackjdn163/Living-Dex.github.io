@@ -205,6 +205,10 @@ async function finishLoadingAnimation() {
     loadingText.classList.add("fade-out");
 
     pokeball.classList.add("finish-spin");
+   
+setTimeout(() => {
+    pokeball.classList.add("shake");
+}, 200);
 
     setTimeout(() => {
         pokeballCenter.classList.add("catch");
