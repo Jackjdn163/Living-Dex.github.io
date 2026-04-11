@@ -39,6 +39,90 @@ header {
 }
 
 /* ============================================================
+   FLOATING BOXES
+   ============================================================ */
+
+/* Floating Stats Box — TOP LEFT */
+#floatingStats {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
+}
+
+body.dark #floatingStats {
+    background: rgba(30, 30, 30, 0.85);
+    color: white;
+}
+
+/* Floating Toggles Box — BOTTOM LEFT */
+#floatingToggles {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 9999;
+}
+
+body.dark #floatingToggles {
+    background: rgba(30, 30, 30, 0.85);
+    color: white;
+}
+
+/* Toggle Switches */
+.switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    display: inline-block;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    background: #ccc;
+    border-radius: 26px;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: 0.3s;
+}
+
+.slider:before {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    left: 2px;
+    top: 2px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background: #4caf50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* ============================================================
    LIST STYLING
    ============================================================ */
 #taskList {
@@ -143,6 +227,7 @@ body.dark .popup-content {
     transition: right 0.3s ease;
     padding: 20px;
     overflow-y: auto;
+    z-index: 9999;
 }
 
 body.dark #infoPanel {
@@ -186,7 +271,7 @@ body.dark .evoBox {
 }
 
 /* ============================================================
-   LOADING SCREEN
+   LOADING SCREEN + POKÉBALL ANIMATION
    ============================================================ */
 #loadingScreen {
     position: fixed;
@@ -253,13 +338,29 @@ body.dark #loadingScreen {
 }
 
 .pokeball-center.catch {
-    background: yellow;
-    box-shadow: 0 0 20px yellow;
+    background: #00ff00;
+    box-shadow: 0 0 20px #00ff00;
+}
+
+.pokeball.finish-spin {
+    animation: none;
+}
+
+.pokeball.shake {
+    animation: shake 0.4s ease-in-out 3;
 }
 
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+    100% { transform: translateX(0); }
 }
 
 #loadingText {
