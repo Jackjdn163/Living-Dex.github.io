@@ -9,6 +9,11 @@ const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
 const darkToggle = document.getElementById("darkModeToggle");
 
+/* Reset popup */
+const resetPopup = document.getElementById("resetPopup");
+const confirmReset = document.getElementById("confirmReset");
+const cancelReset = document.getElementById("cancelReset");
+
 /* Per-generation progress */
 const genProgressEls = {
     1: document.getElementById("gen1Progress"),
@@ -171,7 +176,7 @@ function renderTasks() {
 }
 
 /* ============================================================
-   IMPORT FROM SHEET (NO POKEAPI CALLS → FAST)
+   IMPORT FROM SHEET (FAST, NO API CALLS)
    ============================================================ */
 
 async function importFromSheet() {
@@ -208,21 +213,34 @@ async function importFromSheet() {
 }
 
 /* ============================================================
-   EVENT LISTENERS
+   RESET POPUP LOGIC
    ============================================================ */
 
-resetBtn.addEventListener("click", async () => {
+resetBtn.addEventListener("click", () => {
+    resetPopup.classList.remove("hidden");
+});
+
+cancelReset.addEventListener("click", () => {
+    resetPopup.classList.add("hidden");
+});
+
+confirmReset.addEventListener("click", async () => {
+    resetPopup.classList.add("hidden");
+
     localStorage.removeItem("tasks");
     tasks = [];
-    progressDisplay.textContent = "0.00% complete";
 
+    progressDisplay.textContent = "0.00% complete";
     Object.values(genProgressEls).forEach(el => {
-        if (!el) return;
         el.textContent = el.textContent.replace(/(\d+(\.\d+)?)%/, "0.00%");
     });
 
     await importFromSheet();
 });
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
 
 searchBar.addEventListener("input", renderTasks);
 shinyToggle.addEventListener("change", renderTasks);
@@ -250,7 +268,6 @@ async function init() {
     if (tasks.length === 0) {
         await importFromSheet();
     } else {
-        // Ensure gen is present for older saved data
         tasks.forEach(t => {
             if (!t.gen) t.gen = getGeneration(t.dexRaw);
         });
