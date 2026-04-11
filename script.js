@@ -27,7 +27,6 @@ const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
 let tasks = [];
-let imported = localStorage.getItem("importedFromSheet");
 
 /* ============================================================
    HELPERS
@@ -50,34 +49,30 @@ function getGeneration(n) {
 }
 
 /* ============================================================
-   FETCH TYPES
+   STORAGE
    ============================================================ */
-async function fetchTypesFromPokeAPI(dexNumber) {
-    try {
-        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
-        const data = await res.json();
-        return data.types
-            .map(t => t.type.name.charAt(0).toUpperCase() + t.type.name.slice(1))
-            .join("/");
-    } catch {
-        return "";
-    }
-}
 
-/* ============================================================
-   SAVE / LOAD
-   ============================================================ */
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
 }
 
-function loadTasks() {
-    tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+function loadTasksFromStorage() {
+    const raw = localStorage.getItem("tasks");
+    if (!raw) {
+        tasks = [];
+        return;
+    }
+    try {
+        tasks = JSON.parse(raw);
+    } catch {
+        tasks = [];
+    }
 }
 
 /* ============================================================
    PROGRESS
    ============================================================ */
+
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
@@ -86,7 +81,8 @@ function updateOverallProgress() {
 }
 
 function updateGenProgress() {
-    const totals = {}, caught = {};
+    const totals = {};
+    const caught = {};
 
     tasks.forEach(t => {
         totals[t.gen] = (totals[t.gen] || 0) + 1;
@@ -109,6 +105,7 @@ function updateAllProgress() {
 /* ============================================================
    SORTING
    ============================================================ */
+
 function getSortedTasks() {
     const mode = sortSelect.value;
     const arr = [...tasks];
@@ -129,6 +126,7 @@ function getSortedTasks() {
 /* ============================================================
    RENDER LIST
    ============================================================ */
+
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
@@ -173,53 +171,48 @@ function renderTasks() {
 }
 
 /* ============================================================
-   IMPORT FROM SHEET
+   IMPORT FROM SHEET (NO POKEAPI CALLS → FAST)
    ============================================================ */
+
 async function importFromSheet() {
-    try {
-        const response = await fetch(GOOGLE_SHEET_URL);
-        const csv = await response.text();
-        const rows = csv.split("\n").slice(1);
+    const response = await fetch(GOOGLE_SHEET_URL);
+    const csv = await response.text();
+    const rows = csv.split("\n").slice(1);
 
-        tasks = [];
+    const newTasks = [];
 
-        for (const row of rows) {
-            if (!row.trim()) continue;
+    for (const row of rows) {
+        if (!row.trim()) continue;
 
-            const cols = row.split(",");
-            const dexRaw = cols[0]?.trim();
-            const name = cols[1]?.trim();
+        const cols = row.split(",");
+        const dexRaw = cols[0]?.trim();
+        const name = cols[1]?.trim();
 
-            if (!dexRaw || !name) continue;
+        if (!dexRaw || !name) continue;
 
-            const dex = padDex(dexRaw);
-            const gen = getGeneration(dexRaw);
-            const type = await fetchTypesFromPokeAPI(dexRaw);
+        const dex = padDex(dexRaw);
+        const gen = getGeneration(dexRaw);
 
-            tasks.push({
-                dex,
-                dexRaw,
-                name,
-                gen,
-                type,
-                completed: false
-            });
-        }
-
-        saveTasks();
-        localStorage.setItem("importedFromSheet", "true");
-        renderTasks();
-    } catch (error) {
-        console.error("Error importing from Google Sheets:", error);
+        newTasks.push({
+            dex,
+            dexRaw,
+            name,
+            gen,
+            completed: false
+        });
     }
+
+    tasks = newTasks;
+    saveTasks();
+    renderTasks();
 }
 
 /* ============================================================
    EVENT LISTENERS
    ============================================================ */
+
 resetBtn.addEventListener("click", async () => {
-    localStorage.clear();
-    imported = null;
+    localStorage.removeItem("tasks");
     tasks = [];
     progressDisplay.textContent = "0.00% complete";
 
@@ -250,13 +243,19 @@ if (darkToggle) {
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
-loadTasks();
 
-if (!imported) {
-    importFromSheet();
-} else {
-    tasks.forEach(t => {
-        if (!t.gen) t.gen = getGeneration(t.dexRaw);
-    });
-    renderTasks();
+async function init() {
+    loadTasksFromStorage();
+
+    if (tasks.length === 0) {
+        await importFromSheet();
+    } else {
+        // Ensure gen is present for older saved data
+        tasks.forEach(t => {
+            if (!t.gen) t.gen = getGeneration(t.dexRaw);
+        });
+        renderTasks();
+    }
 }
+
+init();
