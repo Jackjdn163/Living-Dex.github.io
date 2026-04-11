@@ -165,6 +165,10 @@ body.dark #loadingText {
     animation: shake 0.35s ease;
 }
 
+#loadingScreen.fade-out {
+    pointer-events: none !important;
+}
+
 /* ============================================================
    MAIN CONTAINER
    ============================================================ */
