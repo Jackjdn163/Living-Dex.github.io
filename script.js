@@ -3,7 +3,6 @@
    ============================================================ */
 const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
-const progressText = document.getElementById("progressText");
 const resetBtn = document.getElementById("resetBtn");
 const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
@@ -18,8 +17,6 @@ const loadingText = document.getElementById("loadingText");
 const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
 const pokeballCenter = document.querySelector(".pokeball-center");
-
-const ringFG = document.querySelector("#progressRing .fg");
 
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
@@ -119,7 +116,7 @@ function loadTasksFromStorage() {
 }
 
 /* ============================================================
-   MAIN PROGRESS RING + FULL DEX BAR
+   FULL DEX BAR (NO BIG CIRCLE)
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
@@ -128,15 +125,6 @@ function updateOverallProgress() {
     const percent = total ? ((caught / total) * 100) : 0;
     const percentText = percent.toFixed(2) + "%";
 
-    // Update main ring text
-    progressText.textContent = percentText;
-
-    // Update main ring stroke
-    const circumference = 377;
-    const offset = circumference - (percent / 100) * circumference;
-    ringFG.style.strokeDashoffset = offset;
-
-    // Update full dex bar
     const row = document.getElementById("fullDexRow");
     const fill = row.querySelector(".fullDexFill");
     const label = row.querySelector(".fullDexPercent");
@@ -144,7 +132,6 @@ function updateOverallProgress() {
     fill.style.width = percent + "%";
     label.textContent = percentText;
 
-    // Crown + glow
     if (percent >= 100) {
         row.classList.add("completed");
     } else {
@@ -153,7 +140,7 @@ function updateOverallProgress() {
 }
 
 /* ============================================================
-   GENERATION PROGRESS — BAR VERSION
+   GENERATION BARS
    ============================================================ */
 function updateGenProgress() {
     const totals = {};
