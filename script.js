@@ -221,6 +221,88 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
+   EVOLUTION FETCHING (DEX-BASED, FROM OLD WORKING VERSION)
+   ============================================================ */
+async function fetchEvolutionData(dexNumber) {
+    try {
+        const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`);
+        const speciesData = await speciesRes.json();
+
+        const evoRes = await fetch(speciesData.evolution_chain.url);
+        const evoData = await evoRes.json();
+
+        return parseEvolutionChain(evoData.chain, String(dexNumber));
+    } catch (err) {
+        console.error("Evolution fetch error:", err);
+        return { prev: null, next: null };
+    }
+}
+
+function parseEvolutionChain(chain, dexNumber) {
+    let prev = null;
+    let next = null;
+
+    function search(node, parent) {
+        const url = node.species.url;
+        const id = url.split("/").slice(-2, -1)[0];
+
+        if (id === dexNumber) {
+            if (parent) {
+                prev = {
+                    id: parent.id,
+                    name: parent.name,
+                    method: parent.method
+                };
+            }
+
+            if (node.evolves_to.length > 0) {
+                const evo = node.evolves_to[0];
+                const evoId = evo.species.url.split("/").slice(-2, -1)[0];
+
+                next = {
+                    id: evoId,
+                    name: evo.species.name,
+                    method: evo.evolution_details[0]
+                };
+            }
+        }
+
+        node.evolves_to.forEach(evo => {
+            const evoMethod = evo.evolution_details[0];
+            search(evo, {
+                id: id,
+                name: node.species.name,
+                method: evoMethod
+            });
+        });
+    }
+
+    search(chain, null);
+    return { prev, next };
+}
+
+function formatEvolutionMethod(method) {
+    if (!method) return "Unknown";
+
+    if (method.trigger.name === "level-up") {
+        if (method.min_level) return `Level ${method.min_level}`;
+        if (method.min_happiness) return "Friendship";
+        if (method.time_of_day) return `Level up at ${method.time_of_day}`;
+        return "Level up";
+    }
+
+    if (method.trigger.name === "use-item") {
+        return `Use ${method.item.name.replace("-", " ")}`;
+    }
+
+    if (method.trigger.name === "trade") {
+        return "Trade";
+    }
+
+    return method.trigger.name.replace("-", " ");
+}
+
+/* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
 async function importFromSheet() {
@@ -309,7 +391,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (SPRITE + NAME + GAMES ONLY — EVOLUTIONS REMOVED)
+   INFO PANEL (SPRITE + NAME + FULL EVOLUTION LINES)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -324,9 +406,51 @@ async function openInfoPanel(task) {
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
-    document.getElementById("infoEvolutions").innerHTML = `
-        <p style="opacity:0.5; text-align:center;">No evolution data</p>
-    `;
+    const evoBox = document.getElementById("infoEvolutions");
+    evoBox.innerHTML = "Loading evolution data...";
+
+    try {
+        const evo = await fetchEvolutionData(task.dexRaw);
+        evoBox.innerHTML = "";
+
+        const currentName = task.name;
+
+        if (evo.prev) {
+            evoBox.innerHTML += `
+                <div class="evoBox">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.prev.id}.png">
+                    <div>
+                        <strong>FULL LINE:</strong><br>
+                        ${evo.prev.name} → ${currentName}<br>
+                        <strong>Method:</strong> ${formatEvolutionMethod(evo.prev.method)}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (evo.next) {
+            evoBox.innerHTML += `
+                <div class="evoBox">
+                    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.next.id}.png">
+                    <div>
+                        <strong>FULL LINE:</strong><br>
+                        ${currentName} → ${evo.next.name}<br>
+                        <strong>Method:</strong> ${formatEvolutionMethod(evo.next.method)}
+                    </div>
+                </div>
+            `;
+        }
+
+        if (!evo.prev && !evo.next) {
+            evoBox.innerHTML = `
+                <p style="opacity:0.5; text-align:center;">No evolution data</p>
+            `;
+        }
+    } catch (e) {
+        evoBox.innerHTML = `
+            <p style="opacity:0.5; text-align:center;">Error loading evolution data</p>
+        `;
+    }
 
     panel.classList.add("open");
 }
@@ -365,5 +489,3 @@ async function init() {
 }
 
 init();
-
-
