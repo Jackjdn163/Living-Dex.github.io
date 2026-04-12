@@ -103,7 +103,7 @@ body.dark .pokeball-center {
     background: #dddddd;
 }
 
-/* Green flash when loading finishes */
+/* Green flash */
 .pokeball-center.catch {
     background: #4ade80;
     box-shadow: 0 0 20px 10px #4ade80;
@@ -116,7 +116,7 @@ body.dark .pokeball-center {
     to { transform: rotate(360deg); }
 }
 
-/* Stop spinning + rotate upright */
+/* Stop spinning */
 .pokeball.finish-spin {
     animation: none;
     transform: rotate(0deg);
@@ -280,7 +280,7 @@ body.dark #taskList li {
 }
 
 /* ============================================================
-   FLOATING STATS BOX (TOP LEFT)
+   FLOATING STATS BOX
    ============================================================ */
 
 #floatingStats {
@@ -464,14 +464,23 @@ body.dark #infoPanel {
     transform: translateX(0);
 }
 
-#closeInfoPanel {
+/* Close button */
+.closeInfoBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
     background: none;
     border: none;
-    font-size: 22px;
+    font-size: 26px;
     cursor: pointer;
-    float: right;
-    margin-bottom: 10px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
 }
+
+.closeInfoBtn:hover {
+    opacity: 1;
+}
+
 #infoSprite img {
     width: 120px;
     height: 120px;
@@ -486,13 +495,24 @@ body.dark #infoPanel {
 
 #infoGames {
     margin-bottom: 25px;
-    min-height: 40px; /* reserved space */
+    min-height: 40px;
     border-bottom: 1px solid rgba(0,0,0,0.2);
     padding-bottom: 10px;
 }
 
 body.dark #infoGames {
     border-color: rgba(255,255,255,0.2);
+}
+
+/* ============================================================
+   EVOLUTION SECTION
+   ============================================================ */
+
+.evoLabel {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    opacity: 0.8;
 }
 
 #infoEvolutions {
