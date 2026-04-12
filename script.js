@@ -58,6 +58,42 @@ function getGeneration(n) {
 }
 
 /* ============================================================
+   PROPER POKÉMON NAME FORMATTER
+   ============================================================ */
+function formatPokemonName(name) {
+    if (!name) return "";
+
+    name = name.toLowerCase();
+
+    // Gendered forms
+    if (name === "nidoran-f") return "Nidoran♀";
+    if (name === "nidoran-m") return "Nidoran♂";
+
+    // Special cases
+    const special = {
+        "mr-mime": "Mr. Mime",
+        "mime-jr": "Mime Jr.",
+        "type-null": "Type: Null",
+        "ho-oh": "Ho-Oh",
+        "porygon-z": "Porygon-Z",
+        "farfetchd": "Farfetch’d",
+        "sirfetchd": "Sirfetch’d",
+        "jangmo-o": "Jangmo-o",
+        "hakamo-o": "Hakamo-o",
+        "kommo-o": "Kommo-o",
+        "flabebe": "Flabébé"
+    };
+
+    if (special[name]) return special[name];
+
+    // Default: capitalize each segment
+    return name
+        .split("-")
+        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+}
+
+/* ============================================================
    STORAGE
    ============================================================ */
 function saveTasks() {
@@ -158,7 +194,7 @@ function renderTasks() {
         img.src = sprite;
 
         const label = document.createElement("strong");
-        label.textContent = `#${task.dex} — ${task.name}`;
+        label.textContent = `#${task.dex} — ${formatPokemonName(task.name)}`;
 
         const moreBtn = document.createElement("button");
         moreBtn.className = "more-btn";
@@ -221,7 +257,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (DEX-BASED, RELIABLE)
+   EVOLUTION FETCHING (DEX-BASED)
    ============================================================ */
 async function fetchEvolutionData(dexNumber) {
     try {
@@ -391,7 +427,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (CLEAN EVOLUTION BOXES + LABELS + CLOSE BUTTON)
+   INFO PANEL (EVOLUTIONS + LABELS + PROPER NAMES)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -400,7 +436,8 @@ async function openInfoPanel(task) {
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
     `;
 
-    document.getElementById("infoName").textContent = `#${task.dex} — ${task.name}`;
+    document.getElementById("infoName").textContent =
+        `#${task.dex} — ${formatPokemonName(task.name)}`;
 
     document.getElementById("infoGames").innerHTML = `
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
@@ -419,7 +456,7 @@ async function openInfoPanel(task) {
                 <div class="evoBox">
                     <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.prev.id}.png">
                     <div>
-                        <strong>${evo.prev.name}</strong><br>
+                        <strong>${formatPokemonName(evo.prev.name)}</strong><br>
                         <span class="evoMethod">${formatEvolutionMethod(evo.prev.method)}</span>
                     </div>
                 </div>
@@ -432,7 +469,7 @@ async function openInfoPanel(task) {
                 <div class="evoBox">
                     <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.next.id}.png">
                     <div>
-                        <strong>${evo.next.name}</strong><br>
+                        <strong>${formatPokemonName(evo.next.name)}</strong><br>
                         <span class="evoMethod">${formatEvolutionMethod(evo.next.method)}</span>
                     </div>
                 </div>
