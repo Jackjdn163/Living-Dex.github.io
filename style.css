@@ -373,18 +373,17 @@ body.dark #floatingStats {
 .genGrid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px 10px; /* cleaner spacing */
+    gap: 16px 10px;
     margin-top: 16px;
     justify-items: center;
 }
 
 .genCircle {
     position: relative;
-    width: 65px;   /* smaller */
+    width: 65px;
     height: 65px;
 }
 
-/* Color palette */
 :root {
     --gen1: #ff6b6b;
     --gen2: #f7b731;
@@ -403,23 +402,21 @@ body.dark #floatingStats {
     transform: rotate(-90deg);
 }
 
-/* Perfect geometry */
 .genCircle .bg {
     fill: none;
     stroke: rgba(255,255,255,0.25);
-    stroke-width: 7;
+    stroke-width: 6;
 }
 
 .genCircle .fg {
     fill: none;
-    stroke-width: 7;
+    stroke-width: 6;
     stroke-linecap: round;
-    stroke-dasharray: 201; /* circumference for r=32 */
-    stroke-dashoffset: 201;
+    stroke-dasharray: 176;
+    stroke-dashoffset: 176;
     transition: stroke-dashoffset 0.5s ease, filter 0.3s ease;
 }
 
-/* Color-coded rings */
 .genCircle[data-gen="1"] .fg { stroke: var(--gen1); }
 .genCircle[data-gen="2"] .fg { stroke: var(--gen2); }
 .genCircle[data-gen="3"] .fg { stroke: var(--gen3); }
@@ -430,12 +427,10 @@ body.dark #floatingStats {
 .genCircle[data-gen="8"] .fg { stroke: var(--gen8); }
 .genCircle[data-gen="9"] .fg { stroke: var(--gen9); }
 
-/* Completed-gen glow */
 .genCircle.completed .fg {
     filter: drop-shadow(0 0 6px #4ade80) drop-shadow(0 0 10px #4ade80);
 }
 
-/* Centered label */
 .genLabel {
     position: absolute;
     top: 50%;
@@ -476,7 +471,7 @@ body.dark #floatingToggles {
 }
 
 /* ============================================================
-   SLIDER SWITCHES
+   SWITCHES
    ============================================================ */
 
 .switch {
@@ -586,7 +581,7 @@ body.dark .popup-box {
 }
 
 /* ============================================================
-   INFO PANEL (SLIDE + FADE)
+   INFO PANEL
    ============================================================ */
 
 #infoPanel {
@@ -640,7 +635,7 @@ body.dark #infoPanel {
 }
 
 /* ============================================================
-   SPRITE + TYPE BADGES ROW
+   SPRITE + TYPE BADGES
    ============================================================ */
 
 #infoTopRow {
@@ -678,7 +673,6 @@ body.dark #infoPanel {
 .typeBadge img {
     width: 24px;
     height: 24px;
-    filter: none;
 }
 
 /* ============================================================
