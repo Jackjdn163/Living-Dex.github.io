@@ -38,6 +38,13 @@ let tasks = [];
 let dotInterval;
 
 /* ============================================================
+   FORCE STATE CHANGE (THE FIX)
+   ============================================================ */
+function forceStateChange() {
+    tasks = [...tasks]; // new array reference forces UI update
+}
+
+/* ============================================================
    HELPERS
    ============================================================ */
 function padDex(num) {
@@ -57,12 +64,8 @@ function getGeneration(n) {
     return 9;
 }
 
-/* ============================================================
-   PROPER NAME FORMATTER
-   ============================================================ */
 function formatPokemonName(name) {
     if (!name) return "";
-
     name = name.toLowerCase();
 
     const special = {
@@ -180,13 +183,11 @@ function getSortedTasks() {
 }
 
 /* ============================================================
-   RENDER LIST (FIXED)
+   RENDER LIST (NOW UPDATES INSTANTLY)
    ============================================================ */
 function renderTasks() {
     taskList.innerHTML = "";
-
-    // ⭐ Force DOM reflow so UI updates instantly
-    void taskList.offsetHeight;
+    void taskList.offsetHeight; // force DOM refresh
 
     const search = searchBar.value.toLowerCase();
     const shiny = shinyToggle.checked;
@@ -262,7 +263,7 @@ async function finishLoadingAnimation() {
 
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
-        loadingScreen.style.pointerEvents = "none"; // ⭐ Critical fix
+        loadingScreen.style.pointerEvents = "none";
     }, 900);
 }
 
@@ -386,6 +387,7 @@ darkToggle.addEventListener("change", () => {
     const isDark = darkToggle.checked;
     document.body.classList.toggle("dark", isDark);
     localStorage.setItem("darkMode", isDark ? "1" : "0");
+    forceStateChange();
     renderTasks();
 });
 
@@ -411,7 +413,6 @@ async function openInfoPanel(task) {
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
-    /* TYPE BADGES */
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
 
@@ -434,7 +435,6 @@ async function openInfoPanel(task) {
             });
         });
 
-    /* EVOLUTIONS */
     const evoBox = document.getElementById("infoEvolutions");
     evoBox.innerHTML = "Loading evolution data...";
 
@@ -484,6 +484,24 @@ async function openInfoPanel(task) {
 
 document.getElementById("closeInfoPanel").addEventListener("click", () => {
     document.getElementById("infoPanel").classList.remove("open");
+});
+
+/* ============================================================
+   EVENT LISTENERS (FIXED)
+   ============================================================ */
+searchBar.addEventListener("input", () => {
+    forceStateChange();
+    renderTasks();
+});
+
+sortSelect.addEventListener("change", () => {
+    forceStateChange();
+    renderTasks();
+});
+
+shinyToggle.addEventListener("change", () => {
+    forceStateChange();
+    renderTasks();
 });
 
 /* ============================================================
