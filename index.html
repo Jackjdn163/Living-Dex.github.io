@@ -44,10 +44,18 @@
     </div>
 
     <!-- ============================================================
-         FLOATING STATS BOX
+         FLOATING STATS BOX (WITH CIRCULAR PROGRESS RING)
     ============================================================ -->
-    <div id="floatingStats">
-        <div id="progress">0% complete</div>
+    <div id="floatingStats" class="floatingBox">
+
+        <div id="progressRing">
+            <svg>
+                <circle class="bg" cx="60" cy="60" r="60"></circle>
+                <circle class="fg" cx="60" cy="60" r="60"></circle>
+            </svg>
+            <div id="progressText">0%</div>
+        </div>
+
         <div id="genProgress">
             <div id="gen1Progress">Gen 1: 0%</div>
             <div id="gen2Progress">Gen 2: 0%</div>
@@ -59,12 +67,13 @@
             <div id="gen8Progress">Gen 8: 0%</div>
             <div id="gen9Progress">Gen 9: 0%</div>
         </div>
+
     </div>
 
     <!-- ============================================================
          FLOATING TOGGLES
     ============================================================ -->
-    <div id="floatingToggles">
+    <div id="floatingToggles" class="floatingBox">
 
         <label class="switch">
             <input type="checkbox" id="shinyToggle">
@@ -94,7 +103,7 @@
     </div>
 
     <!-- ============================================================
-         INFO PANEL (WITH WRAPPER)
+         INFO PANEL (WITH CONTENT WRAPPER)
     ============================================================ -->
     <div id="infoPanel">
         <button id="closeInfoPanel" class="closeInfoBtn">×</button>
