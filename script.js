@@ -65,12 +65,9 @@ function formatPokemonName(name) {
 
     name = name.toLowerCase();
 
-    // Gendered forms
-    if (name === "nidoran-f") return "Nidoran♀";
-    if (name === "nidoran-m") return "Nidoran♂";
-
-    // Special cases
     const special = {
+        "nidoran-f": "Nidoran♀",
+        "nidoran-m": "Nidoran♂",
         "mr-mime": "Mr. Mime",
         "mime-jr": "Mime Jr.",
         "type-null": "Type: Null",
@@ -86,20 +83,41 @@ function formatPokemonName(name) {
 
     if (special[name]) return special[name];
 
-    // Default: capitalize each segment
     return name
         .split("-")
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .map(p => p.charAt(0).toUpperCase() + p.slice(1))
         .join(" ");
 }
 
 /* ============================================================
-   TYPE ICON SOURCE
+   TYPE ICONS + COLORS
    ============================================================ */
 function typeIconSrc(type) {
-    if (!type) return null;
-    const key = type.toLowerCase();
-    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
+    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${type}.svg`;
+}
+
+function getTypeColor(type) {
+    const map = {
+        normal:  "#A8A77A",
+        fire:    "#EE8130",
+        water:   "#6390F0",
+        electric:"#F7D02C",
+        grass:   "#7AC74C",
+        ice:     "#96D9D6",
+        fighting:"#C22E28",
+        poison:  "#A33EA1",
+        ground:  "#E2BF65",
+        flying:  "#A98FF3",
+        psychic:"#F95587",
+        bug:     "#A6B91A",
+        rock:    "#B6A136",
+        ghost:   "#735797",
+        dragon:  "#6F35FC",
+        dark:    "#705746",
+        steel:   "#B7B7CE",
+        fairy:   "#D685AD"
+    };
+    return map[type] || "#888";
 }
 
 /* ============================================================
@@ -111,15 +129,7 @@ function saveTasks() {
 
 function loadTasksFromStorage() {
     const raw = localStorage.getItem("tasks");
-    if (!raw) {
-        tasks = [];
-        return;
-    }
-    try {
-        tasks = JSON.parse(raw);
-    } catch {
-        tasks = [];
-    }
+    tasks = raw ? JSON.parse(raw) : [];
 }
 
 /* ============================================================
@@ -161,15 +171,10 @@ function getSortedTasks() {
     const mode = sortSelect.value;
     const arr = [...tasks];
 
-    if (mode === "name") {
-        arr.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (mode === "caught") {
-        arr.sort((a, b) => (b.completed - a.completed) || (Number(a.dexRaw) - Number(b.dexRaw)));
-    } else if (mode === "uncaught") {
-        arr.sort((a, b) => (a.completed - b.completed) || (Number(a.dexRaw) - Number(b.dexRaw)));
-    } else {
-        arr.sort((a, b) => Number(a.dexRaw) - Number(b.dexRaw));
-    }
+    if (mode === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
+    else if (mode === "caught") arr.sort((a, b) => (b.completed - a.completed) || (a.dexRaw - b.dexRaw));
+    else if (mode === "uncaught") arr.sort((a, b) => (a.completed - b.completed) || (a.dexRaw - b.dexRaw));
+    else arr.sort((a, b) => a.dexRaw - b.dexRaw);
 
     return arr;
 }
@@ -208,9 +213,8 @@ function renderTasks() {
         const moreBtn = document.createElement("button");
         moreBtn.className = "more-btn";
         moreBtn.textContent = "⋮";
-
-        moreBtn.addEventListener("click", (event) => {
-            event.stopPropagation();
+        moreBtn.addEventListener("click", e => {
+            e.stopPropagation();
             openInfoPanel(task);
         });
 
@@ -223,7 +227,6 @@ function renderTasks() {
         li.appendChild(img);
         li.appendChild(label);
         li.appendChild(moreBtn);
-
         taskList.appendChild(li);
     });
 
@@ -231,7 +234,7 @@ function renderTasks() {
 }
 
 /* ============================================================
-   LOADING SCREEN LOGIC
+   LOADING SCREEN
    ============================================================ */
 function startLoadingDots() {
     let count = 1;
@@ -247,18 +250,11 @@ function stopLoadingDots() {
 
 async function finishLoadingAnimation() {
     stopLoadingDots();
-
     loadingText.classList.add("fade-out");
     pokeball.classList.add("finish-spin");
 
-    setTimeout(() => {
-        pokeball.classList.add("shake");
-    }, 200);
-
-    setTimeout(() => {
-        pokeballCenter.classList.add("catch");
-    }, 300);
-
+    setTimeout(() => pokeball.classList.add("shake"), 200);
+    setTimeout(() => pokeballCenter.classList.add("catch"), 300);
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
         loadingScreen.style.pointerEvents = "none";
@@ -266,7 +262,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (DEX-BASED)
+   EVOLUTION FETCHING
    ============================================================ */
 async function fetchEvolutionData(dexNumber) {
     try {
@@ -277,8 +273,7 @@ async function fetchEvolutionData(dexNumber) {
         const evoData = await evoRes.json();
 
         return parseEvolutionChain(evoData.chain, String(dexNumber));
-    } catch (err) {
-        console.error("Evolution fetch error:", err);
+    } catch {
         return { prev: null, next: null };
     }
 }
@@ -288,24 +283,15 @@ function parseEvolutionChain(chain, dexNumber) {
     let next = null;
 
     function search(node, parent) {
-        const url = node.species.url;
-        const id = url.split("/").slice(-2, -1)[0];
+        const id = node.species.url.split("/").slice(-2, -1)[0];
 
         if (id === dexNumber) {
-            if (parent) {
-                prev = {
-                    id: parent.id,
-                    name: parent.name,
-                    method: parent.method
-                };
-            }
+            if (parent) prev = parent;
 
             if (node.evolves_to.length > 0) {
                 const evo = node.evolves_to[0];
-                const evoId = evo.species.url.split("/").slice(-2, -1)[0];
-
                 next = {
-                    id: evoId,
+                    id: evo.species.url.split("/").slice(-2, -1)[0],
                     name: evo.species.name,
                     method: evo.evolution_details[0]
                 };
@@ -313,11 +299,10 @@ function parseEvolutionChain(chain, dexNumber) {
         }
 
         node.evolves_to.forEach(evo => {
-            const evoMethod = evo.evolution_details[0];
             search(evo, {
-                id: id,
+                id,
                 name: node.species.name,
-                method: evoMethod
+                method: evo.evolution_details[0]
             });
         });
     }
@@ -337,12 +322,10 @@ function formatEvolutionMethod(method) {
     }
 
     if (method.trigger.name === "use-item") {
-        return `${method.item.name.replace("-", " ")}`;
+        return method.item.name.replace("-", " ");
     }
 
-    if (method.trigger.name === "trade") {
-        return "Trade";
-    }
+    if (method.trigger.name === "trade") return "Trade";
 
     return method.trigger.name.replace("-", " ");
 }
@@ -355,36 +338,26 @@ async function importFromSheet() {
     const csv = await response.text();
     const rows = csv.split("\n").slice(1);
 
-    const newTasks = [];
-
-    for (const row of rows) {
-        if (!row.trim()) continue;
-
-        const cols = row.split(",");
-        const dexRaw = cols[0]?.trim();
-        const name = cols[1]?.trim();
-
-        if (!dexRaw || !name) continue;
-
-        const dex = padDex(dexRaw);
-        const gen = getGeneration(dexRaw);
-
-        newTasks.push({
-            dex,
-            dexRaw,
-            name,
-            gen,
-            completed: false
+    tasks = rows
+        .filter(r => r.trim())
+        .map(row => {
+            const [dexRaw, name] = row.split(",");
+            const cleanDex = dexRaw.trim();
+            return {
+                dexRaw: cleanDex,
+                dex: padDex(cleanDex),
+                name: name.trim(),
+                gen: getGeneration(cleanDex),
+                completed: false
+            };
         });
-    }
 
-    tasks = newTasks;
     saveTasks();
     renderTasks();
 }
 
 /* ============================================================
-   RESET POPUP LOGIC
+   RESET POPUP
    ============================================================ */
 resetBtn.addEventListener("click", () => {
     resetPopup.classList.remove("hidden");
@@ -396,15 +369,8 @@ cancelReset.addEventListener("click", () => {
 
 confirmReset.addEventListener("click", async () => {
     resetPopup.classList.add("hidden");
-
     localStorage.removeItem("tasks");
     tasks = [];
-
-    progressDisplay.textContent = "0.00% complete";
-    Object.values(genProgressEls).forEach(el => {
-        el.textContent = el.textContent.replace(/(\d+(\.\d+)?)%/, "0.00%");
-    });
-
     await importFromSheet();
 });
 
@@ -415,11 +381,6 @@ darkToggle.addEventListener("change", () => {
     const isDark = darkToggle.checked;
     document.body.classList.toggle("dark", isDark);
     localStorage.setItem("darkMode", isDark ? "1" : "0");
-
-    if (!loadingScreen.classList.contains("fade-out")) {
-        loadingScreen.style.background = isDark ? "#1a1a1a" : "#ffffff";
-    }
-
     renderTasks();
 });
 
@@ -429,33 +390,23 @@ if (localStorage.getItem("darkMode") === "1") {
 }
 
 /* ============================================================
-   EVENT LISTENERS
-   ============================================================ */
-searchBar.addEventListener("input", renderTasks);
-shinyToggle.addEventListener("change", renderTasks);
-sortSelect.addEventListener("change", renderTasks);
-
-/* ============================================================
-   INFO PANEL (EVOLUTIONS + TYPE ICONS + LABELS)
+   INFO PANEL (SPRITE + TYPE BADGES + EVOLUTIONS)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
 
-    // SPRITE
     document.getElementById("infoSprite").innerHTML = `
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
     `;
 
-    // NAME
     document.getElementById("infoName").textContent =
         `#${task.dex} — ${formatPokemonName(task.name)}`;
 
-    // GAMES (placeholder)
     document.getElementById("infoGames").innerHTML = `
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
-    // TYPES
+    /* TYPE BADGES */
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
 
@@ -464,14 +415,21 @@ async function openInfoPanel(task) {
         .then(data => {
             data.types.forEach(t => {
                 const typeName = t.type.name;
+
+                const badge = document.createElement("div");
+                badge.className = "typeBadge";
+                badge.style.backgroundColor = getTypeColor(typeName);
+
                 const icon = document.createElement("img");
                 icon.src = typeIconSrc(typeName);
                 icon.alt = typeName;
-                infoTypes.appendChild(icon);
+
+                badge.appendChild(icon);
+                infoTypes.appendChild(badge);
             });
         });
 
-    // EVOLUTIONS
+    /* EVOLUTIONS */
     const evoBox = document.getElementById("infoEvolutions");
     evoBox.innerHTML = "Loading evolution data...";
 
@@ -510,7 +468,7 @@ async function openInfoPanel(task) {
                 <p style="opacity:0.5; text-align:center;">No evolution data</p>
             `;
         }
-    } catch (e) {
+    } catch {
         evoBox.innerHTML = `
             <p style="opacity:0.5; text-align:center;">Error loading evolution data</p>
         `;
@@ -529,8 +487,7 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
 async function init() {
     startLoadingDots();
 
-    const startTime = Date.now();
-
+    const start = Date.now();
     loadTasksFromStorage();
 
     if (tasks.length === 0) {
@@ -542,12 +499,9 @@ async function init() {
         renderTasks();
     }
 
-    const elapsed = Date.now() - startTime;
-    const minDuration = 5000;
-
-    if (elapsed < minDuration) {
-        await new Promise(resolve => setTimeout(resolve, minDuration - elapsed));
-    }
+    const elapsed = Date.now() - start;
+    const min = 5000;
+    if (elapsed < min) await new Promise(r => setTimeout(r, min - elapsed));
 
     await finishLoadingAnimation();
 }
