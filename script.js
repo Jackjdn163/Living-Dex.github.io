@@ -221,7 +221,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (DEX-BASED, FROM OLD WORKING VERSION)
+   EVOLUTION FETCHING (DEX-BASED, RELIABLE)
    ============================================================ */
 async function fetchEvolutionData(dexNumber) {
     try {
@@ -292,7 +292,7 @@ function formatEvolutionMethod(method) {
     }
 
     if (method.trigger.name === "use-item") {
-        return `Use ${method.item.name.replace("-", " ")}`;
+        return `${method.item.name.replace("-", " ")}`;
     }
 
     if (method.trigger.name === "trade") {
@@ -391,7 +391,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (SPRITE + NAME + FULL EVOLUTION LINES)
+   INFO PANEL (CLEAN EVOLUTION BOXES + LABELS + CLOSE BUTTON)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -413,16 +413,14 @@ async function openInfoPanel(task) {
         const evo = await fetchEvolutionData(task.dexRaw);
         evoBox.innerHTML = "";
 
-        const currentName = task.name;
-
         if (evo.prev) {
             evoBox.innerHTML += `
+                <div class="evoLabel">Evolves From</div>
                 <div class="evoBox">
                     <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.prev.id}.png">
                     <div>
-                        <strong>FULL LINE:</strong><br>
-                        ${evo.prev.name} → ${currentName}<br>
-                        <strong>Method:</strong> ${formatEvolutionMethod(evo.prev.method)}
+                        <strong>${evo.prev.name}</strong><br>
+                        <span class="evoMethod">${formatEvolutionMethod(evo.prev.method)}</span>
                     </div>
                 </div>
             `;
@@ -430,12 +428,12 @@ async function openInfoPanel(task) {
 
         if (evo.next) {
             evoBox.innerHTML += `
+                <div class="evoLabel">Evolves Into</div>
                 <div class="evoBox">
                     <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evo.next.id}.png">
                     <div>
-                        <strong>FULL LINE:</strong><br>
-                        ${currentName} → ${evo.next.name}<br>
-                        <strong>Method:</strong> ${formatEvolutionMethod(evo.next.method)}
+                        <strong>${evo.next.name}</strong><br>
+                        <span class="evoMethod">${formatEvolutionMethod(evo.next.method)}</span>
                     </div>
                 </div>
             `;
