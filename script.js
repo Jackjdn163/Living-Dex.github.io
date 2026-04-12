@@ -221,85 +221,6 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (FIXED + NORMALIZED)
-   ============================================================ */
-function normalizeName(name) {
-    return name
-        .normalize("NFKD")
-        .replace(/[\u200B-\u200F\u00A0]/g, "") // remove invisible chars
-        .replace(/♀/g, "f")
-        .replace(/♂/g, "m")
-        .replace(/[:.'’]/g, "") // remove punctuation
-        .replace(/\s+/g, "-")   // spaces → hyphens
-        .toLowerCase();
-}
-
-async function getEvolutionData(task) {
-    const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
-    const speciesRes = await fetch(speciesURL);
-    const speciesData = await speciesRes.json();
-
-    const evoURL = speciesData.evolution_chain.url;
-    const evoRes = await fetch(evoURL);
-    const evoData = await evoRes.json();
-
-    const cleanTarget = normalizeName(task.name);
-
-    return parseEvolutionChain(evoData.chain, cleanTarget);
-}
-
-function parseEvolutionChain(chain, targetName) {
-    let prev = null;
-    let next = null;
-
-    function walk(node, parent) {
-        const cleanNodeName = normalizeName(node.species.name);
-
-        if (cleanNodeName === targetName) {
-            if (parent) prev = parent;
-            if (node.evolves_to.length > 0) next = node.evolves_to[0];
-        }
-
-        node.evolves_to.forEach(child => walk(child, node));
-    }
-
-    walk(chain, null);
-
-    return { prev, next };
-}
-
-function parseEvolutionChain(chain, targetName) {
-    let prev = null;
-    let next = null;
-
-    function search(node, parent) {
-        if (node.species.name === targetName) {
-            if (parent) prev = parent;
-            if (node.evolves_to.length > 0) next = node.evolves_to[0];
-        }
-        node.evolves_to.forEach(child => search(child, node));
-    }
-
-    search(chain, null);
-
-    return { prev, next };
-}
-
-function formatEvolutionMethod(details) {
-    if (!details) return "";
-
-    const d = details[0];
-
-    if (d.min_level) return `Level ${d.min_level}`;
-    if (d.item) return `Use ${d.item.name}`;
-    if (d.trigger.name === "trade") return "Trade";
-    if (d.min_happiness) return "High Friendship";
-    if (d.min_beauty) return "High Beauty";
-    if (d.min_affection) return "High Affection";
-
-    return d.trigger.name.replace(/-/g, " ");
-}
-/* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
 async function importFromSheet() {
@@ -388,7 +309,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (SPRITE + NAME + GAMES PLACEHOLDER + EVOLUTIONS)
+   INFO PANEL (SPRITE + NAME + GAMES ONLY — EVOLUTIONS REMOVED)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -403,40 +324,9 @@ async function openInfoPanel(task) {
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
-    const evo = await getEvolutionData(task);
-
-    const evoBox = document.getElementById("infoEvolutions");
-    evoBox.innerHTML = "";
-
-    if (evo.prev) {
-        const p = evo.prev;
-        const method = formatEvolutionMethod(p.evolution_details);
-
-        evoBox.innerHTML += `
-            <div class="evoBox">
-                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${p.species.url.split('/')[6]}.png">
-                <div>
-                    <strong>${p.species.name}</strong><br>
-                    <span class="evoMethod">${method}</span>
-                </div>
-            </div>
-        `;
-    }
-
-    if (evo.next) {
-        const n = evo.next;
-        const method = formatEvolutionMethod(n.evolution_details);
-
-        evoBox.innerHTML += `
-            <div class="evoBox">
-                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${n.species.url.split('/')[6]}.png">
-                <div>
-                    <strong>${n.species.name}</strong><br>
-                    <span class="evoMethod">${method}</span>
-                </div>
-            </div>
-        `;
-    }
+    document.getElementById("infoEvolutions").innerHTML = `
+        <p style="opacity:0.5; text-align:center;">No evolution data</p>
+    `;
 
     panel.classList.add("open");
 }
