@@ -58,7 +58,7 @@ function getGeneration(n) {
 }
 
 /* ============================================================
-   PROPER POKÉMON NAME FORMATTER
+   PROPER NAME FORMATTER
    ============================================================ */
 function formatPokemonName(name) {
     if (!name) return "";
@@ -180,12 +180,15 @@ function getSortedTasks() {
 }
 
 /* ============================================================
-   RENDER LIST
+   RENDER LIST (FIXED)
    ============================================================ */
 function renderTasks() {
-    const search = searchBar.value.toLowerCase();
     taskList.innerHTML = "";
 
+    // ⭐ Force DOM reflow so UI updates instantly
+    void taskList.offsetHeight;
+
+    const search = searchBar.value.toLowerCase();
     const shiny = shinyToggle.checked;
     const sorted = getSortedTasks();
 
@@ -250,14 +253,16 @@ function stopLoadingDots() {
 
 async function finishLoadingAnimation() {
     stopLoadingDots();
+
     loadingText.classList.add("fade-out");
     pokeball.classList.add("finish-spin");
 
     setTimeout(() => pokeball.classList.add("shake"), 200);
     setTimeout(() => pokeballCenter.classList.add("catch"), 300);
+
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
-        loadingScreen.style.pointerEvents = "none";
+        loadingScreen.style.pointerEvents = "none"; // ⭐ Critical fix
     }, 900);
 }
 
@@ -390,7 +395,7 @@ if (localStorage.getItem("darkMode") === "1") {
 }
 
 /* ============================================================
-   INFO PANEL (SPRITE + TYPE BADGES + EVOLUTIONS)
+   INFO PANEL
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
