@@ -221,66 +221,6 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (RESTORED)
-   ============================================================ */
-function normalizeName(name) {
-    return name
-        .normalize("NFKD")
-        .replace(/[\u200B-\u200F\u00A0]/g, "")
-        .replace(/♀/g, "f")
-        .replace(/♂/g, "m")
-        .replace(/[:.'’]/g, "")
-        .replace(/\s+/g, "-")
-        .toLowerCase();
-}
-
-async function getEvolutionData(task) {
-    const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
-    const speciesRes = await fetch(speciesURL);
-    const speciesData = await speciesRes.json();
-
-    const evoURL = speciesData.evolution_chain.url;
-    const evoRes = await fetch(evoURL);
-    const evoData = await evoRes.json();
-
-    const cleanTarget = normalizeName(task.name);
-
-    return parseEvolutionChain(evoData.chain, cleanTarget);
-}
-
-function parseEvolutionChain(chain, targetName) {
-    let prev = null;
-    let next = null;
-
-    function walk(node, parent) {
-        const cleanNodeName = normalizeName(node.species.name);
-
-        if (cleanNodeName === targetName) {
-            if (parent) prev = parent;
-            if (node.evolves_to.length > 0) next = node.evolves_to[0];
-        }
-
-        node.evolves_to.forEach(child => walk(child, node));
-    }
-
-    walk(chain, null);
-
-    return { prev, next };
-}
-
-function formatEvolutionMethod(details) {
-    if (!details) return "";
-    const d = details[0];
-    if (d.min_level) return `Level ${d.min_level}`;
-    if (d.item) return `Use ${d.item.name}`;
-    if (d.trigger.name === "trade") return "Trade";
-    if (d.min_happiness) return "High Friendship";
-    if (d.min_beauty) return "High Beauty";
-    if (d.min_affection) return "High Affection";
-    return d.trigger.name.replace(/-/g, " ");
-}
-
-/* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
 async function importFromSheet() {
@@ -369,7 +309,7 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (FULL EVOLUTION LINES)
+   INFO PANEL (SPRITE + NAME + GAMES ONLY — EVOLUTIONS REMOVED)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -384,48 +324,9 @@ async function openInfoPanel(task) {
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
-    const evo = await getEvolutionData(task);
-
-    const evoBox = document.getElementById("infoEvolutions");
-    evoBox.innerHTML = "";
-
-    if (evo.prev) {
-        const p = evo.prev;
-        const prevID = p.species.url.split('/')[6];
-        const prevName = p.species.name;
-        const currentName = task.name.toLowerCase();
-        const method = formatEvolutionMethod(p.evolution_details);
-
-        evoBox.innerHTML += `
-            <div class="evoBox">
-                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${prevID}.png">
-                <div>
-                    <strong>FULL LINE:</strong><br>
-                    ${prevName} → ${currentName}<br>
-                    <strong>Method:</strong> ${method}
-                </div>
-            </div>
-        `;
-    }
-
-    if (evo.next) {
-        const n = evo.next;
-        const nextID = n.species.url.split('/')[6];
-        const nextName = n.species.name;
-        const currentName = task.name.toLowerCase();
-        const method = formatEvolutionMethod(n.evolution_details);
-
-        evoBox.innerHTML += `
-            <div class="evoBox">
-                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${nextID}.png">
-                <div>
-                    <strong>FULL LINE:</strong><br>
-                    ${currentName} → ${nextName}<br>
-                    <strong>Method:</strong> ${method}
-                </div>
-            </div>
-        `;
-    }
+    document.getElementById("infoEvolutions").innerHTML = `
+        <p style="opacity:0.5; text-align:center;">No evolution data</p>
+    `;
 
     panel.classList.add("open");
 }
@@ -464,3 +365,5 @@ async function init() {
 }
 
 init();
+
+
