@@ -38,10 +38,10 @@ let tasks = [];
 let dotInterval;
 
 /* ============================================================
-   FORCE STATE CHANGE (THE FIX)
+   FORCE STATE CHANGE (FOR INSTANT UI UPDATES)
    ============================================================ */
 function forceStateChange() {
-    tasks = [...tasks]; // new array reference forces UI update
+    tasks = [...tasks]; // new array reference
 }
 
 /* ============================================================
@@ -183,7 +183,7 @@ function getSortedTasks() {
 }
 
 /* ============================================================
-   RENDER LIST (NOW UPDATES INSTANTLY)
+   RENDER LIST
    ============================================================ */
 function renderTasks() {
     taskList.innerHTML = "";
@@ -397,22 +397,33 @@ if (localStorage.getItem("darkMode") === "1") {
 }
 
 /* ============================================================
-   INFO PANEL
+   INFO PANEL (ANIMATED OPEN/CLOSE + CONTENT FADE)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
+    const content = document.getElementById("infoContent");
 
+    // If panel already open, fade content out first
+    if (panel.classList.contains("open")) {
+        content.classList.add("fading");
+        await new Promise(r => setTimeout(r, 150));
+    }
+
+    // Sprite
     document.getElementById("infoSprite").innerHTML = `
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
     `;
 
+    // Name
     document.getElementById("infoName").textContent =
         `#${task.dex} — ${formatPokemonName(task.name)}`;
 
+    // Games placeholder
     document.getElementById("infoGames").innerHTML = `
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
+    // Types
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
 
@@ -435,6 +446,7 @@ async function openInfoPanel(task) {
             });
         });
 
+    // Evolutions
     const evoBox = document.getElementById("infoEvolutions");
     evoBox.innerHTML = "Loading evolution data...";
 
@@ -479,15 +491,27 @@ async function openInfoPanel(task) {
         `;
     }
 
+    // Fade content back in
+    content.classList.remove("fading");
+
+    // Open panel
     panel.classList.add("open");
 }
 
 document.getElementById("closeInfoPanel").addEventListener("click", () => {
-    document.getElementById("infoPanel").classList.remove("open");
+    const panel = document.getElementById("infoPanel");
+    const content = document.getElementById("infoContent");
+
+    content.classList.add("fading");
+    panel.classList.remove("open");
+
+    setTimeout(() => {
+        content.classList.remove("fading");
+    }, 300);
 });
 
 /* ============================================================
-   EVENT LISTENERS (FIXED)
+   EVENT LISTENERS (INSTANT UPDATES)
    ============================================================ */
 searchBar.addEventListener("input", () => {
     forceStateChange();
