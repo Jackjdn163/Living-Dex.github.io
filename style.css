@@ -280,7 +280,7 @@ body.dark #taskList li {
 }
 
 /* ============================================================
-   CIRCULAR PROGRESS RING
+   MAIN CIRCULAR PROGRESS RING
    ============================================================ */
 
 #floatingStats {
@@ -323,7 +323,6 @@ body.dark #floatingStats {
     color: white;
 }
 
-/* Ring container */
 #progressRing {
     position: relative;
     width: 120px;
@@ -331,32 +330,28 @@ body.dark #floatingStats {
     margin: 0 auto 14px auto;
 }
 
-/* SVG ring */
 #progressRing svg {
     width: 120px;
     height: 120px;
     transform: rotate(-90deg);
 }
 
-/* Background circle */
 #progressRing .bg {
     fill: none;
     stroke: rgba(255,255,255,0.3);
     stroke-width: 10;
 }
 
-/* Foreground circle */
 #progressRing .fg {
     fill: none;
     stroke: #4ade80;
     stroke-width: 10;
     stroke-linecap: round;
-    stroke-dasharray: 377; /* circumference of circle */
+    stroke-dasharray: 377;
     stroke-dashoffset: 377;
     transition: stroke-dashoffset 0.5s ease;
 }
 
-/* Percentage text */
 #progressText {
     position: absolute;
     top: 50%;
@@ -367,14 +362,88 @@ body.dark #floatingStats {
     letter-spacing: 0.6px;
     text-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
+/* ============================================================
+   MINI GENERATION RINGS (COLOR CODED)
+   ============================================================ */
 
-/* Gen progress list */
-#genProgress div {
-    font-size: 15px;
-    font-weight: 600;
-    opacity: 0.9;
-    margin-top: 6px;
-    letter-spacing: 0.3px;
+.genGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 10px;
+    justify-items: center;
+}
+
+.genCircle {
+    position: relative;
+    width: 70px;
+    height: 70px;
+}
+
+/* Stylish palette (Option D) */
+:root {
+    --gen1: #ff6b6b;
+    --gen2: #f7b731;
+    --gen3: #20bf6b;
+    --gen4: #a55eea;
+    --gen5: #4b6584;
+    --gen6: #3867d6;
+    --gen7: #fa8231;
+    --gen8: #eb3b5a;
+    --gen9: #8854d0;
+}
+
+.genCircle svg {
+    width: 70px;
+    height: 70px;
+    transform: rotate(-90deg);
+}
+
+.genCircle .bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.25);
+    stroke-width: 8;
+}
+
+.genCircle .fg {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 220;
+    stroke-dashoffset: 220;
+    transition: stroke-dashoffset 0.5s ease, filter 0.3s ease;
+}
+
+/* Color-coded rings */
+.genCircle[data-gen="1"] .fg { stroke: var(--gen1); }
+.genCircle[data-gen="2"] .fg { stroke: var(--gen2); }
+.genCircle[data-gen="3"] .fg { stroke: var(--gen3); }
+.genCircle[data-gen="4"] .fg { stroke: var(--gen4); }
+.genCircle[data-gen="5"] .fg { stroke: var(--gen5); }
+.genCircle[data-gen="6"] .fg { stroke: var(--gen6); }
+.genCircle[data-gen="7"] .fg { stroke: var(--gen7); }
+.genCircle[data-gen="8"] .fg { stroke: var(--gen8); }
+.genCircle[data-gen="9"] .fg { stroke: var(--gen9); }
+
+/* Completed-gen glow */
+.genCircle.completed .fg {
+    filter: drop-shadow(0 0 8px #4ade80) drop-shadow(0 0 12px #4ade80);
+}
+
+.genLabel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.genLabel .genPercent {
+    font-size: 11px;
+    opacity: 0.85;
 }
 
 /* ============================================================
@@ -539,7 +608,6 @@ body.dark #infoPanel {
     opacity: 1;
 }
 
-/* Content fade animation */
 #infoContent {
     opacity: 1;
     transition: opacity 0.25s ease;
@@ -549,7 +617,6 @@ body.dark #infoPanel {
     opacity: 0;
 }
 
-/* Close button */
 .closeInfoBtn {
     position: absolute;
     top: 12px;
