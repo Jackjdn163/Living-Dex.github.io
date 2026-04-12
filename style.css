@@ -481,12 +481,37 @@ body.dark #infoPanel {
     opacity: 1;
 }
 
+/* ============================================================
+   SPRITE + TYPE ICONS ROW
+   ============================================================ */
+
+#infoTopRow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
 #infoSprite img {
     width: 120px;
     height: 120px;
-    display: block;
-    margin: 0 auto 10px auto;
 }
+
+#infoTypes {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+#infoTypes img {
+    width: 42px;
+    height: 42px;
+}
+
+/* ============================================================
+   NAME + GAMES
+   ============================================================ */
 
 #infoName {
     text-align: center;
