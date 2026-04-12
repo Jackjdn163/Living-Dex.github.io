@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Living Dex Checklist</title>
+    <title>Pokédex Tracker</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <!-- ============================================================
@@ -18,51 +19,15 @@
                 <div class="pokeball-bottom"></div>
                 <div class="pokeball-center"></div>
             </div>
-
-            <div id="loadingText">Loading<span id="loadingDots">.</span></div>
+            <div id="loadingText">Loading<span id="loadingDots"></span></div>
         </div>
     </div>
 
     <!-- ============================================================
-         FLOATING STATS BOX (TOP LEFT)
-    ============================================================ -->
-    <div id="floatingStats">
-        <div id="progress">0.00% complete</div>
-        <div id="genProgress">
-            <div id="gen1Progress">Gen 1: 0.00%</div>
-            <div id="gen2Progress">Gen 2: 0.00%</div>
-            <div id="gen3Progress">Gen 3: 0.00%</div>
-            <div id="gen4Progress">Gen 4: 0.00%</div>
-            <div id="gen5Progress">Gen 5: 0.00%</div>
-            <div id="gen6Progress">Gen 6: 0.00%</div>
-            <div id="gen7Progress">Gen 7: 0.00%</div>
-            <div id="gen8Progress">Gen 8: 0.00%</div>
-            <div id="gen9Progress">Gen 9: 0.00%</div>
-        </div>
-    </div>
-
-    <!-- ============================================================
-         FLOATING TOGGLE BOX (BOTTOM LEFT)
-    ============================================================ -->
-    <div id="floatingToggles">
-        <label class="switch">
-            <input type="checkbox" id="shinyToggle">
-            <span class="slider"></span>
-            <span class="switch-label">Shiny</span>
-        </label>
-
-        <label class="switch">
-            <input type="checkbox" id="darkModeToggle">
-            <span class="slider"></span>
-            <span class="switch-label">Dark Mode</span>
-        </label>
-    </div>
-
-    <!-- ============================================================
-         MAIN CONTENT
+         MAIN CONTAINER
     ============================================================ -->
     <div class="container">
-        <h1>Living Dex Checklist</h1>
+        <h1>Pokédex Tracker</h1>
 
         <input id="searchBar" type="text" placeholder="Search Pokémon...">
 
@@ -73,54 +38,87 @@
             <option value="uncaught">Sort by Uncaught</option>
         </select>
 
-        <button id="resetBtn">Reset Checklist</button>
+        <button id="resetBtn">Reset Progress</button>
 
         <ul id="taskList"></ul>
     </div>
 
     <!-- ============================================================
-         RESET CONFIRMATION POPUP
+         FLOATING STATS BOX
+    ============================================================ -->
+    <div id="floatingStats">
+        <div id="progress">0% complete</div>
+        <div id="genProgress">
+            <div id="gen1Progress">Gen 1: 0%</div>
+            <div id="gen2Progress">Gen 2: 0%</div>
+            <div id="gen3Progress">Gen 3: 0%</div>
+            <div id="gen4Progress">Gen 4: 0%</div>
+            <div id="gen5Progress">Gen 5: 0%</div>
+            <div id="gen6Progress">Gen 6: 0%</div>
+            <div id="gen7Progress">Gen 7: 0%</div>
+            <div id="gen8Progress">Gen 8: 0%</div>
+            <div id="gen9Progress">Gen 9: 0%</div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         FLOATING TOGGLES
+    ============================================================ -->
+    <div id="floatingToggles">
+
+        <label class="switch">
+            <input type="checkbox" id="shinyToggle">
+            <span class="slider"></span>
+            <span class="switch-label">Show Shiny</span>
+        </label>
+
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+            <span class="switch-label">Dark Mode</span>
+        </label>
+
+    </div>
+
+    <!-- ============================================================
+         RESET POPUP
     ============================================================ -->
     <div id="resetPopup" class="popup hidden">
         <div class="popup-box">
-            <h2>Reset Checklist?</h2>
-            <p>This will clear all progress. Are you sure?</p>
-
+            <p>Are you sure you want to reset all progress?</p>
             <div class="popup-buttons">
-                <button id="confirmReset" class="danger">Yes, Reset</button>
+                <button id="confirmReset" class="danger">Reset</button>
                 <button id="cancelReset">Cancel</button>
             </div>
         </div>
     </div>
 
     <!-- ============================================================
-         RIGHT-SIDE INFO PANEL
+         INFO PANEL (WITH WRAPPER)
     ============================================================ -->
-    <div id="infoPanel" class="hidden">
-
-        <!-- Close Button -->
-        <button id="closeInfoPanel" class="closeInfoBtn">✕</button>
+    <div id="infoPanel">
+        <button id="closeInfoPanel" class="closeInfoBtn">×</button>
 
         <div id="infoContent">
 
-            <!-- SPRITE + TYPES ROW -->
             <div id="infoTopRow">
                 <div id="infoSprite"></div>
                 <div id="infoTypes"></div>
             </div>
 
-            <!-- Pokémon Name -->
             <h2 id="infoName"></h2>
 
-            <!-- Reserved Games Section -->
             <div id="infoGames"></div>
 
-            <!-- Evolution Section -->
             <div id="infoEvolutions"></div>
 
         </div>
     </div>
 
+    <!-- ============================================================
+         SCRIPT
+    ============================================================ -->
     <script src="script.js"></script>
+
 </body>
 </html>
