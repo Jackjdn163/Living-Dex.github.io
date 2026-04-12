@@ -280,92 +280,21 @@ body.dark #taskList li {
 }
 
 /* ============================================================
-   MAIN PROGRESS RING
+   TOTAL HEADER (REPLACES BIG CIRCLE)
    ============================================================ */
 
-#floatingStats {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-
-    width: 300px;
-    min-height: 420px;
-
-    background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-
-    padding: 22px 26px;
-    border-radius: 16px;
-
-    border: 1px solid rgba(255, 255, 255, 0.45);
-    box-shadow:
-        0 4px 12px rgba(0,0,0,0.25),
-        0 0 18px rgba(255,255,255,0.35) inset;
-
-    z-index: 9999;
-    color: #111;
-
-    opacity: 0;
-    transform: translateY(-10px);
-    animation: statsFadeIn 0.4s ease forwards;
+#totalHeader {
+    text-align: center;
+    margin-bottom: 18px;
 }
 
-@keyframes statsFadeIn {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-body.dark #floatingStats {
-    background: rgba(30, 30, 30, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow:
-        0 4px 12px rgba(0,0,0,0.55),
-        0 0 18px rgba(255,255,255,0.08) inset;
-    color: white;
-}
-
-#progressRing {
-    position: relative;
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 22px auto;
-}
-
-#progressRing svg {
-    width: 120px;
-    height: 120px;
-    transform: rotate(-90deg);
-}
-
-#progressRing .bg {
-    fill: none;
-    stroke: rgba(255,255,255,0.3);
-    stroke-width: 10;
-}
-
-#progressRing .fg {
-    fill: none;
-    stroke: #4ade80;
-    stroke-width: 10;
-    stroke-linecap: round;
-    stroke-dasharray: 377;
-    stroke-dashoffset: 377;
-    transition: stroke-dashoffset 0.5s ease;
-}
-
-#progressText {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 26px;
+.totalTitle {
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: 0.6px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.25);
+    letter-spacing: 0.5px;
+    opacity: 0.9;
 }
+
 /* ============================================================
    FULL POKEDEX BAR
    ============================================================ */
@@ -400,7 +329,6 @@ body.dark #floatingStats {
     transition: width 0.4s ease;
 }
 
-/* Crown appears only at 100% */
 .fullDexCrown {
     position: absolute;
     top: 50%;
@@ -412,7 +340,6 @@ body.dark #floatingStats {
     font-size: 18px;
 }
 
-/* Glow when complete */
 .fullDexRow.completed .fullDexFill {
     box-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80;
 }
@@ -467,7 +394,6 @@ body.dark #floatingStats {
     transition: width 0.4s ease;
 }
 
-/* Color-coded fills */
 .genRow[data-gen="1"] .genFill { background: #ff6b6b; }
 .genRow[data-gen="2"] .genFill { background: #f7b731; }
 .genRow[data-gen="3"] .genFill { background: #20bf6b; }
