@@ -367,7 +367,69 @@ body.dark #floatingStats {
     text-shadow: 0 1px 2px rgba(0,0,0,0.25);
 }
 /* ============================================================
-   MINI GENERATION BARS (Option A)
+   FULL POKEDEX BAR
+   ============================================================ */
+
+.fullDexRow {
+    display: grid;
+    grid-template-columns: 50px 1fr 45px;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.fullDexLabel {
+    font-weight: 800;
+    font-size: 14px;
+}
+
+.fullDexBar {
+    position: relative;
+    width: 100%;
+    height: 14px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.fullDexFill {
+    height: 100%;
+    width: 0%;
+    background: #4ade80;
+    border-radius: 8px;
+    transition: width 0.4s ease;
+}
+
+/* Crown appears only at 100% */
+.fullDexCrown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.6);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    font-size: 18px;
+}
+
+/* Glow when complete */
+.fullDexRow.completed .fullDexFill {
+    box-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80;
+}
+
+.fullDexRow.completed .fullDexCrown {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.fullDexPercent {
+    font-size: 13px;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* ============================================================
+   GENERATION BARS
    ============================================================ */
 
 .genBars {
@@ -405,6 +467,7 @@ body.dark #floatingStats {
     transition: width 0.4s ease;
 }
 
+/* Color-coded fills */
 .genRow[data-gen="1"] .genFill { background: #ff6b6b; }
 .genRow[data-gen="2"] .genFill { background: #f7b731; }
 .genRow[data-gen="3"] .genFill { background: #20bf6b; }
@@ -581,6 +644,11 @@ body.dark #infoPanel {
 #infoPanel.open {
     transform: translateX(0);
     opacity: 1;
+}
+
+#infoContent {
+    opacity: 1;
+    transition: opacity 0.25s ease;
 }
 
 #infoContent.fading {
