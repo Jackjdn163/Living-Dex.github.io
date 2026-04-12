@@ -52,7 +52,6 @@ body.dark #loadingScreen {
     text-align: center;
 }
 
-/* Pokéball container */
 .pokeball {
     width: 120px;
     height: 120px;
@@ -63,7 +62,6 @@ body.dark #loadingScreen {
     animation: spin 1.2s linear infinite;
 }
 
-/* Top half */
 .pokeball-top {
     background: #ff0000;
     width: 100%;
@@ -74,7 +72,6 @@ body.dark .pokeball-top {
     background: #cc0000;
 }
 
-/* Bottom half */
 .pokeball-bottom {
     background: #ffffff;
     width: 100%;
@@ -85,7 +82,6 @@ body.dark .pokeball-bottom {
     background: #e5e5e5;
 }
 
-/* Center button */
 .pokeball-center {
     position: absolute;
     top: 50%;
@@ -103,27 +99,23 @@ body.dark .pokeball-center {
     background: #dddddd;
 }
 
-/* Green flash */
 .pokeball-center.catch {
     background: #4ade80;
     box-shadow: 0 0 20px 10px #4ade80;
     border-color: #4ade80;
 }
 
-/* Spin animation */
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
 
-/* Stop spinning */
 .pokeball.finish-spin {
     animation: none;
     transform: rotate(0deg);
     transition: transform 0.4s ease;
 }
 
-/* Shake animation */
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
@@ -136,7 +128,6 @@ body.dark .pokeball-center {
     animation: shake 0.35s ease;
 }
 
-/* Loading text */
 #loadingText {
     margin-top: 20px;
     font-size: 22px;
@@ -153,7 +144,6 @@ body.dark #loadingText {
     opacity: 0;
 }
 
-/* Animated dots */
 #loadingDots {
     display: inline-block;
     width: 24px;
@@ -464,7 +454,6 @@ body.dark #infoPanel {
     transform: translateX(0);
 }
 
-/* Close button */
 .closeInfoBtn {
     position: absolute;
     top: 12px;
@@ -482,7 +471,7 @@ body.dark #infoPanel {
 }
 
 /* ============================================================
-   SPRITE + TYPE ICONS ROW
+   SPRITE + TYPE BADGES ROW
    ============================================================ */
 
 #infoTopRow {
@@ -505,97 +494,22 @@ body.dark #infoPanel {
 }
 
 /* ============================================================
-   TYPE ICON COLORING (OPTION 1 — FILTERS)
+   TYPE BADGES (ACCURATE COLORS)
    ============================================================ */
 
-#infoTypes img {
+.typeBadge {
     width: 42px;
     height: 42px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-/* Grass */
-#infoTypes img[alt="grass"] {
-    filter: invert(63%) sepia(29%) saturate(749%) hue-rotate(61deg) brightness(92%) contrast(89%);
-}
-
-/* Poison */
-#infoTypes img[alt="poison"] {
-    filter: invert(29%) sepia(91%) saturate(508%) hue-rotate(268deg) brightness(92%) contrast(88%);
-}
-
-/* Fire */
-#infoTypes img[alt="fire"] {
-    filter: invert(53%) sepia(80%) saturate(747%) hue-rotate(352deg) brightness(101%) contrast(95%);
-}
-
-/* Water */
-#infoTypes img[alt="water"] {
-    filter: invert(46%) sepia(45%) saturate(749%) hue-rotate(176deg) brightness(92%) contrast(89%);
-}
-
-/* Electric */
-#infoTypes img[alt="electric"] {
-    filter: invert(84%) sepia(52%) saturate(748%) hue-rotate(358deg) brightness(103%) contrast(95%);
-}
-
-/* Flying */
-#infoTypes img[alt="flying"] {
-    filter: invert(68%) sepia(23%) saturate(748%) hue-rotate(202deg) brightness(97%) contrast(92%);
-}
-
-/* Bug */
-#infoTypes img[alt="bug"] {
-    filter: invert(63%) sepia(52%) saturate(748%) hue-rotate(33deg) brightness(92%) contrast(89%);
-}
-
-/* Rock */
-#infoTypes img[alt="rock"] {
-    filter: invert(71%) sepia(28%) saturate(748%) hue-rotate(16deg) brightness(92%) contrast(89%);
-}
-
-/* Ground */
-#infoTypes img[alt="ground"] {
-    filter: invert(79%) sepia(39%) saturate(748%) hue-rotate(16deg) brightness(92%) contrast(89%);
-}
-
-/* Psychic */
-#infoTypes img[alt="psychic"] {
-    filter: invert(52%) sepia(78%) saturate(748%) hue-rotate(316deg) brightness(97%) contrast(92%);
-}
-
-/* Ice */
-#infoTypes img[alt="ice"] {
-    filter: invert(80%) sepia(12%) saturate(748%) hue-rotate(152deg) brightness(97%) contrast(92%);
-}
-
-/* Dragon */
-#infoTypes img[alt="dragon"] {
-    filter: invert(36%) sepia(78%) saturate(748%) hue-rotate(245deg) brightness(97%) contrast(92%);
-}
-
-/* Dark */
-#infoTypes img[alt="dark"] {
-    filter: invert(33%) sepia(17%) saturate(748%) hue-rotate(346deg) brightness(97%) contrast(92%);
-}
-
-/* Steel */
-#infoTypes img[alt="steel"] {
-    filter: invert(75%) sepia(5%) saturate(748%) hue-rotate(202deg) brightness(97%) contrast(92%);
-}
-
-/* Fairy */
-#infoTypes img[alt="fairy"] {
-    filter: invert(78%) sepia(28%) saturate(748%) hue-rotate(296deg) brightness(97%) contrast(92%);
-}
-
-/* Ghost */
-#infoTypes img[alt="ghost"] {
-    filter: invert(41%) sepia(18%) saturate(748%) hue-rotate(246deg) brightness(97%) contrast(92%);
-}
-
-/* Fighting */
-#infoTypes img[alt="fighting"] {
-    filter: invert(38%) sepia(78%) saturate(748%) hue-rotate(347deg) brightness(97%) contrast(92%);
+.typeBadge img {
+    width: 24px;
+    height: 24px;
+    filter: none;
 }
 
 /* ============================================================
