@@ -221,8 +221,19 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING
+   EVOLUTION FETCHING (FIXED + NORMALIZED)
    ============================================================ */
+function normalizeName(name) {
+    return name
+        .normalize("NFKD")
+        .replace(/[\u200B-\u200F\u00A0]/g, "") // remove invisible chars
+        .replace(/♀/g, "f")
+        .replace(/♂/g, "m")
+        .replace(/[:.'’]/g, "") // remove punctuation
+        .replace(/\s+/g, "-")   // spaces → hyphens
+        .toLowerCase();
+}
+
 async function getEvolutionData(task) {
     const speciesURL = `https://pokeapi.co/api/v2/pokemon-species/${task.dexRaw}/`;
     const speciesRes = await fetch(speciesURL);
@@ -232,7 +243,29 @@ async function getEvolutionData(task) {
     const evoRes = await fetch(evoURL);
     const evoData = await evoRes.json();
 
-    return parseEvolutionChain(evoData.chain, task.name.toLowerCase());
+    const cleanTarget = normalizeName(task.name);
+
+    return parseEvolutionChain(evoData.chain, cleanTarget);
+}
+
+function parseEvolutionChain(chain, targetName) {
+    let prev = null;
+    let next = null;
+
+    function walk(node, parent) {
+        const cleanNodeName = normalizeName(node.species.name);
+
+        if (cleanNodeName === targetName) {
+            if (parent) prev = parent;
+            if (node.evolves_to.length > 0) next = node.evolves_to[0];
+        }
+
+        node.evolves_to.forEach(child => walk(child, node));
+    }
+
+    walk(chain, null);
+
+    return { prev, next };
 }
 
 function parseEvolutionChain(chain, targetName) {
