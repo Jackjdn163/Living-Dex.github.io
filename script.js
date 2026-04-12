@@ -3,7 +3,7 @@
    ============================================================ */
 const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
-const progressDisplay = document.getElementById("progressText"); // now inside ring
+const progressText = document.getElementById("progressText");
 const resetBtn = document.getElementById("resetBtn");
 const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
@@ -19,18 +19,6 @@ const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
 const pokeballCenter = document.querySelector(".pokeball-center");
 
-const genProgressEls = {
-    1: document.getElementById("gen1Progress"),
-    2: document.getElementById("gen2Progress"),
-    3: document.getElementById("gen3Progress"),
-    4: document.getElementById("gen4Progress"),
-    5: document.getElementById("gen5Progress"),
-    6: document.getElementById("gen6Progress"),
-    7: document.getElementById("gen7Progress"),
-    8: document.getElementById("gen8Progress"),
-    9: document.getElementById("gen9Progress"),
-};
-
 const ringFG = document.querySelector("#progressRing .fg");
 
 const GOOGLE_SHEET_URL =
@@ -38,13 +26,6 @@ const GOOGLE_SHEET_URL =
 
 let tasks = [];
 let dotInterval;
-
-/* ============================================================
-   FORCE STATE CHANGE (FOR INSTANT UI UPDATES)
-   ============================================================ */
-function forceStateChange() {
-    tasks = [...tasks];
-}
 
 /* ============================================================
    HELPERS
@@ -138,7 +119,7 @@ function loadTasksFromStorage() {
 }
 
 /* ============================================================
-   PROGRESS + RING ANIMATION
+   MAIN PROGRESS RING
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
@@ -147,15 +128,16 @@ function updateOverallProgress() {
     const percent = total ? ((caught / total) * 100) : 0;
     const percentText = percent.toFixed(2) + "%";
 
-    // Update text
-    progressDisplay.textContent = percentText;
+    progressText.textContent = percentText;
 
-    // Animate ring
-    const circumference = 377; // matches CSS
+    const circumference = 377;
     const offset = circumference - (percent / 100) * circumference;
     ringFG.style.strokeDashoffset = offset;
 }
 
+/* ============================================================
+   MINI GENERATION RINGS
+   ============================================================ */
 function updateGenProgress() {
     const totals = {};
     const caught = {};
@@ -165,11 +147,27 @@ function updateGenProgress() {
         if (t.completed) caught[t.gen] = (caught[t.gen] || 0) + 1;
     });
 
-    Object.keys(genProgressEls).forEach(g => {
-        const total = totals[g] || 0;
-        const c = caught[g] || 0;
-        const percent = total ? ((c / total) * 100).toFixed(2) : "0.00";
-        genProgressEls[g].textContent = `Gen ${g}: ${percent}%`;
+    document.querySelectorAll(".genCircle").forEach(circle => {
+        const gen = circle.dataset.gen;
+        const total = totals[gen] || 0;
+        const c = caught[gen] || 0;
+
+        const percent = total ? (c / total) * 100 : 0;
+        const percentText = percent.toFixed(2) + "%";
+
+        circle.querySelector(".genPercent").textContent = percentText;
+
+        const fg = circle.querySelector(".fg");
+        const circumference = 220;
+        const offset = circumference - (percent / 100) * circumference;
+        fg.style.strokeDashoffset = offset;
+
+        // Glow when completed
+        if (percent >= 100) {
+            circle.classList.add("completed");
+        } else {
+            circle.classList.remove("completed");
+        }
     });
 }
 
@@ -398,7 +396,6 @@ darkToggle.addEventListener("change", () => {
     const isDark = darkToggle.checked;
     document.body.classList.toggle("dark", isDark);
     localStorage.setItem("darkMode", isDark ? "1" : "0");
-    forceStateChange();
     renderTasks();
 });
 
@@ -408,7 +405,7 @@ if (localStorage.getItem("darkMode") === "1") {
 }
 
 /* ============================================================
-   INFO PANEL (ANIMATED OPEN/CLOSE + CONTENT FADE)
+   INFO PANEL
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -513,22 +510,11 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
 });
 
 /* ============================================================
-   EVENT LISTENERS (INSTANT UPDATES)
+   EVENT LISTENERS
    ============================================================ */
-searchBar.addEventListener("input", () => {
-    forceStateChange();
-    renderTasks();
-});
-
-sortSelect.addEventListener("change", () => {
-    forceStateChange();
-    renderTasks();
-});
-
-shinyToggle.addEventListener("change", () => {
-    forceStateChange();
-    renderTasks();
-});
+searchBar.addEventListener("input", renderTasks);
+sortSelect.addEventListener("change", renderTasks);
+shinyToggle.addEventListener("change", renderTasks);
 
 /* ============================================================
    INITIAL LOAD
