@@ -94,6 +94,15 @@ function formatPokemonName(name) {
 }
 
 /* ============================================================
+   TYPE ICON SOURCE
+   ============================================================ */
+function typeIconSrc(type) {
+    if (!type) return null;
+    const key = type.toLowerCase();
+    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${key}.svg`;
+}
+
+/* ============================================================
    STORAGE
    ============================================================ */
 function saveTasks() {
@@ -427,22 +436,42 @@ shinyToggle.addEventListener("change", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 
 /* ============================================================
-   INFO PANEL (EVOLUTIONS + LABELS + PROPER NAMES)
+   INFO PANEL (EVOLUTIONS + TYPE ICONS + LABELS)
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
 
+    // SPRITE
     document.getElementById("infoSprite").innerHTML = `
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
     `;
 
+    // NAME
     document.getElementById("infoName").textContent =
         `#${task.dex} — ${formatPokemonName(task.name)}`;
 
+    // GAMES (placeholder)
     document.getElementById("infoGames").innerHTML = `
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
+    // TYPES
+    const infoTypes = document.getElementById("infoTypes");
+    infoTypes.innerHTML = "";
+
+    fetch(`https://pokeapi.co/api/v2/pokemon/${task.dexRaw}`)
+        .then(res => res.json())
+        .then(data => {
+            data.types.forEach(t => {
+                const typeName = t.type.name;
+                const icon = document.createElement("img");
+                icon.src = typeIconSrc(typeName);
+                icon.alt = typeName;
+                infoTypes.appendChild(icon);
+            });
+        });
+
+    // EVOLUTIONS
     const evoBox = document.getElementById("infoEvolutions");
     evoBox.innerHTML = "Loading evolution data...";
 
