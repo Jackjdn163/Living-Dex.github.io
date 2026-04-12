@@ -119,7 +119,7 @@ function loadTasksFromStorage() {
 }
 
 /* ============================================================
-   MAIN PROGRESS RING
+   MAIN PROGRESS RING + FULL DEX BAR
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
@@ -128,11 +128,28 @@ function updateOverallProgress() {
     const percent = total ? ((caught / total) * 100) : 0;
     const percentText = percent.toFixed(2) + "%";
 
+    // Update main ring text
     progressText.textContent = percentText;
 
+    // Update main ring stroke
     const circumference = 377;
     const offset = circumference - (percent / 100) * circumference;
     ringFG.style.strokeDashoffset = offset;
+
+    // Update full dex bar
+    const row = document.getElementById("fullDexRow");
+    const fill = row.querySelector(".fullDexFill");
+    const label = row.querySelector(".fullDexPercent");
+
+    fill.style.width = percent + "%";
+    label.textContent = percentText;
+
+    // Crown + glow
+    if (percent >= 100) {
+        row.classList.add("completed");
+    } else {
+        row.classList.remove("completed");
+    }
 }
 
 /* ============================================================
