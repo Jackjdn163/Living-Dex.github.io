@@ -136,7 +136,7 @@ function updateOverallProgress() {
 }
 
 /* ============================================================
-   MINI GENERATION RINGS (80px, r=40)
+   MINI GENERATION RINGS (65px, r=28)
    ============================================================ */
 function updateGenProgress() {
     const totals = {};
@@ -158,11 +158,10 @@ function updateGenProgress() {
         circle.querySelector(".genPercent").textContent = percentText;
 
         const fg = circle.querySelector(".fg");
-        const circumference = 251; // r=40
+        const circumference = 176; // FIXED r=28
         const offset = circumference - (percent / 100) * circumference;
         fg.style.strokeDashoffset = offset;
 
-        // Glow when completed
         if (percent >= 100) {
             circle.classList.add("completed");
         } else {
