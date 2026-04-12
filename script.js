@@ -136,7 +136,7 @@ function updateOverallProgress() {
 }
 
 /* ============================================================
-   MINI GENERATION RINGS (65px, r=28)
+   GENERATION PROGRESS — BAR VERSION
    ============================================================ */
 function updateGenProgress() {
     const totals = {};
@@ -147,26 +147,15 @@ function updateGenProgress() {
         if (t.completed) caught[t.gen] = (caught[t.gen] || 0) + 1;
     });
 
-    document.querySelectorAll(".genCircle").forEach(circle => {
-        const gen = circle.dataset.gen;
+    document.querySelectorAll(".genRow").forEach(row => {
+        const gen = row.dataset.gen;
         const total = totals[gen] || 0;
         const c = caught[gen] || 0;
 
         const percent = total ? (c / total) * 100 : 0;
-        const percentText = percent.toFixed(2) + "%";
 
-        circle.querySelector(".genPercent").textContent = percentText;
-
-        const fg = circle.querySelector(".fg");
-        const circumference = 176; // FIXED r=28
-        const offset = circumference - (percent / 100) * circumference;
-        fg.style.strokeDashoffset = offset;
-
-        if (percent >= 100) {
-            circle.classList.add("completed");
-        } else {
-            circle.classList.remove("completed");
-        }
+        row.querySelector(".genPercent").textContent = percent.toFixed(2) + "%";
+        row.querySelector(".genFill").style.width = percent + "%";
     });
 }
 
