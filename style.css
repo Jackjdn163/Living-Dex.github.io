@@ -504,9 +504,98 @@ body.dark #infoPanel {
     gap: 8px;
 }
 
+/* ============================================================
+   TYPE ICON COLORING (OPTION 1 — FILTERS)
+   ============================================================ */
+
 #infoTypes img {
     width: 42px;
     height: 42px;
+}
+
+/* Grass */
+#infoTypes img[alt="grass"] {
+    filter: invert(63%) sepia(29%) saturate(749%) hue-rotate(61deg) brightness(92%) contrast(89%);
+}
+
+/* Poison */
+#infoTypes img[alt="poison"] {
+    filter: invert(29%) sepia(91%) saturate(508%) hue-rotate(268deg) brightness(92%) contrast(88%);
+}
+
+/* Fire */
+#infoTypes img[alt="fire"] {
+    filter: invert(53%) sepia(80%) saturate(747%) hue-rotate(352deg) brightness(101%) contrast(95%);
+}
+
+/* Water */
+#infoTypes img[alt="water"] {
+    filter: invert(46%) sepia(45%) saturate(749%) hue-rotate(176deg) brightness(92%) contrast(89%);
+}
+
+/* Electric */
+#infoTypes img[alt="electric"] {
+    filter: invert(84%) sepia(52%) saturate(748%) hue-rotate(358deg) brightness(103%) contrast(95%);
+}
+
+/* Flying */
+#infoTypes img[alt="flying"] {
+    filter: invert(68%) sepia(23%) saturate(748%) hue-rotate(202deg) brightness(97%) contrast(92%);
+}
+
+/* Bug */
+#infoTypes img[alt="bug"] {
+    filter: invert(63%) sepia(52%) saturate(748%) hue-rotate(33deg) brightness(92%) contrast(89%);
+}
+
+/* Rock */
+#infoTypes img[alt="rock"] {
+    filter: invert(71%) sepia(28%) saturate(748%) hue-rotate(16deg) brightness(92%) contrast(89%);
+}
+
+/* Ground */
+#infoTypes img[alt="ground"] {
+    filter: invert(79%) sepia(39%) saturate(748%) hue-rotate(16deg) brightness(92%) contrast(89%);
+}
+
+/* Psychic */
+#infoTypes img[alt="psychic"] {
+    filter: invert(52%) sepia(78%) saturate(748%) hue-rotate(316deg) brightness(97%) contrast(92%);
+}
+
+/* Ice */
+#infoTypes img[alt="ice"] {
+    filter: invert(80%) sepia(12%) saturate(748%) hue-rotate(152deg) brightness(97%) contrast(92%);
+}
+
+/* Dragon */
+#infoTypes img[alt="dragon"] {
+    filter: invert(36%) sepia(78%) saturate(748%) hue-rotate(245deg) brightness(97%) contrast(92%);
+}
+
+/* Dark */
+#infoTypes img[alt="dark"] {
+    filter: invert(33%) sepia(17%) saturate(748%) hue-rotate(346deg) brightness(97%) contrast(92%);
+}
+
+/* Steel */
+#infoTypes img[alt="steel"] {
+    filter: invert(75%) sepia(5%) saturate(748%) hue-rotate(202deg) brightness(97%) contrast(92%);
+}
+
+/* Fairy */
+#infoTypes img[alt="fairy"] {
+    filter: invert(78%) sepia(28%) saturate(748%) hue-rotate(296deg) brightness(97%) contrast(92%);
+}
+
+/* Ghost */
+#infoTypes img[alt="ghost"] {
+    filter: invert(41%) sepia(18%) saturate(748%) hue-rotate(246deg) brightness(97%) contrast(92%);
+}
+
+/* Fighting */
+#infoTypes img[alt="fighting"] {
+    filter: invert(38%) sepia(78%) saturate(748%) hue-rotate(347deg) brightness(97%) contrast(92%);
 }
 
 /* ============================================================
