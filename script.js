@@ -3,7 +3,7 @@
    ============================================================ */
 const taskList = document.getElementById("taskList");
 const searchBar = document.getElementById("searchBar");
-const progressDisplay = document.getElementById("progress");
+const progressDisplay = document.getElementById("progressText"); // now inside ring
 const resetBtn = document.getElementById("resetBtn");
 const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
@@ -31,6 +31,8 @@ const genProgressEls = {
     9: document.getElementById("gen9Progress"),
 };
 
+const ringFG = document.querySelector("#progressRing .fg");
+
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
 
@@ -41,7 +43,7 @@ let dotInterval;
    FORCE STATE CHANGE (FOR INSTANT UI UPDATES)
    ============================================================ */
 function forceStateChange() {
-    tasks = [...tasks]; // new array reference
+    tasks = [...tasks];
 }
 
 /* ============================================================
@@ -136,13 +138,22 @@ function loadTasksFromStorage() {
 }
 
 /* ============================================================
-   PROGRESS
+   PROGRESS + RING ANIMATION
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
-    const percent = total ? ((caught / total) * 100).toFixed(2) : "0.00";
-    progressDisplay.textContent = `${percent}% complete`;
+
+    const percent = total ? ((caught / total) * 100) : 0;
+    const percentText = percent.toFixed(2) + "%";
+
+    // Update text
+    progressDisplay.textContent = percentText;
+
+    // Animate ring
+    const circumference = 377; // matches CSS
+    const offset = circumference - (percent / 100) * circumference;
+    ringFG.style.strokeDashoffset = offset;
 }
 
 function updateGenProgress() {
@@ -187,7 +198,7 @@ function getSortedTasks() {
    ============================================================ */
 function renderTasks() {
     taskList.innerHTML = "";
-    void taskList.offsetHeight; // force DOM refresh
+    void taskList.offsetHeight;
 
     const search = searchBar.value.toLowerCase();
     const shiny = shinyToggle.checked;
@@ -403,27 +414,22 @@ async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
     const content = document.getElementById("infoContent");
 
-    // If panel already open, fade content out first
     if (panel.classList.contains("open")) {
         content.classList.add("fading");
         await new Promise(r => setTimeout(r, 150));
     }
 
-    // Sprite
     document.getElementById("infoSprite").innerHTML = `
         <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
     `;
 
-    // Name
     document.getElementById("infoName").textContent =
         `#${task.dex} — ${formatPokemonName(task.name)}`;
 
-    // Games placeholder
     document.getElementById("infoGames").innerHTML = `
         <p style="opacity:0.5; text-align:center;">Games will appear here</p>
     `;
 
-    // Types
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
 
@@ -446,7 +452,6 @@ async function openInfoPanel(task) {
             });
         });
 
-    // Evolutions
     const evoBox = document.getElementById("infoEvolutions");
     evoBox.innerHTML = "Loading evolution data...";
 
@@ -491,10 +496,7 @@ async function openInfoPanel(task) {
         `;
     }
 
-    // Fade content back in
     content.classList.remove("fading");
-
-    // Open panel
     panel.classList.add("open");
 }
 
