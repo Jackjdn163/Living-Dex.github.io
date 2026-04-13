@@ -223,10 +223,22 @@ function renderTasks() {
             openInfoPanel(task);
         });
 
-        li.addEventListener("click", () => {
-            task.completed = !task.completed;
-            saveTasks();
-            renderTasks();
+       li.addEventListener("click", () => {
+    const wasCompleted = task.completed;
+    task.completed = !task.completed;
+
+    // Add animation class
+    li.classList.remove("check-anim", "uncheck-anim");
+    void li.offsetWidth; // forces reflow so animation restarts
+
+    if (!wasCompleted) {
+        li.classList.add("check-anim");
+    } else {
+        li.classList.add("uncheck-anim");
+    }
+
+    saveTasks();
+    renderTasks();
         });
 
         li.appendChild(img);
