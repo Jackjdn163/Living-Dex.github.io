@@ -280,7 +280,7 @@ body.dark #taskList li {
     left: 20px;
 
     width: 300px;
-    min-height: 420px;
+    min-height: 320px;
 
     background: rgba(255, 255, 255, 0.25);
     backdrop-filter: blur(14px);
