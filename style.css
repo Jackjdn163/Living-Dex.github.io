@@ -58,9 +58,9 @@ body.dark #loadingScreen {
     gap: 18px;
 }
 
-/* ============================================================
+/* ============================
    ORIGINAL WORKING POKEBALL
-   ============================================================ */
+   ============================ */
 
 .pokeball {
     width: 120px;
@@ -70,32 +70,26 @@ body.dark #loadingScreen {
     overflow: hidden;
     animation: spin 1.4s linear infinite;
     box-shadow: 0 0 0 4px black;
-    will-change: transform;
-    transform: translateZ(0);
 }
 
 /* Top half */
-.pokeball::before {
-    content: "";
+.pokeball-top {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 50%;
     background: #ff0000;
-    contain: paint;
 }
 
 /* Bottom half */
-.pokeball::after {
-    content: "";
+.pokeball-bottom {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 50%;
     background: white;
-    contain: paint;
 }
 
 /* Black band */
@@ -108,11 +102,10 @@ body.dark #loadingScreen {
     background: black;
     transform: translateY(-50%);
     z-index: 2;
-    contain: paint;
 }
 
 /* Center button */
-.pokeball-center {
+.pokeball-button {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -123,12 +116,10 @@ body.dark #loadingScreen {
     border-radius: 50%;
     transform: translate(-50%, -50%);
     z-index: 3;
-    will-change: transform;
-    contain: paint;
 }
 
 /* Green catch glow */
-.pokeball-center.catch {
+.pokeball-button.catch {
     background: #4ade80;
     box-shadow: 0 0 12px #4ade80;
 }
@@ -136,7 +127,7 @@ body.dark #loadingScreen {
 /* Spin animation */
 @keyframes spin {
     from { transform: rotate(0deg); }
-    to   { transform: rotate(359deg); }
+    to   { transform: rotate(360deg); }
 }
 
 .pokeball.finish-spin {
@@ -157,6 +148,7 @@ body.dark #loadingScreen {
 .pokeball.shake {
     animation: shake 0.35s ease;
 }
+
 
 /* ============================================================
    LOADING TEXT
