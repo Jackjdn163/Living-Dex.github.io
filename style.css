@@ -50,7 +50,12 @@ body.dark #loadingScreen {
 }
 
 .loading-content {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px; /* perfect spacing */
+}
+
 }
 
 /* ============================================================
@@ -71,14 +76,17 @@ body.dark #loadingScreen {
 
 /* Top half */
 .pokeball-top {
-    background: linear-gradient(#ff4d4d, #cc0000);
+    background: linear-gradient(#ff5a5a, #d40000);
     width: 100%;
     height: 50%;
 }
 
+}
+
 /* Bottom half */
 .pokeball-bottom {
-    background: linear-gradient(#ffffff, #e5e5e5);
+    background: linear-gradient(#ffffff, #dcdcdc);
+};
     width: 100%;
     height: 50%;
 }
@@ -96,28 +104,49 @@ body.dark #loadingScreen {
     box-shadow: 0 0 6px rgba(0,0,0,0.4);
 }
 
-/* Center button */
+/* Center button — Scarlet/Violet style */
 .pokeball-button {
     position: absolute;
     top: 50%;
     left: 50%;
     width: 42px;
     height: 42px;
-    background: radial-gradient(circle, #ffffff 40%, #dcdcdc 100%);
     border-radius: 50%;
     border: 6px solid black;
     transform: translate(-50%, -50%);
     z-index: 3;
+
+    /* Metallic SV-style button */
+    background: radial-gradient(circle, #ffffff 35%, #cfcfcf 100%);
+
     box-shadow:
-        0 0 10px rgba(0,0,0,0.3),
+        0 0 6px rgba(0,0,0,0.25),
         inset 0 0 8px rgba(0,0,0,0.25);
+
     transition: background 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* Green glow when loading finishes */
+.pokeball-button.catch {
+    background: radial-gradient(circle, #6bff8a 35%, #3be76a 100%);
+    border-color: #6bff8a;
+    box-shadow:
+        0 0 12px 4px rgba(107, 255, 138, 0.8),
+        0 0 24px 10px rgba(107, 255, 138, 0.45),
+        inset 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
+
 /* Green flash when loading finishes */
 .pokeball-button.catch {
-    background: radial-gradient(circle, #4ade80 40%, #2ecc71 100%);
-    box-shadow: 0 0 20px 10px #4ade80;
+    background: radial-gradient(circle, #6bff8a 35%, #3be76a 100%);
+    border-color: #6bff8a;
+    box-shadow:
+        0 0 12px 4px rgba(107, 255, 138, 0.8),
+        0 0 24px 10px rgba(107, 255, 138, 0.45),
+        inset 0 0 10px rgba(255, 255, 255, 0.6);
+}
+
 }
 
 /* Spin animation */
@@ -149,7 +178,6 @@ body.dark #loadingScreen {
 }
 
 #loadingText {
-    margin-top: 20px;
     font-size: 22px;
     font-weight: bold;
     opacity: 1;
