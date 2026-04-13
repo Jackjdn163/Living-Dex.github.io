@@ -55,44 +55,8 @@ body.dark #loadingScreen {
     align-items: center;
     gap: 18px; /* perfect spacing */
 }
-/* ============================================================
-   FULL SCARLET/VIOLET POKEBALL
-   ============================================================ */
-
-/* ORIGINAL POKEBALL (works with your HTML/JS) */
-.pokeball {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    position: relative;
-    overflow: hidden;
-    animation: spin 1.4s linear infinite;
-    box-shadow: 0 0 0 4px black;
-}
-
-.pokeball::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background: #ff0000;
-}
-
-.pokeball::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50%;
-    background: white;
-}
-
 .pokeball-center {
     position: absolute;
-    opacity: 1
     top: 50%;
     left: 50%;
     width: 32px;
@@ -107,6 +71,8 @@ body.dark #loadingScreen {
 .pokeball-center.catch {
     background: #4ade80;
     box-shadow: 0 0 12px #4ade80;
+}
+
 }
 
 /* Black band */
