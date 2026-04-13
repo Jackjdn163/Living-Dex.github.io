@@ -27,6 +27,12 @@ let dotInterval;
 /* ============================================================
    HELPERS
    ============================================================ */
+function preserveScroll(fn) {
+    const scrollPos = window.scrollY;
+    fn();
+    window.scrollTo(0, scrollPos);
+}
+
 function padDex(num) {
     return num.toString().padStart(3, "0");
 }
@@ -238,7 +244,7 @@ function renderTasks() {
     }
 
     saveTasks();
-    renderTasks();
+    preserveScroll(() => renderTasks());
         });
 
         li.appendChild(img);
