@@ -55,9 +55,6 @@ body.dark #loadingScreen {
     align-items: center;
     gap: 18px; /* perfect spacing */
 }
-
-}
-
 /* ============================================================
    FULL SCARLET/VIOLET POKEBALL
    ============================================================ */
@@ -183,9 +180,6 @@ body.dark #loadingScreen {
     animation: shake 0.35s ease;
 }
 
-}
-
-}
 
 #loadingText {
     font-size: 22px;
