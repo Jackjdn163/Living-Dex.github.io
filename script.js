@@ -27,18 +27,16 @@ let dotInterval;
 /* ============================================================
    HELPERS
    ============================================================ */
-function preserveScroll(fn) {
-    const scrollPos = window.scrollY;
+const preserveScroll = fn => {
+    const y = window.scrollY;
     fn();
-    window.scrollTo(0, scrollPos);
-}
+    window.scrollTo(0, y);
+};
 
-function padDex(num) {
-    return num.toString().padStart(3, "0");
-}
+const padDex = n => n.toString().padStart(3, "0");
 
 function getGeneration(n) {
-    n = parseInt(n);
+    n = +n;
     if (n <= 151) return 1;
     if (n <= 251) return 2;
     if (n <= 386) return 3;
@@ -74,94 +72,65 @@ function formatPokemonName(name) {
 
     return name
         .split("-")
-        .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+        .map(p => p[0].toUpperCase() + p.slice(1))
         .join(" ");
 }
 
 /* ============================================================
    TYPE ICONS + COLORS
    ============================================================ */
-function typeIconSrc(type) {
-    return `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${type}.svg`;
-}
+const typeIconSrc = t =>
+`https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${t}.svg`;
 
-function getTypeColor(type) {
-    const map = {
-        normal:  "#A8A77A",
-        fire:    "#EE8130",
-        water:   "#6390F0",
-        electric:"#F7D02C",
-        grass:   "#7AC74C",
-        ice:     "#96D9D6",
-        fighting:"#C22E28",
-        poison:  "#A33EA1",
-        ground:  "#E2BF65",
-        flying:  "#A98FF3",
-        psychic:"#F95587",
-        bug:     "#A6B91A",
-        rock:    "#B6A136",
-        ghost:   "#735797",
-        dragon:  "#6F35FC",
-        dark:    "#705746",
-        steel:   "#B7B7CE",
-        fairy:   "#D685AD"
-    };
-    return map[type] || "#888";
-}
+const typeColors = {
+    normal:"#A8A77A", fire:"#EE8130", water:"#6390F0", electric:"#F7D02C",
+    grass:"#7AC74C", ice:"#96D9D6", fighting:"#C22E28", poison:"#A33EA1",
+    ground:"#E2BF65", flying:"#A98FF3", psychic:"#F95587", bug:"#A6B91A",
+    rock:"#B6A136", ghost:"#735797", dragon:"#6F35FC", dark:"#705746",
+    steel:"#B7B7CE", fairy:"#D685AD"
+};
+
+const getTypeColor = t => typeColors[t] || "#888";
 
 /* ============================================================
    STORAGE
    ============================================================ */
-function saveTasks() {
+const saveTasks = () =>
     localStorage.setItem("tasks", JSON.stringify(tasks));
-}
 
-function loadTasksFromStorage() {
+const loadTasksFromStorage = () => {
     const raw = localStorage.getItem("tasks");
     tasks = raw ? JSON.parse(raw) : [];
-}
+};
 
 /* ============================================================
-   FULL DEX BAR
+   PROGRESS BARS
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
-
-    const percent = total ? ((caught / total) * 100) : 0;
-    const percentText = percent.toFixed(2) + "%";
+    const percent = total ? (caught / total) * 100 : 0;
 
     const row = document.getElementById("fullDexRow");
-    const fill = row.querySelector(".fullDexFill");
-    const label = row.querySelector(".fullDexPercent");
+    row.querySelector(".fullDexFill").style.width = percent + "%";
+    row.querySelector(".fullDexPercent").textContent = percent.toFixed(2) + "%";
 
-    fill.style.width = percent + "%";
-    label.textContent = percentText;
-
-    if (percent >= 100) {
-        row.classList.add("completed");
-    } else {
-        row.classList.remove("completed");
-    }
+    row.classList.toggle("completed", percent >= 100);
 }
 
-/* ============================================================
-   GENERATION BARS
-   ============================================================ */
 function updateGenProgress() {
     const totals = {};
     const caught = {};
 
-    tasks.forEach(t => {
+    for (const t of tasks) {
         totals[t.gen] = (totals[t.gen] || 0) + 1;
         if (t.completed) caught[t.gen] = (caught[t.gen] || 0) + 1;
-    });
+    }
 
     document.querySelectorAll(".genRow").forEach(row => {
         const gen = row.dataset.gen;
         const total = totals[gen] || 0;
         const c = caught[gen] || 0;
-
         const percent = total ? (c / total) * 100 : 0;
 
         row.querySelector(".genPercent").textContent = percent.toFixed(2) + "%";
@@ -169,54 +138,52 @@ function updateGenProgress() {
     });
 }
 
-function updateAllProgress() {
+const updateAllProgress = () => {
     updateOverallProgress();
     updateGenProgress();
-}
+};
 
 /* ============================================================
    SORTING
    ============================================================ */
 function getSortedTasks() {
     const mode = sortSelect.value;
-    const arr = [...tasks];
 
-    if (mode === "name") arr.sort((a, b) => a.name.localeCompare(b.name));
-    else if (mode === "caught") arr.sort((a, b) => (b.completed - a.completed) || (a.dexRaw - b.dexRaw));
-    else if (mode === "uncaught") arr.sort((a, b) => (a.completed - b.completed) || (a.dexRaw - b.dexRaw));
-    else arr.sort((a, b) => a.dexRaw - b.dexRaw);
-
-    return arr;
+    return [...tasks].sort((a, b) => {
+        if (mode === "name") return a.name.localeCompare(b.name);
+        if (mode === "caught") return (b.completed - a.completed) || (a.dexRaw - b.dexRaw);
+        if (mode === "uncaught") return (a.completed - b.completed) || (a.dexRaw - b.dexRaw);
+        return a.dexRaw - b.dexRaw;
+    });
 }
 
 /* ============================================================
    RENDER LIST
    ============================================================ */
 function renderTasks() {
-    taskList.innerHTML = "";
-    void taskList.offsetHeight;
-
     const search = searchBar.value.toLowerCase();
     const shiny = shinyToggle.checked;
     const sorted = getSortedTasks();
 
-    sorted.forEach(task => {
+    taskList.innerHTML = "";
+
+    const frag = document.createDocumentFragment();
+
+    for (const task of sorted) {
         if (
             !task.name.toLowerCase().includes(search) &&
             !task.dex.includes(search) &&
             !task.dexRaw.includes(search)
-        ) return;
+        ) continue;
 
         const li = document.createElement("li");
         li.className = task.completed ? "completed" : "";
 
-        const sprite = shiny
-            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${task.dexRaw}.png`
-            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png`;
-
         const img = document.createElement("img");
         img.className = "sprite";
-        img.src = sprite;
+        img.src = shiny
+            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${task.dexRaw}.png`
+            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png`;
 
         const label = document.createElement("strong");
         label.textContent = `#${task.dex} — ${formatPokemonName(task.name)}`;
@@ -229,35 +196,25 @@ function renderTasks() {
             openInfoPanel(task);
         });
 
-       li.addEventListener("click", () => {
-    const wasCompleted = task.completed;
-    task.completed = !task.completed;
+        li.addEventListener("click", () => {
+            const wasCompleted = task.completed;
+            task.completed = !task.completed;
 
-    // Add animation class BEFORE re-rendering
-    li.classList.remove("check-anim", "uncheck-anim");
-    void li.offsetWidth; // restart animation
+            li.classList.remove("check-anim", "uncheck-anim");
+            void li.offsetWidth;
 
-    if (!wasCompleted) {
-        li.classList.add("check-anim");
-    } else {
-        li.classList.add("uncheck-anim");
+            li.classList.add(wasCompleted ? "uncheck-anim" : "check-anim");
+
+            saveTasks();
+
+            setTimeout(() => preserveScroll(renderTasks), 250);
+        });
+
+        li.append(img, label, moreBtn);
+        frag.appendChild(li);
     }
 
-    saveTasks();
-
-    // Delay re-render so animation can play
-    setTimeout(() => {
-        const scrollPos = window.scrollY;
-        renderTasks();
-        window.scrollTo(0, scrollPos);
-    }, 250); // perfect timing
-});
-        li.appendChild(img);
-        li.appendChild(label);
-        li.appendChild(moreBtn);
-        taskList.appendChild(li);
-    });
-
+    taskList.appendChild(frag);
     updateAllProgress();
 }
 
@@ -272,9 +229,7 @@ function startLoadingDots() {
     }, 400);
 }
 
-function stopLoadingDots() {
-    clearInterval(dotInterval);
-}
+const stopLoadingDots = () => clearInterval(dotInterval);
 
 async function finishLoadingAnimation() {
     stopLoadingDots();
@@ -296,12 +251,8 @@ async function finishLoadingAnimation() {
    ============================================================ */
 async function fetchEvolutionData(dexNumber) {
     try {
-        const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`);
-        const speciesData = await speciesRes.json();
-
-        const evoRes = await fetch(speciesData.evolution_chain.url);
-        const evoData = await evoRes.json();
-
+        const speciesData = await (await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`)).json();
+        const evoData = await (await fetch(speciesData.evolution_chain.url)).json();
         return parseEvolutionChain(evoData.chain, String(dexNumber));
     } catch {
         return { prev: null, next: null };
@@ -309,8 +260,7 @@ async function fetchEvolutionData(dexNumber) {
 }
 
 function parseEvolutionChain(chain, dexNumber) {
-    let prev = null;
-    let next = null;
+    let prev = null, next = null;
 
     function search(node, parent) {
         const id = node.species.url.split("/").slice(-2, -1)[0];
@@ -328,13 +278,13 @@ function parseEvolutionChain(chain, dexNumber) {
             }
         }
 
-        node.evolves_to.forEach(evo => {
+        for (const evo of node.evolves_to) {
             search(evo, {
                 id,
                 name: node.species.name,
                 method: evo.evolution_details[0]
             });
-        });
+        }
     }
 
     search(chain, null);
@@ -344,40 +294,38 @@ function parseEvolutionChain(chain, dexNumber) {
 function formatEvolutionMethod(method) {
     if (!method) return "Unknown";
 
-    if (method.trigger.name === "level-up") {
+    const t = method.trigger.name;
+
+    if (t === "level-up") {
         if (method.min_level) return `Level ${method.min_level}`;
         if (method.min_happiness) return "Friendship";
         if (method.time_of_day) return `Level up at ${method.time_of_day}`;
         return "Level up";
     }
 
-    if (method.trigger.name === "use-item") {
-        return method.item.name.replace("-", " ");
-    }
+    if (t === "use-item") return method.item.name.replace("-", " ");
+    if (t === "trade") return "Trade";
 
-    if (method.trigger.name === "trade") return "Trade";
-
-    return method.trigger.name.replace("-", " ");
+    return t.replace("-", " ");
 }
 
 /* ============================================================
    IMPORT FROM SHEET
    ============================================================ */
 async function importFromSheet() {
-    const response = await fetch(GOOGLE_SHEET_URL);
-    const csv = await response.text();
+    const csv = await (await fetch(GOOGLE_SHEET_URL)).text();
     const rows = csv.split("\n").slice(1);
 
     tasks = rows
-        .filter(r => r.trim())
+        .filter(Boolean)
         .map(row => {
             const [dexRaw, name] = row.split(",");
-            const cleanDex = dexRaw.trim();
+            const clean = dexRaw.trim();
             return {
-                dexRaw: cleanDex,
-                dex: padDex(cleanDex),
+                dexRaw: clean,
+                dex: padDex(clean),
                 name: name.trim(),
-                gen: getGeneration(cleanDex),
+                gen: getGeneration(clean),
                 completed: false
             };
         });
@@ -389,13 +337,13 @@ async function importFromSheet() {
 /* ============================================================
    RESET POPUP
    ============================================================ */
-resetBtn.addEventListener("click", () => {
-    resetPopup.classList.remove("hidden");
-});
+resetBtn.addEventListener("click", () =>
+    resetPopup.classList.remove("hidden")
+);
 
-cancelReset.addEventListener("click", () => {
-    resetPopup.classList.add("hidden");
-});
+cancelReset.addEventListener("click", () =>
+    resetPopup.classList.add("hidden")
+);
 
 confirmReset.addEventListener("click", async () => {
     resetPopup.classList.add("hidden");
@@ -420,7 +368,7 @@ if (localStorage.getItem("darkMode") === "1") {
 }
 
 /* ============================================================
-   INFO PANEL (NO GAME LOGIC)
+   INFO PANEL
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -431,25 +379,22 @@ async function openInfoPanel(task) {
         await new Promise(r => setTimeout(r, 150));
     }
 
-    document.getElementById("infoSprite").innerHTML = `
-        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">
-    `;
+    document.getElementById("infoSprite").innerHTML =
+        `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">`;
 
     document.getElementById("infoName").textContent =
         `#${task.dex} — ${formatPokemonName(task.name)}`;
 
-    // Games section now blank
-    document.getElementById("infoGames").innerHTML = `
-        <p style="opacity:0.5; text-align:center;">No game data</p>
-    `;
+    document.getElementById("infoGames").innerHTML =
+        `<p style="opacity:0.5; text-align:center;">No game data</p>`;
 
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
 
     fetch(`https://pokeapi.co/api/v2/pokemon/${task.dexRaw}`)
-        .then(res => res.json())
+        .then(r => r.json())
         .then(data => {
-            data.types.forEach(t => {
+            for (const t of data.types) {
                 const typeName = t.type.name;
 
                 const badge = document.createElement("div");
@@ -458,11 +403,10 @@ async function openInfoPanel(task) {
 
                 const icon = document.createElement("img");
                 icon.src = typeIconSrc(typeName);
-                icon.alt = typeName;
 
                 badge.appendChild(icon);
                 infoTypes.appendChild(badge);
-            });
+            }
         });
 
     const evoBox = document.getElementById("infoEvolutions");
@@ -481,8 +425,7 @@ async function openInfoPanel(task) {
                         <strong>${formatPokemonName(evo.prev.name)}</strong><br>
                         <span class="evoMethod">${formatEvolutionMethod(evo.prev.method)}</span>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         if (evo.next) {
@@ -494,19 +437,16 @@ async function openInfoPanel(task) {
                         <strong>${formatPokemonName(evo.next.name)}</strong><br>
                         <span class="evoMethod">${formatEvolutionMethod(evo.next.method)}</span>
                     </div>
-                </div>
-            `;
+                </div>`;
         }
 
         if (!evo.prev && !evo.next) {
-            evoBox.innerHTML = `
-                <p style="opacity:0.5; text-align:center;">No evolution data</p>
-            `;
+            evoBox.innerHTML =
+                `<p style="opacity:0.5; text-align:center;">No evolution data</p>`;
         }
     } catch {
-        evoBox.innerHTML = `
-            <p style="opacity:0.5; text-align:center;">Error loading evolution data</p>
-        `;
+        evoBox.innerHTML =
+            `<p style="opacity:0.5; text-align:center;">Error loading evolution data</p>`;
     }
 
     content.classList.remove("fading");
@@ -520,9 +460,7 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
     content.classList.add("fading");
     panel.classList.remove("open");
 
-    setTimeout(() => {
-        content.classList.remove("fading");
-    }, 300);
+    setTimeout(() => content.classList.remove("fading"), 300);
 });
 
 /* ============================================================
@@ -538,19 +476,19 @@ shinyToggle.addEventListener("change", renderTasks);
 async function init() {
     startLoadingDots();
 
-    const start = Date.now();
+    const start = performance.now();
     loadTasksFromStorage();
 
     if (tasks.length === 0) {
         await importFromSheet();
     } else {
-        tasks.forEach(t => {
+        for (const t of tasks) {
             if (!t.gen) t.gen = getGeneration(t.dexRaw);
-        });
+        }
         renderTasks();
     }
 
-    const elapsed = Date.now() - start;
+    const elapsed = performance.now() - start;
     const min = 5000;
     if (elapsed < min) await new Promise(r => setTimeout(r, min - elapsed));
 
