@@ -233,9 +233,9 @@ function renderTasks() {
     const wasCompleted = task.completed;
     task.completed = !task.completed;
 
-    // Add animation class
+    // Add animation class BEFORE re-rendering
     li.classList.remove("check-anim", "uncheck-anim");
-    void li.offsetWidth; // forces reflow so animation restarts
+    void li.offsetWidth; // restart animation
 
     if (!wasCompleted) {
         li.classList.add("check-anim");
@@ -244,9 +244,14 @@ function renderTasks() {
     }
 
     saveTasks();
-    preserveScroll(() => renderTasks());
-        });
 
+    // Delay re-render so animation can play
+    setTimeout(() => {
+        const scrollPos = window.scrollY;
+        renderTasks();
+        window.scrollTo(0, scrollPos);
+    }, 250); // perfect timing
+});
         li.appendChild(img);
         li.appendChild(label);
         li.appendChild(moreBtn);
