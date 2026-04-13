@@ -229,11 +229,11 @@ body.dark #searchBar {
 }
 
 li.check-anim {
-    animation: catchPop 0.00s ease;
+    animation: catchPop 0.35s ease;
 }
 
 li.uncheck-anim {
-    animation: uncatchFade 0.00s ease;
+    animation: uncatchFade 0.35s ease;
 
 }
 
