@@ -20,6 +20,57 @@ const pokeballCenter = document.querySelector(".pokeball-center");
 
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
+// Maps PokéAPI version names → readable game titles
+const GAME_NAME_MAP = {
+    "red": "Red",
+    "blue": "Blue",
+    "yellow": "Yellow",
+
+    "gold": "Gold",
+    "silver": "Silver",
+    "crystal": "Crystal",
+
+    "ruby": "Ruby",
+    "sapphire": "Sapphire",
+    "emerald": "Emerald",
+
+    "firered": "FireRed",
+    "leafgreen": "LeafGreen",
+
+    "diamond": "Diamond",
+    "pearl": "Pearl",
+    "platinum": "Platinum",
+
+    "heartgold": "HeartGold",
+    "soulsilver": "SoulSilver",
+
+    "black": "Black",
+    "white": "White",
+    "black-2": "Black 2",
+    "white-2": "White 2",
+
+    "x": "X",
+    "y": "Y",
+
+    "omega-ruby": "Omega Ruby",
+    "alpha-sapphire": "Alpha Sapphire",
+
+    "sun": "Sun",
+    "moon": "Moon",
+    "ultra-sun": "Ultra Sun",
+    "ultra-moon": "Ultra Moon",
+
+    // Switch games PokéAPI DOES include:
+    "lets-go-pikachu": "Let's Go Pikachu",
+    "lets-go-eevee": "Let's Go Eevee",
+    "sword": "Sword",
+    "shield": "Shield",
+    "brilliant-diamond": "Brilliant Diamond",
+    "shining-pearl": "Shining Pearl",
+    "legends-arceus": "Legends Arceus",
+    "scarlet": "Scarlet",
+    "violet": "Violet"
+};
 
 let tasks = [];
 let dotInterval;
@@ -271,6 +322,19 @@ async function finishLoadingAnimation() {
 /* ============================================================
    EVOLUTION FETCHING
    ============================================================ */
+function formatGameList(gameIndices) {
+    const versions = gameIndices.map(g => g.version.name);
+
+    // Convert to readable names
+    const readable = versions
+        .map(v => GAME_NAME_MAP[v])
+        .filter(Boolean); // remove undefined
+
+    // Remove duplicates
+    const unique = [...new Set(readable)];
+
+    return unique;
+}
 async function fetchEvolutionData(dexNumber) {
     try {
         const speciesRes = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${dexNumber}`);
@@ -416,8 +480,26 @@ async function openInfoPanel(task) {
         `#${task.dex} — ${formatPokemonName(task.name)}`;
 
     document.getElementById("infoGames").innerHTML = `
-        <p style="opacity:0.5; text-align:center;">Games will appear here</p>
-    `;
+    <div id="infoGamesTitle">Appears in:</div>
+    <div id="infoGamesList"></div>
+`;
+
+// Load game availability
+fetch(`https://pokeapi.co/api/v2/pokemon/${task.dexRaw}`)
+    .then(res => res.json())
+    .then(data => {
+        const games = formatGameList(data.game_indices);
+        const list = document.getElementById("infoGamesList");
+
+        if (games.length === 0) {
+            list.innerHTML = `<span style="opacity:0.5;">No game data</span>`;
+            return;
+        }
+
+        list.innerHTML = games
+            .map(g => `<span class="infoGameTag">${g}</span>`)
+            .join("");
+    });
 
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
