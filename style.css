@@ -386,6 +386,15 @@ body.dark #floatingStats {
    GENERATION BARS
    ============================================================ */
 
+.genBarsTitle {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    opacity: 0.85;
+    letter-spacing: 0.4px;
+}
+
 .genBars {
     display: flex;
     flex-direction: column;
