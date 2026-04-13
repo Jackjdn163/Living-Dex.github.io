@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex Tracker</title>
+
+    <!-- Preload CSS for faster first paint -->
+    <link rel="preload" href="style.css" as="style">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Improve rendering performance -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 </head>
 
 <body>
@@ -12,21 +18,26 @@
     <!-- LOADING SCREEN -->
     <div id="loadingScreen">
         <div class="loading-content">
-           <div class="pokeball">
-    <div class="pokeball-top"></div>
-    <div class="pokeball-band"></div>
-    <div class="pokeball-bottom"></div>
-    <div class="pokeball-button"></div>
-           </div>
-            <div id="loadingText">Loading<span id="loadingDots"></span></div>
+
+            <!-- ORIGINAL WORKING POKEBALL -->
+            <div class="pokeball">
+                <div class="pokeball-top"></div>
+                <div class="pokeball-band"></div>
+                <div class="pokeball-bottom"></div>
+                <div class="pokeball-center"></div>
+            </div>
+
+            <div id="loadingText">
+                Loading<span id="loadingDots"></span>
+            </div>
         </div>
     </div>
 
     <!-- MAIN CONTAINER -->
-    <div class="container">
+    <main class="container">
         <h1>Pokédex Tracker</h1>
 
-        <input id="searchBar" type="text" placeholder="Search Pokémon...">
+        <input id="searchBar" type="text" placeholder="Search Pokémon..." autocomplete="off">
 
         <select id="sortSelect">
             <option value="dex">Sort by Dex</option>
@@ -38,13 +49,14 @@
         <button id="resetBtn">Reset Progress</button>
 
         <ul id="taskList"></ul>
-    </div>
+    </main>
 
     <!-- FLOATING STATS BOX -->
-    <div id="floatingStats" class="floatingBox">
+    <aside id="floatingStats" class="floatingBox">
+
+        <h3 class="genBarsTitle">Pokédex Completion</h3>
 
         <!-- FULL POKEDEX BAR -->
-         <h3 class="genBarsTitle">Pokédex Completion</h3>
         <div id="fullDexRow" class="fullDexRow">
             <span class="fullDexLabel">Total</span>
             <div class="fullDexBar">
@@ -57,6 +69,7 @@
         <!-- GENERATION PROGRESS BARS -->
         <div id="genProgress" class="genBars">
 
+            <!-- GEN ROW TEMPLATE (kept explicit for JS compatibility) -->
             <div class="genRow" data-gen="1">
                 <span class="genLabel">Gen 1</span>
                 <div class="genBar"><div class="genFill"></div></div>
@@ -112,10 +125,10 @@
             </div>
 
         </div>
-    </div>
+    </aside>
 
     <!-- FLOATING TOGGLES -->
-    <div id="floatingToggles" class="floatingBox">
+    <aside id="floatingToggles" class="floatingBox">
 
         <label class="switch">
             <input type="checkbox" id="shinyToggle">
@@ -129,7 +142,7 @@
             <span class="switch-label">Dark Mode</span>
         </label>
 
-    </div>
+    </aside>
 
     <!-- RESET POPUP -->
     <div id="resetPopup" class="popup hidden">
@@ -143,7 +156,7 @@
     </div>
 
     <!-- INFO PANEL -->
-    <div id="infoPanel">
+    <aside id="infoPanel">
         <button id="closeInfoPanel" class="closeInfoBtn">×</button>
 
         <div id="infoContent">
@@ -160,10 +173,10 @@
             <div id="infoEvolutions"></div>
 
         </div>
-    </div>
+    </aside>
 
     <!-- SCRIPT -->
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 
 </body>
 </html>
