@@ -55,24 +55,40 @@ body.dark #loadingScreen {
     align-items: center;
     gap: 18px; /* perfect spacing */
 }
-.pokeball-center {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 32px;
-    height: 32px;
-    background: white;
-    border: 6px solid black;
+/* =====================================================
+   ORIGINAL WORKING POKEBALL
+   ===================================================== */
+
+.pokeball {
+    width: 120px;
+    height: 120px;
     border-radius: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3;
+    position: relative;
+    overflow: hidden;
+    animation: spin 1.4s linear infinite;
+    box-shadow: 0 0 0 4px black;
 }
 
-.pokeball-center.catch {
-    background: #4ade80;
-    box-shadow: 0 0 12px #4ade80;
+/* Top half */
+.pokeball::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: #ff0000;
 }
 
+/* Bottom half */
+.pokeball::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: white;
 }
 
 /* Black band */
@@ -87,10 +103,36 @@ body.dark #loadingScreen {
     z-index: 2;
 }
 
+/* Center button */
+.pokeball-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border: 6px solid black;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+}
+
+/* Green catch glow */
+.pokeball-center.catch {
+    background: #4ade80;
+    box-shadow: 0 0 12px #4ade80;
+}
+
 /* Spin animation */
 @keyframes spin {
     from { transform: rotate(0deg); }
     to   { transform: rotate(360deg); }
+}
+
+.pokeball.finish-spin {
+    animation: none;
+    transform: rotate(0deg);
+    transition: transform 0.4s ease;
 }
 
 /* Shake animation */
@@ -105,13 +147,6 @@ body.dark #loadingScreen {
 .pokeball.shake {
     animation: shake 0.35s ease;
 }
-
-.pokeball.finish-spin {
-    animation: none;
-    transform: rotate(0deg);
-    transition: transform 0.4s ease;
-}
-
 
 
 #loadingText {
