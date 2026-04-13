@@ -53,70 +53,87 @@ body.dark #loadingScreen {
     text-align: center;
 }
 
+/* ============================================================
+   BEAUTIFUL 3D POKEBALL
+   ============================================================ */
+
 .pokeball {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     position: relative;
     border-radius: 50%;
     overflow: hidden;
-    border: 6px solid black;
-    animation: spin 1.2s linear infinite;
+    animation: spin 1.4s linear infinite;
+    box-shadow:
+        0 0 0 6px black,
+        0 8px 18px rgba(0,0,0,0.35);
 }
 
+/* Top half */
 .pokeball-top {
-    background: #ff0000;
+    background: linear-gradient(#ff4d4d, #cc0000);
     width: 100%;
     height: 50%;
 }
 
-body.dark .pokeball-top {
-    background: #cc0000;
-}
-
+/* Bottom half */
 .pokeball-bottom {
-    background: #ffffff;
+    background: linear-gradient(#ffffff, #e5e5e5);
     width: 100%;
     height: 50%;
 }
 
-body.dark .pokeball-bottom {
-    background: #e5e5e5;
+/* Black band */
+.pokeball-band {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 14px;
+    background: black;
+    transform: translateY(-50%);
+    z-index: 2;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
 }
 
-.pokeball-center {
+/* Center button */
+.pokeball-button {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 38px;
-    height: 38px;
-    background: white;
-    border: 6px solid black;
+    width: 42px;
+    height: 42px;
+    background: radial-gradient(circle, #ffffff 40%, #dcdcdc 100%);
     border-radius: 50%;
+    border: 6px solid black;
     transform: translate(-50%, -50%);
-    transition: background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    z-index: 3;
+    box-shadow:
+        0 0 10px rgba(0,0,0,0.3),
+        inset 0 0 8px rgba(0,0,0,0.25);
+    transition: background 0.25s ease, box-shadow 0.25s ease;
 }
 
-body.dark .pokeball-center {
-    background: #dddddd;
-}
-
-.pokeball-center.catch {
-    background: #4ade80;
+/* Green flash when loading finishes */
+.pokeball-button.catch {
+    background: radial-gradient(circle, #4ade80 40%, #2ecc71 100%);
     box-shadow: 0 0 20px 10px #4ade80;
-    border-color: #4ade80;
 }
 
+/* Spin animation */
 @keyframes spin {
     from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    to   { transform: rotate(360deg); }
 }
 
+/* Stop + settle upright */
 .pokeball.finish-spin {
     animation: none;
     transform: rotate(0deg);
     transition: transform 0.4s ease;
 }
 
+/* Shake animation */
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
@@ -127,6 +144,8 @@ body.dark .pokeball-center {
 
 .pokeball.shake {
     animation: shake 0.35s ease;
+}
+
 }
 
 #loadingText {
