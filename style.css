@@ -296,6 +296,8 @@ li.uncheck-anim {
     animation: uncatchFade 0.35s ease;
 }
 
+}
+
 #sortSelect {
     width: 100%;
     padding: 10px;
