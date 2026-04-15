@@ -498,7 +498,7 @@ function pickRandomUncaught() {
     const uncaught = tasks.filter(t => !t.completed);
     
     if (uncaught.length === 0) {
-        alert("🎉 Congratulations! You've caught everything!");
+        alert("🎉 Congratulations! You've caught everything in your Living Dex!");
         return;
     }
 
@@ -520,11 +520,12 @@ function pickRandomUncaught() {
     }, 100);
 }
 
-// Safe event listener (won’t break loading even if button is missing)
-const randomBtn = document.getElementById("randomUncaughtBtn");
-if (randomBtn) {
-    randomBtn.addEventListener("click", pickRandomUncaught);
+// Make it a constant (exactly what you asked for)
+const randomUncaughtBtn = document.getElementById("randomUncaughtBtn");
+
+if (randomUncaughtBtn) {
+    randomUncaughtBtn.addEventListener("click", pickRandomUncaught);
 } else {
-    console.warn("Random button not found in HTML yet");
+    console.warn("Random Uncaught button not found in HTML");
 }
 init();
