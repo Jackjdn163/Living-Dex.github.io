@@ -782,50 +782,39 @@ body.dark .evoBox {
     15%  { transform: scale(1.08); }
     100% { transform: scale(1); }
 }
-/* FLOATING BOXES - side-by-side at bottom-right (matches percent box width) */
-#floatingToggles,
-#floatingRandom {
-    position: fixed;
-    bottom: 20px;
+/* RANDOM UNCAUGHT BAR - clean horizontal bar above Reset button */
+.random-bar {
     background: rgba(255, 255, 255, 0.95);
-    padding: 14px 18px;
+    padding: 12px 20px;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-bottom: 12px;
+    text-align: center;
+    width: 100%;
+    max-width: 420px;           /* matches the width of your percent box */
+    margin-left: auto;
+    margin-right: auto;
 }
 
-#floatingToggles {
-    right: 280px;        /* left box */
-}
-
-#floatingRandom {
-    right: 20px;         /* right box - this is where you want the random button */
-    min-width: 240px;
-}
-
-body.dark #floatingToggles,
-body.dark #floatingRandom {
+body.dark .random-bar {
     background: rgba(30, 30, 30, 0.95);
     color: white;
 }
 
-/* Random button style */
+/* Random button inside the bar */
 .random-btn {
     background: #4ade80;
     color: #111;
     border: none;
-    padding: 14px 28px;
+    padding: 14px 32px;
     border-radius: 9999px;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: all 0.2s ease;
     width: 100%;
-    white-space: nowrap;
+    max-width: 360px;
 }
 
 .random-btn:hover {
