@@ -4,20 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex Tracker</title>
+
+    <!-- Preload CSS for faster first paint -->
     <link rel="preload" href="style.css" as="style">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Improve rendering performance -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 </head>
+
 <body>
+
     <!-- LOADING SCREEN -->
     <div id="loadingScreen">
         <div class="loading-content">
+
+            <!-- ORIGINAL WORKING POKEBALL -->
             <div class="pokeball">
                 <div class="pokeball-top"></div>
                 <div class="pokeball-band"></div>
                 <div class="pokeball-bottom"></div>
                 <div class="pokeball-center"></div>
             </div>
+
             <div id="loadingText">
                 Loading<span id="loadingDots"></span>
             </div>
@@ -27,12 +36,8 @@
     <!-- MAIN CONTAINER -->
     <main class="container">
         <h1>Pokédex Tracker</h1>
+
         <input id="searchBar" type="text" placeholder="Search Pokémon..." autocomplete="off">
-        
-        <!-- NEW: Random Uncaught Button -->
-        <button id="randomBtn" class="random-btn">
-            🎲 Random Uncaught Pokémon
-        </button>
 
         <select id="sortSelect">
             <option value="dex">Sort by Dex</option>
@@ -40,15 +45,18 @@
             <option value="caught">Sort by Caught</option>
             <option value="uncaught">Sort by Uncaught</option>
         </select>
+
         <button id="resetBtn">Reset Progress</button>
-        
-        <!-- Changed from <ul> to <div class="dex-grid"> for 3-column layout -->
-        <div id="taskList" class="dex-grid"></div>
+
+        <ul id="taskList"></ul>
     </main>
 
     <!-- FLOATING STATS BOX -->
     <aside id="floatingStats" class="floatingBox">
+
         <h3 class="genBarsTitle">Pokédex Completion</h3>
+
+        <!-- FULL POKEDEX BAR -->
         <div id="fullDexRow" class="fullDexRow">
             <span class="fullDexLabel">Total</span>
             <div class="fullDexBar">
@@ -57,31 +65,83 @@
             </div>
             <span class="fullDexPercent">0%</span>
         </div>
+
+        <!-- GENERATION PROGRESS BARS -->
         <div id="genProgress" class="genBars">
-            <div class="genRow" data-gen="1"><span class="genLabel">Gen 1</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="2"><span class="genLabel">Gen 2</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="3"><span class="genLabel">Gen 3</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="4"><span class="genLabel">Gen 4</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="5"><span class="genLabel">Gen 5</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="6"><span class="genLabel">Gen 6</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="7"><span class="genLabel">Gen 7</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="8"><span class="genLabel">Gen 8</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
-            <div class="genRow" data-gen="9"><span class="genLabel">Gen 9</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+
+            <!-- GEN ROW TEMPLATE (kept explicit for JS compatibility) -->
+            <div class="genRow" data-gen="1">
+                <span class="genLabel">Gen 1</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="2">
+                <span class="genLabel">Gen 2</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="3">
+                <span class="genLabel">Gen 3</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="4">
+                <span class="genLabel">Gen 4</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="5">
+                <span class="genLabel">Gen 5</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="6">
+                <span class="genLabel">Gen 6</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="7">
+                <span class="genLabel">Gen 7</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="8">
+                <span class="genLabel">Gen 8</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
+            <div class="genRow" data-gen="9">
+                <span class="genLabel">Gen 9</span>
+                <div class="genBar"><div class="genFill"></div></div>
+                <span class="genPercent">0%</span>
+            </div>
+
         </div>
     </aside>
 
     <!-- FLOATING TOGGLES -->
     <aside id="floatingToggles" class="floatingBox">
+
         <label class="switch">
             <input type="checkbox" id="shinyToggle">
             <span class="slider"></span>
             <span class="switch-label">Show Shiny</span>
         </label>
+
         <label class="switch">
             <input type="checkbox" id="darkModeToggle">
             <span class="slider"></span>
             <span class="switch-label">Dark Mode</span>
         </label>
+
     </aside>
 
     <!-- RESET POPUP -->
@@ -98,30 +158,25 @@
     <!-- INFO PANEL -->
     <aside id="infoPanel">
         <button id="closeInfoPanel" class="closeInfoBtn">×</button>
+
         <div id="infoContent">
+
             <div id="infoTopRow">
                 <div id="infoSprite"></div>
                 <div id="infoTypes"></div>
             </div>
+
             <h2 id="infoName"></h2>
+
             <div id="infoGames"></div>
+
             <div id="infoEvolutions"></div>
+
         </div>
     </aside>
 
-    <!-- Random Uncaught Pokémon Popup -->
-    <div id="randomPopup" class="popup hidden">
-        <div class="popup-box random-popup-box">
-            <div id="randomSprite"></div>
-            <h2 id="randomName"></h2>
-            <div class="popup-buttons">
-                <button id="randomTakeMe">Take me there</button>
-                <button id="randomRollAgain">🎲 Roll Again</button>
-                <button id="randomClose">Close</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT -->
     <script src="script.js" defer></script>
+
 </body>
 </html>
