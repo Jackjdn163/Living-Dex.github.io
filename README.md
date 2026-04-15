@@ -4,4 +4,7 @@ eventually will have
 What switch games each Pokémon is in
 A "pick random uncaught" feature if you don't know what to hunt
 a "what games I have feature"
+make the loading screen look like a pokeball
+a tools tab for helpful information
+an animation for reseting
 and more!
