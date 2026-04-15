@@ -15,7 +15,7 @@ const loadingText = document.getElementById("loadingText");
 const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
 const pokeballCenter = document.querySelector(".pokeball-center");
-const randomBtn = document.getElementById("randomBtn");   // safe reference
+const randomBtn = document.getElementById("randomBtn");   // NEW: random button reference
 
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
@@ -31,9 +31,7 @@ const preserveScroll = fn => {
     fn();
     window.scrollTo(0, y);
 };
-
 const padDex = n => n.toString().padStart(3, "0");
-
 function getGeneration(n) {
     n = +n;
     if (n <= 151) return 1;
@@ -46,7 +44,6 @@ function getGeneration(n) {
     if (n <= 898) return 8;
     return 9;
 }
-
 function formatPokemonName(name) {
     if (!name) return "";
     name = name.toLowerCase();
@@ -77,7 +74,6 @@ function formatPokemonName(name) {
    ============================================================ */
 const typeIconSrc = t =>
 `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${t}.svg`;
-
 const typeColors = {
     normal:"#A8A77A", fire:"#EE8130", water:"#6390F0", electric:"#F7D02C",
     grass:"#7AC74C", ice:"#96D9D6", fighting:"#C22E28", poison:"#A33EA1",
@@ -92,14 +88,13 @@ const getTypeColor = t => typeColors[t] || "#888";
    ============================================================ */
 const saveTasks = () =>
     localStorage.setItem("tasks", JSON.stringify(tasks));
-
 const loadTasksFromStorage = () => {
     const raw = localStorage.getItem("tasks");
     tasks = raw ? JSON.parse(raw) : [];
 };
 
 /* ============================================================
-   PROGRESS BARS – NOW SHOW CAUGHT / TOTAL
+   PROGRESS BARS – NOW SHOW CAUGHT/TOTAL (new)
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
@@ -110,7 +105,6 @@ function updateOverallProgress() {
     row.querySelector(".fullDexPercent").textContent = `${caught}/${total} (${percent.toFixed(2)}%)`;
     row.classList.toggle("completed", percent >= 100);
 }
-
 function updateGenProgress() {
     const totals = {};
     const caught = {};
@@ -127,7 +121,6 @@ function updateGenProgress() {
         row.querySelector(".genFill").style.width = percent + "%";
     });
 }
-
 const updateAllProgress = () => {
     updateOverallProgress();
     updateGenProgress();
@@ -147,13 +140,12 @@ function getSortedTasks() {
 }
 
 /* ============================================================
-   RENDER – 3-COLUMN RESPONSIVE GRID
+   RENDER – NOW 3-COLUMN GRID WITH SMALLER CARDS (new render)
    ============================================================ */
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     const shiny = shinyToggle.checked;
     const sorted = getSortedTasks();
-
     taskList.innerHTML = "";
     const frag = document.createDocumentFragment();
 
@@ -196,7 +188,6 @@ function renderTasks() {
 
         frag.appendChild(card);
     }
-
     taskList.appendChild(frag);
     updateAllProgress();
 }
@@ -211,15 +202,14 @@ function startLoadingDots() {
         count = count === 3 ? 1 : count + 1;
     }, 400);
 }
-
 const stopLoadingDots = () => clearInterval(dotInterval);
-
 async function finishLoadingAnimation() {
     stopLoadingDots();
     loadingText.classList.add("fade-out");
     pokeball.classList.add("finish-spin");
     setTimeout(() => pokeball.classList.add("shake"), 200);
     setTimeout(() => pokeballCenter.classList.add("catch"), 300);
+    setTimeout(() => pokeballCenter.classList.add("flash-green"), 450); // new green flash
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
         loadingScreen.style.pointerEvents = "none";
@@ -238,7 +228,6 @@ async function fetchEvolutionData(dexNumber) {
         return { prev: null, next: null };
     }
 }
-
 function parseEvolutionChain(chain, dexNumber) {
     let prev = null, next = null;
     function search(node, parent) {
@@ -265,7 +254,6 @@ function parseEvolutionChain(chain, dexNumber) {
     search(chain, null);
     return { prev, next };
 }
-
 function formatEvolutionMethod(method) {
     if (!method) return "Unknown";
     const t = method.trigger.name;
@@ -304,7 +292,7 @@ async function importFromSheet() {
 }
 
 /* ============================================================
-   RESET POPUP – with grid fade animation
+   RESET POPUP
    ============================================================ */
 resetBtn.addEventListener("click", () =>
     resetPopup.classList.remove("hidden")
@@ -414,7 +402,7 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
 });
 
 /* ============================================================
-   RANDOM UNCAUGHT POKÉMON
+   NEW: RANDOM UNCAUGHT POKÉMON POPUP
    ============================================================ */
 function getRandomUncaught() {
     const uncaught = tasks.filter(t => !t.completed);
@@ -423,16 +411,28 @@ function getRandomUncaught() {
         return;
     }
     const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
-    renderTasks();
-    const cards = Array.from(taskList.children);
-    const targetCard = cards.find(card => 
-        card.querySelector("strong").textContent === `#${randomTask.dex}`
-    );
-    if (targetCard) {
-        targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
-        targetCard.style.boxShadow = "0 0 0 6px #4ade80";
-        setTimeout(() => targetCard.style.boxShadow = "", 2000);
-    }
+    const popup = document.getElementById("randomPopup");
+    const spriteDiv = document.getElementById("randomSprite");
+    const nameEl = document.getElementById("randomName");
+    const shiny = shinyToggle.checked;
+    const url = shiny 
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${randomTask.dexRaw}.png`
+        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomTask.dexRaw}.png`;
+    spriteDiv.innerHTML = `<img src="${url}">`;
+    nameEl.textContent = `#${randomTask.dex} — ${formatPokemonName(randomTask.name)}`;
+    popup.classList.remove("hidden");
+
+    document.getElementById("randomTakeMe").onclick = () => {
+        popup.classList.add("hidden");
+        renderTasks();
+        const card = Array.from(taskList.children).find(c => c.querySelector("strong").textContent === `#${randomTask.dex}`);
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+    document.getElementById("randomRollAgain").onclick = () => {
+        popup.classList.add("hidden");
+        setTimeout(getRandomUncaught, 300);
+    };
+    document.getElementById("randomClose").onclick = () => popup.classList.add("hidden");
 }
 
 /* ============================================================
@@ -441,14 +441,13 @@ function getRandomUncaught() {
 searchBar.addEventListener("input", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 shinyToggle.addEventListener("change", renderTasks);
-if (randomBtn) randomBtn.addEventListener("click", getRandomUncaught);
+randomBtn.addEventListener("click", getRandomUncaught);
 
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
 async function init() {
     startLoadingDots();
-    loadingText.textContent = "Catching Pokémon for your Living Dex...";
     const start = performance.now();
     loadTasksFromStorage();
     if (tasks.length === 0) {
@@ -464,48 +463,4 @@ async function init() {
     if (elapsed < min) await new Promise(r => setTimeout(r, min - elapsed));
     await finishLoadingAnimation();
 }
-/* ============================================================
-   NEW: Random Uncaught Popup (keeps all your original code intact)
-   ============================================================ */
-function getRandomUncaught() {
-    const uncaught = tasks.filter(t => !t.completed);
-    if (uncaught.length === 0) {
-        alert("🎉 You've caught everything! Amazing living dex!");
-        return;
-    }
-    const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
-    
-    const popup = document.getElementById("randomPopup");
-    const spriteDiv = document.getElementById("randomSprite");
-    const nameEl = document.getElementById("randomName");
-    
-    const shiny = shinyToggle.checked;
-    const url = shiny 
-        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${randomTask.dexRaw}.png`
-        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomTask.dexRaw}.png`;
-    
-    spriteDiv.innerHTML = `<img src="${url}">`;
-    nameEl.textContent = `#${randomTask.dex} — ${formatPokemonName(randomTask.name)}`;
-    
-    popup.classList.remove("hidden");
-
-    document.getElementById("randomTakeMe").onclick = () => {
-        popup.classList.add("hidden");
-        renderTasks();
-        const card = Array.from(taskList.children).find(c => 
-            c.querySelector("strong").textContent === `#${randomTask.dex}`
-        );
-        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
-    };
-
-    document.getElementById("randomRollAgain").onclick = () => {
-        popup.classList.add("hidden");
-        setTimeout(getRandomUncaught, 280);
-    };
-
-    document.getElementById("randomClose").onclick = () => popup.classList.add("hidden");
-}
-
-/* Make sure the random button works */
-randomBtn.addEventListener("click", getRandomUncaught);
 init();
