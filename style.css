@@ -336,7 +336,7 @@ body.dark .random-bar {
     box-shadow: 0 4px 12px rgba(74, 222, 128, 0.35);
     transition: all 0.25s ease;
     width: 100%;
-    max-width: 340px;           /* much narrower and balanced */
+    max-width: 500px;           /* much narrower and balanced */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -354,7 +354,7 @@ body.dark .random-bar {
 #floatingToggles {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 20px;
     background: rgba(255, 255, 255, 0.9);
     padding: 14px 18px;
     border-radius: 12px;
