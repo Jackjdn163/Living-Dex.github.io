@@ -184,9 +184,9 @@ function renderTasks() {
     updateAllProgress();
 }
 
-/* ============================================================
-   RANDOM UNCAUGHT FEATURE (now cleanly integrated)
-   ============================================================ */
+/* ====================== RANDOM UNCAUGHT MODAL FEATURE ====================== */
+let currentRandomTask = null;
+
 function pickRandomUncaught() {
     const uncaught = tasks.filter(t => !t.completed);
     
@@ -195,24 +195,57 @@ function pickRandomUncaught() {
         return;
     }
 
-    const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
+    currentRandomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
 
-    renderTasks();
+    // Show the modal
+    const modal = document.getElementById("randomModal");
+    const spriteContainer = document.getElementById("modalSprite");
+    const nameEl = document.getElementById("modalName");
 
-    setTimeout(() => {
-        const listItems = document.querySelectorAll('#taskList li');
-        const targetLi = Array.from(listItems).find(li =>
-            li.textContent.includes(`#${randomTask.dex} —`)
-        );
+    // Sprite (respects shiny toggle)
+    const isShiny = document.getElementById("shinyToggle").checked;
+    spriteContainer.innerHTML = `
+        <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${isShiny ? 'shiny/' : ''}${currentRandomTask.dexRaw}.png" alt="${currentRandomTask.name}">
+    `;
 
-        if (targetLi) {
-            targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
-            targetLi.classList.add("highlight-flash");
-            setTimeout(() => targetLi.classList.remove("highlight-flash"), 1800);
-        }
-    }, 100);
+    nameEl.textContent = `#${currentRandomTask.dex} — ${formatPokemonName(currentRandomTask.name)}`;
+
+    modal.classList.remove("hidden");
 }
 
+// Modal event listeners (add this after the function)
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById("randomModal");
+    const closeBtn = document.getElementById("modalCloseBtn");
+    const rerollBtn = document.getElementById("modalRerollBtn");
+    const goToBtn = document.getElementById("modalGoToBtn");
+
+    const closeModal = () => modal.classList.add("hidden");
+
+    closeBtn.addEventListener("click", closeModal);
+    rerollBtn.addEventListener("click", () => {
+        closeModal();
+        setTimeout(pickRandomUncaught, 300);   // quick reroll
+    });
+    goToBtn.addEventListener("click", () => {
+        if (!currentRandomTask) return;
+        closeModal();
+
+        renderTasks();
+
+        setTimeout(() => {
+            const listItems = document.querySelectorAll('#taskList li');
+            const targetLi = Array.from(listItems).find(li =>
+                li.textContent.includes(`#${currentRandomTask.dex} —`)
+            );
+            if (targetLi) {
+                targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
+                targetLi.classList.add("highlight-flash");
+                setTimeout(() => targetLi.classList.remove("highlight-flash"), 2000);
+            }
+        }, 400);
+    });
+});
 /* ============================================================
    LOADING SCREEN
    ============================================================ */
