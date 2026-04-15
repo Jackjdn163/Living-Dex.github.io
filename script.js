@@ -469,46 +469,6 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
 searchBar.addEventListener("input", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 shinyToggle.addEventListener("change", renderTasks);
-
-// ====================== RANDOM UNCAUGHT FEATURE ======================
-function pickRandomUncaught() {
-    const uncaught = tasks.filter(t => !t.completed);
-    
-    if (uncaught.length === 0) {
-        alert("🎉 Congratulations! You've caught everything in your Living Dex!");
-        return;
-    }
-
-    // Pick one at random
-    const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
-
-    // Re-render so everything is up to date
-    renderTasks();
-
-    // Scroll to the Pokémon and highlight it temporarily
-    setTimeout(() => {
-        const listItems = document.querySelectorAll('#taskList li');
-        const targetLi = Array.from(listItems).find(li => 
-            li.textContent.includes(`#${randomTask.dex} —`)
-        );
-
-        if (targetLi) {
-            targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
-            
-            // Nice highlight animation (reuses your existing animation classes)
-            targetLi.classList.add("highlight-flash");
-            setTimeout(() => {
-                targetLi.classList.remove("highlight-flash");
-            }, 1800);
-        }
-
-        // Optional: auto-open the info panel for the random mon
-        // openInfoPanel(randomTask);   // uncomment if you want this
-    }, 100);
-}
-
-// Add event listener (put this with your other button listeners)
-document.getElementById("randomUncaughtBtn").addEventListener("click", pickRandomUncaught);
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
