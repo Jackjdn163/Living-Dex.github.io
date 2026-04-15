@@ -803,6 +803,60 @@ body.dark .evoBox {
 }
 
 .evoMethod {
+   /* ====================== URGENT FIX - BROKEN INFO PANEL ====================== */
+#infoPanel {
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 320px !important;
+    height: 100% !important;
+    background: rgba(255,255,255,0.95) !important;
+    box-shadow: -4px 0 12px rgba(0,0,0,0.25) !important;
+    padding: 20px !important;
+    transform: translateX(100%) !important;
+    opacity: 0 !important;
+    transition: transform 0.35s ease, opacity 0.35s ease !important;
+    z-index: 99999 !important;
+    overflow-y: auto !important;
+}
+body.dark #infoPanel {
+    background: rgba(30,30,30,0.95) !important;
+    color: white !important;
+}
+#infoPanel.open {
+    transform: translateX(0) !important;
+    opacity: 1 !important;
+}
+
+#infoTopRow {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 16px !important;
+    margin-bottom: 10px !important;
+}
+#infoSprite img {
+    width: 120px !important;
+    height: 120px !important;
+}
+#infoTypes {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+}
+.typeBadge {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 9999px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+.typeBadge img {
+    width: 24px !important;
+    height: 24px !important;
+}
     font-size: 14px;
     opacity: 0.8;
 }
