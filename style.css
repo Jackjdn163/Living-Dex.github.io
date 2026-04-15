@@ -782,43 +782,59 @@ body.dark .evoBox {
     15%  { transform: scale(1.08); }
     100% { transform: scale(1); }
 }
-/* RANDOM UNCAUGHT BAR - clean horizontal bar above Reset button */
+/* ====================== RANDOM UNCAUGHT BAR ====================== */
 .random-bar {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 12px 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin: 18px 0 14px 0;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
     text-align: center;
+    border: 3px solid #4ade80;
+    max-width: 100%;
     width: 100%;
-    max-width: 420px;           /* matches the width of your percent box */
-    margin-left: auto;
-    margin-right: auto;
 }
 
 body.dark .random-bar {
     background: rgba(30, 30, 30, 0.95);
-    color: white;
+    border-color: #22c55e;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
 }
 
-/* Random button inside the bar */
+/* The button itself */
 .random-btn {
-    background: #4ade80;
+    background: linear-gradient(90deg, #4ade80, #22c55e);
     color: #111;
     border: none;
-    padding: 14px 32px;
+    padding: 16px 32px;
     border-radius: 9999px;
-    font-size: 1.1rem;
-    font-weight: bold;
+    font-size: 1.15rem;
+    font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: all 0.2s ease;
+    box-shadow: 0 6px 16px rgba(74, 222, 128, 0.4);
+    transition: all 0.25s ease;
     width: 100%;
-    max-width: 360px;
+    max-width: 380px;
+    letter-spacing: 0.5px;
 }
 
 .random-btn:hover {
-    background: #22c55e;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(74, 222, 128, 0.5);
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 10px 24px rgba(74, 222, 128, 0.6);
+}
+
+.random-btn:active {
+    transform: scale(0.97);
+}
+.highlight-flash {
+    animation: highlightPop 1.8s ease-out;
+    background-color: #4ade80 !important;
+    box-shadow: 0 0 25px #4ade80;
+}
+
+@keyframes highlightPop {
+    0%   { transform: scale(1); }
+    20%  { transform: scale(1.12); }
+    100% { transform: scale(1); }
 }
