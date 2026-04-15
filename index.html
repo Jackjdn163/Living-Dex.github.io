@@ -29,7 +29,7 @@
         <h1>Pokédex Tracker</h1>
         <input id="searchBar" type="text" placeholder="Search Pokémon..." autocomplete="off">
         
-        <!-- Random button (this was missing before) -->
+        <!-- NEW: Random Uncaught Button -->
         <button id="randomBtn" class="random-btn">
             🎲 Random Uncaught Pokémon
         </button>
@@ -42,11 +42,11 @@
         </select>
         <button id="resetBtn">Reset Progress</button>
         
-        <!-- Grid container (changed from <ul>) -->
+        <!-- Changed from <ul> to <div class="dex-grid"> for 3-column layout -->
         <div id="taskList" class="dex-grid"></div>
     </main>
 
-    <!-- FLOATING STATS BOX (unchanged) -->
+    <!-- FLOATING STATS BOX -->
     <aside id="floatingStats" class="floatingBox">
         <h3 class="genBarsTitle">Pokédex Completion</h3>
         <div id="fullDexRow" class="fullDexRow">
@@ -58,7 +58,6 @@
             <span class="fullDexPercent">0%</span>
         </div>
         <div id="genProgress" class="genBars">
-            <!-- Your 9 gen rows stay exactly the same -->
             <div class="genRow" data-gen="1"><span class="genLabel">Gen 1</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
             <div class="genRow" data-gen="2"><span class="genLabel">Gen 2</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
             <div class="genRow" data-gen="3"><span class="genLabel">Gen 3</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
@@ -73,8 +72,16 @@
 
     <!-- FLOATING TOGGLES -->
     <aside id="floatingToggles" class="floatingBox">
-        <label class="switch"><input type="checkbox" id="shinyToggle"><span class="slider"></span><span class="switch-label">Show Shiny</span></label>
-        <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span><span class="switch-label">Dark Mode</span></label>
+        <label class="switch">
+            <input type="checkbox" id="shinyToggle">
+            <span class="slider"></span>
+            <span class="switch-label">Show Shiny</span>
+        </label>
+        <label class="switch">
+            <input type="checkbox" id="darkModeToggle">
+            <span class="slider"></span>
+            <span class="switch-label">Dark Mode</span>
+        </label>
     </aside>
 
     <!-- RESET POPUP -->
@@ -102,8 +109,7 @@
         </div>
     </aside>
 
-    <script src="script.js" defer></script>
-         <!-- Random Uncaught Pokémon Popup -->
+    <!-- Random Uncaught Pokémon Popup -->
     <div id="randomPopup" class="popup hidden">
         <div class="popup-box random-popup-box">
             <div id="randomSprite"></div>
@@ -115,5 +121,7 @@
             </div>
         </div>
     </div>
+
+    <script src="script.js" defer></script>
 </body>
 </html>
