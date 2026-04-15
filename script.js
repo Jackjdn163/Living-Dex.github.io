@@ -366,7 +366,44 @@ if (localStorage.getItem("darkMode") === "1") {
     document.body.classList.add("dark");
     darkToggle.checked = true;
 }
+// ====================== RANDOM UNCAUGHT FEATURE (safer version) ======================
+document.addEventListener('DOMContentLoaded', () => {
+    const randomUncaughtBtn = document.getElementById("randomUncaughtBtn");
 
+    if (!randomUncaughtBtn) {
+        console.warn("Random Uncaught button not found in HTML");
+        return;
+    }
+
+    function pickRandomUncaught() {
+        const uncaught = tasks.filter(t => !t.completed);
+        
+        if (uncaught.length === 0) {
+            alert("🎉 Congratulations! You've caught everything in your Living Dex!");
+            return;
+        }
+
+        const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
+
+        renderTasks();
+
+        setTimeout(() => {
+            const listItems = document.querySelectorAll('#taskList li');
+            const targetLi = Array.from(listItems).find(li => 
+                li.textContent.includes(`#${randomTask.dex} —`)
+            );
+
+            if (targetLi) {
+                targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
+                targetLi.classList.add("highlight-flash");
+                setTimeout(() => targetLi.classList.remove("highlight-flash"), 1800);
+            }
+        }, 100);
+    }
+
+    randomUncaughtBtn.addEventListener("click", pickRandomUncaught);
+    console.log("✅ Random Uncaught button successfully attached!");
+});
 /* ============================================================
    INFO PANEL
    ============================================================ */
@@ -493,42 +530,4 @@ async function init() {
 
     await finishLoadingAnimation();
 }
-// ====================== RANDOM UNCAUGHT FEATURE (safer version) ======================
-document.addEventListener('DOMContentLoaded', () => {
-    const randomUncaughtBtn = document.getElementById("randomUncaughtBtn");
-
-    if (!randomUncaughtBtn) {
-        console.warn("Random Uncaught button not found in HTML");
-        return;
-    }
-
-    function pickRandomUncaught() {
-        const uncaught = tasks.filter(t => !t.completed);
-        
-        if (uncaught.length === 0) {
-            alert("🎉 Congratulations! You've caught everything in your Living Dex!");
-            return;
-        }
-
-        const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
-
-        renderTasks();
-
-        setTimeout(() => {
-            const listItems = document.querySelectorAll('#taskList li');
-            const targetLi = Array.from(listItems).find(li => 
-                li.textContent.includes(`#${randomTask.dex} —`)
-            );
-
-            if (targetLi) {
-                targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
-                targetLi.classList.add("highlight-flash");
-                setTimeout(() => targetLi.classList.remove("highlight-flash"), 1800);
-            }
-        }, 100);
-    }
-
-    randomUncaughtBtn.addEventListener("click", pickRandomUncaught);
-    console.log("✅ Random Uncaught button successfully attached!");
-});
 init();
