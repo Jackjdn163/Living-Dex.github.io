@@ -4,17 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokédex Tracker</title>
-    <!-- Preload CSS for faster first paint -->
     <link rel="preload" href="style.css" as="style">
     <link rel="stylesheet" href="style.css">
-    <!-- Improve rendering performance -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 </head>
 <body>
     <!-- LOADING SCREEN -->
     <div id="loadingScreen">
         <div class="loading-content">
-            <!-- ORIGINAL WORKING POKEBALL -->
             <div class="pokeball">
                 <div class="pokeball-top"></div>
                 <div class="pokeball-band"></div>
@@ -30,10 +27,9 @@
     <!-- MAIN CONTAINER -->
     <main class="container">
         <h1>Pokédex Tracker</h1>
-        
         <input id="searchBar" type="text" placeholder="Search Pokémon..." autocomplete="off">
         
-        <!-- NEW: Random Uncaught Pokémon Button -->
+        <!-- Random button (this was missing before) -->
         <button id="randomBtn" class="random-btn">
             🎲 Random Uncaught Pokémon
         </button>
@@ -44,17 +40,15 @@
             <option value="caught">Sort by Caught</option>
             <option value="uncaught">Sort by Uncaught</option>
         </select>
-        
         <button id="resetBtn">Reset Progress</button>
         
-        <!-- NEW: Changed from <ul> to <div class="dex-grid"> for the responsive grid -->
+        <!-- Grid container (changed from <ul>) -->
         <div id="taskList" class="dex-grid"></div>
     </main>
 
-    <!-- FLOATING STATS BOX -->
+    <!-- FLOATING STATS BOX (unchanged) -->
     <aside id="floatingStats" class="floatingBox">
         <h3 class="genBarsTitle">Pokédex Completion</h3>
-        <!-- FULL POKEDEX BAR -->
         <div id="fullDexRow" class="fullDexRow">
             <span class="fullDexLabel">Total</span>
             <div class="fullDexBar">
@@ -63,68 +57,24 @@
             </div>
             <span class="fullDexPercent">0%</span>
         </div>
-        <!-- GENERATION PROGRESS BARS -->
         <div id="genProgress" class="genBars">
-            <div class="genRow" data-gen="1">
-                <span class="genLabel">Gen 1</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="2">
-                <span class="genLabel">Gen 2</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="3">
-                <span class="genLabel">Gen 3</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="4">
-                <span class="genLabel">Gen 4</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="5">
-                <span class="genLabel">Gen 5</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="6">
-                <span class="genLabel">Gen 6</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="7">
-                <span class="genLabel">Gen 7</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="8">
-                <span class="genLabel">Gen 8</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
-            <div class="genRow" data-gen="9">
-                <span class="genLabel">Gen 9</span>
-                <div class="genBar"><div class="genFill"></div></div>
-                <span class="genPercent">0%</span>
-            </div>
+            <!-- Your 9 gen rows stay exactly the same -->
+            <div class="genRow" data-gen="1"><span class="genLabel">Gen 1</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="2"><span class="genLabel">Gen 2</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="3"><span class="genLabel">Gen 3</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="4"><span class="genLabel">Gen 4</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="5"><span class="genLabel">Gen 5</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="6"><span class="genLabel">Gen 6</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="7"><span class="genLabel">Gen 7</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="8"><span class="genLabel">Gen 8</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
+            <div class="genRow" data-gen="9"><span class="genLabel">Gen 9</span><div class="genBar"><div class="genFill"></div></div><span class="genPercent">0%</span></div>
         </div>
     </aside>
 
     <!-- FLOATING TOGGLES -->
     <aside id="floatingToggles" class="floatingBox">
-        <label class="switch">
-            <input type="checkbox" id="shinyToggle">
-            <span class="slider"></span>
-            <span class="switch-label">Show Shiny</span>
-        </label>
-        <label class="switch">
-            <input type="checkbox" id="darkModeToggle">
-            <span class="slider"></span>
-            <span class="switch-label">Dark Mode</span>
-        </label>
+        <label class="switch"><input type="checkbox" id="shinyToggle"><span class="slider"></span><span class="switch-label">Show Shiny</span></label>
+        <label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span><span class="switch-label">Dark Mode</span></label>
     </aside>
 
     <!-- RESET POPUP -->
@@ -152,7 +102,6 @@
         </div>
     </aside>
 
-    <!-- SCRIPT -->
     <script src="script.js" defer></script>
 </body>
 </html>
