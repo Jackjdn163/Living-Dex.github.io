@@ -7,15 +7,16 @@ const resetBtn = document.getElementById("resetBtn");
 const shinyToggle = document.getElementById("shinyToggle");
 const sortSelect = document.getElementById("sortSelect");
 const darkToggle = document.getElementById("darkModeToggle");
+
 const resetPopup = document.getElementById("resetPopup");
 const confirmReset = document.getElementById("confirmReset");
 const cancelReset = document.getElementById("cancelReset");
+
 const loadingScreen = document.getElementById("loadingScreen");
 const loadingText = document.getElementById("loadingText");
 const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
 const pokeballCenter = document.querySelector(".pokeball-center");
-const randomBtn = document.getElementById("randomBtn");   // NEW: random button reference
 
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
@@ -31,7 +32,9 @@ const preserveScroll = fn => {
     fn();
     window.scrollTo(0, y);
 };
+
 const padDex = n => n.toString().padStart(3, "0");
+
 function getGeneration(n) {
     n = +n;
     if (n <= 151) return 1;
@@ -44,9 +47,11 @@ function getGeneration(n) {
     if (n <= 898) return 8;
     return 9;
 }
+
 function formatPokemonName(name) {
     if (!name) return "";
     name = name.toLowerCase();
+
     const special = {
         "nidoran-f": "Nidoran♀",
         "nidoran-m": "Nidoran♂",
@@ -62,7 +67,9 @@ function formatPokemonName(name) {
         "kommo-o": "Kommo-o",
         "flabebe": "Flabébé"
     };
+
     if (special[name]) return special[name];
+
     return name
         .split("-")
         .map(p => p[0].toUpperCase() + p.slice(1))
@@ -74,6 +81,7 @@ function formatPokemonName(name) {
    ============================================================ */
 const typeIconSrc = t =>
 `https://raw.githubusercontent.com/duiker101/pokemon-type-svg-icons/master/icons/${t}.svg`;
+
 const typeColors = {
     normal:"#A8A77A", fire:"#EE8130", water:"#6390F0", electric:"#F7D02C",
     grass:"#7AC74C", ice:"#96D9D6", fighting:"#C22E28", poison:"#A33EA1",
@@ -81,6 +89,7 @@ const typeColors = {
     rock:"#B6A136", ghost:"#735797", dragon:"#6F35FC", dark:"#705746",
     steel:"#B7B7CE", fairy:"#D685AD"
 };
+
 const getTypeColor = t => typeColors[t] || "#888";
 
 /* ============================================================
@@ -88,39 +97,47 @@ const getTypeColor = t => typeColors[t] || "#888";
    ============================================================ */
 const saveTasks = () =>
     localStorage.setItem("tasks", JSON.stringify(tasks));
+
 const loadTasksFromStorage = () => {
     const raw = localStorage.getItem("tasks");
     tasks = raw ? JSON.parse(raw) : [];
 };
 
 /* ============================================================
-   PROGRESS BARS – NOW SHOW CAUGHT/TOTAL (new)
+   PROGRESS BARS
    ============================================================ */
 function updateOverallProgress() {
     const total = tasks.length;
     const caught = tasks.filter(t => t.completed).length;
     const percent = total ? (caught / total) * 100 : 0;
+
     const row = document.getElementById("fullDexRow");
     row.querySelector(".fullDexFill").style.width = percent + "%";
-    row.querySelector(".fullDexPercent").textContent = `${caught}/${total} (${percent.toFixed(2)}%)`;
+    row.querySelector(".fullDexPercent").textContent = percent.toFixed(2) + "%";
+
     row.classList.toggle("completed", percent >= 100);
 }
+
 function updateGenProgress() {
     const totals = {};
     const caught = {};
+
     for (const t of tasks) {
         totals[t.gen] = (totals[t.gen] || 0) + 1;
         if (t.completed) caught[t.gen] = (caught[t.gen] || 0) + 1;
     }
+
     document.querySelectorAll(".genRow").forEach(row => {
         const gen = row.dataset.gen;
         const total = totals[gen] || 0;
         const c = caught[gen] || 0;
         const percent = total ? (c / total) * 100 : 0;
-        row.querySelector(".genPercent").textContent = `${c}/${total} (${percent.toFixed(2)}%)`;
+
+        row.querySelector(".genPercent").textContent = percent.toFixed(2) + "%";
         row.querySelector(".genFill").style.width = percent + "%";
     });
 }
+
 const updateAllProgress = () => {
     updateOverallProgress();
     updateGenProgress();
@@ -131,6 +148,7 @@ const updateAllProgress = () => {
    ============================================================ */
 function getSortedTasks() {
     const mode = sortSelect.value;
+
     return [...tasks].sort((a, b) => {
         if (mode === "name") return a.name.localeCompare(b.name);
         if (mode === "caught") return (b.completed - a.completed) || (a.dexRaw - b.dexRaw);
@@ -140,13 +158,15 @@ function getSortedTasks() {
 }
 
 /* ============================================================
-   RENDER – NOW 3-COLUMN GRID WITH SMALLER CARDS (new render)
+   RENDER LIST
    ============================================================ */
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
     const shiny = shinyToggle.checked;
     const sorted = getSortedTasks();
+
     taskList.innerHTML = "";
+
     const frag = document.createDocumentFragment();
 
     for (const task of sorted) {
@@ -156,38 +176,44 @@ function renderTasks() {
             !task.dexRaw.includes(search)
         ) continue;
 
-        const normalUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png`;
-        const shinyUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${task.dexRaw}.png`;
+        const li = document.createElement("li");
+        li.className = task.completed ? "completed" : "";
 
-        const card = document.createElement("div");
-        card.className = `pokemon-card ${task.completed ? "completed" : ""}`;
-        card.innerHTML = `
-            <img class="sprite" src="${shiny ? shinyUrl : normalUrl}" alt="${task.name}">
-            <div class="card-info">
-                <strong>#${task.dex}</strong>
-                <span>${formatPokemonName(task.name)}</span>
-            </div>
-            <button class="more-btn">⋮</button>
-        `;
+        const img = document.createElement("img");
+        img.className = "sprite";
+        img.src = shiny
+            ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${task.dexRaw}.png`
+            : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png`;
 
-        card.addEventListener("click", (e) => {
-            if (e.target.classList.contains("more-btn")) return;
-            const wasCompleted = task.completed;
-            task.completed = !task.completed;
-            card.classList.remove("check-anim", "uncheck-anim");
-            void card.offsetWidth;
-            card.classList.add(wasCompleted ? "uncheck-anim" : "check-anim");
-            saveTasks();
-            setTimeout(() => preserveScroll(renderTasks), 250);
-        });
+        const label = document.createElement("strong");
+        label.textContent = `#${task.dex} — ${formatPokemonName(task.name)}`;
 
-        card.querySelector(".more-btn").addEventListener("click", e => {
+        const moreBtn = document.createElement("button");
+        moreBtn.className = "more-btn";
+        moreBtn.textContent = "⋮";
+        moreBtn.addEventListener("click", e => {
             e.stopPropagation();
             openInfoPanel(task);
         });
 
-        frag.appendChild(card);
+        li.addEventListener("click", () => {
+            const wasCompleted = task.completed;
+            task.completed = !task.completed;
+
+            li.classList.remove("check-anim", "uncheck-anim");
+            void li.offsetWidth;
+
+            li.classList.add(wasCompleted ? "uncheck-anim" : "check-anim");
+
+            saveTasks();
+
+            setTimeout(() => preserveScroll(renderTasks), 250);
+        });
+
+        li.append(img, label, moreBtn);
+        frag.appendChild(li);
     }
+
     taskList.appendChild(frag);
     updateAllProgress();
 }
@@ -202,14 +228,18 @@ function startLoadingDots() {
         count = count === 3 ? 1 : count + 1;
     }, 400);
 }
+
 const stopLoadingDots = () => clearInterval(dotInterval);
+
 async function finishLoadingAnimation() {
     stopLoadingDots();
+
     loadingText.classList.add("fade-out");
     pokeball.classList.add("finish-spin");
+
     setTimeout(() => pokeball.classList.add("shake"), 200);
     setTimeout(() => pokeballCenter.classList.add("catch"), 300);
-    setTimeout(() => pokeballCenter.classList.add("flash-green"), 450); // new green flash
+
     setTimeout(() => {
         loadingScreen.classList.add("fade-out");
         loadingScreen.style.pointerEvents = "none";
@@ -228,12 +258,16 @@ async function fetchEvolutionData(dexNumber) {
         return { prev: null, next: null };
     }
 }
+
 function parseEvolutionChain(chain, dexNumber) {
     let prev = null, next = null;
+
     function search(node, parent) {
         const id = node.species.url.split("/").slice(-2, -1)[0];
+
         if (id === dexNumber) {
             if (parent) prev = parent;
+
             if (node.evolves_to.length > 0) {
                 const evo = node.evolves_to[0];
                 next = {
@@ -243,6 +277,7 @@ function parseEvolutionChain(chain, dexNumber) {
                 };
             }
         }
+
         for (const evo of node.evolves_to) {
             search(evo, {
                 id,
@@ -251,20 +286,26 @@ function parseEvolutionChain(chain, dexNumber) {
             });
         }
     }
+
     search(chain, null);
     return { prev, next };
 }
+
 function formatEvolutionMethod(method) {
     if (!method) return "Unknown";
+
     const t = method.trigger.name;
+
     if (t === "level-up") {
         if (method.min_level) return `Level ${method.min_level}`;
         if (method.min_happiness) return "Friendship";
         if (method.time_of_day) return `Level up at ${method.time_of_day}`;
         return "Level up";
     }
+
     if (t === "use-item") return method.item.name.replace("-", " ");
     if (t === "trade") return "Trade";
+
     return t.replace("-", " ");
 }
 
@@ -274,6 +315,7 @@ function formatEvolutionMethod(method) {
 async function importFromSheet() {
     const csv = await (await fetch(GOOGLE_SHEET_URL)).text();
     const rows = csv.split("\n").slice(1);
+
     tasks = rows
         .filter(Boolean)
         .map(row => {
@@ -287,6 +329,7 @@ async function importFromSheet() {
                 completed: false
             };
         });
+
     saveTasks();
     renderTasks();
 }
@@ -297,16 +340,16 @@ async function importFromSheet() {
 resetBtn.addEventListener("click", () =>
     resetPopup.classList.remove("hidden")
 );
+
 cancelReset.addEventListener("click", () =>
     resetPopup.classList.add("hidden")
 );
+
 confirmReset.addEventListener("click", async () => {
     resetPopup.classList.add("hidden");
-    taskList.classList.add("resetting");
     localStorage.removeItem("tasks");
     tasks = [];
     await importFromSheet();
-    taskList.classList.remove("resetting");
 });
 
 /* ============================================================
@@ -318,6 +361,7 @@ darkToggle.addEventListener("change", () => {
     localStorage.setItem("darkMode", isDark ? "1" : "0");
     renderTasks();
 });
+
 if (localStorage.getItem("darkMode") === "1") {
     document.body.classList.add("dark");
     darkToggle.checked = true;
@@ -329,37 +373,49 @@ if (localStorage.getItem("darkMode") === "1") {
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
     const content = document.getElementById("infoContent");
+
     if (panel.classList.contains("open")) {
         content.classList.add("fading");
         await new Promise(r => setTimeout(r, 150));
     }
+
     document.getElementById("infoSprite").innerHTML =
         `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${task.dexRaw}.png">`;
+
     document.getElementById("infoName").textContent =
         `#${task.dex} — ${formatPokemonName(task.name)}`;
+
     document.getElementById("infoGames").innerHTML =
         `<p style="opacity:0.5; text-align:center;">No game data</p>`;
+
     const infoTypes = document.getElementById("infoTypes");
     infoTypes.innerHTML = "";
+
     fetch(`https://pokeapi.co/api/v2/pokemon/${task.dexRaw}`)
         .then(r => r.json())
         .then(data => {
             for (const t of data.types) {
                 const typeName = t.type.name;
+
                 const badge = document.createElement("div");
                 badge.className = "typeBadge";
                 badge.style.backgroundColor = getTypeColor(typeName);
+
                 const icon = document.createElement("img");
                 icon.src = typeIconSrc(typeName);
+
                 badge.appendChild(icon);
                 infoTypes.appendChild(badge);
             }
         });
+
     const evoBox = document.getElementById("infoEvolutions");
     evoBox.innerHTML = "Loading evolution data...";
+
     try {
         const evo = await fetchEvolutionData(task.dexRaw);
         evoBox.innerHTML = "";
+
         if (evo.prev) {
             evoBox.innerHTML += `
                 <div class="evoLabel">Evolves From</div>
@@ -371,6 +427,7 @@ async function openInfoPanel(task) {
                     </div>
                 </div>`;
         }
+
         if (evo.next) {
             evoBox.innerHTML += `
                 <div class="evoLabel">Evolves Into</div>
@@ -382,6 +439,7 @@ async function openInfoPanel(task) {
                     </div>
                 </div>`;
         }
+
         if (!evo.prev && !evo.next) {
             evoBox.innerHTML =
                 `<p style="opacity:0.5; text-align:center;">No evolution data</p>`;
@@ -390,50 +448,20 @@ async function openInfoPanel(task) {
         evoBox.innerHTML =
             `<p style="opacity:0.5; text-align:center;">Error loading evolution data</p>`;
     }
+
     content.classList.remove("fading");
     panel.classList.add("open");
 }
+
 document.getElementById("closeInfoPanel").addEventListener("click", () => {
     const panel = document.getElementById("infoPanel");
     const content = document.getElementById("infoContent");
+
     content.classList.add("fading");
     panel.classList.remove("open");
+
     setTimeout(() => content.classList.remove("fading"), 300);
 });
-
-/* ============================================================
-   NEW: RANDOM UNCAUGHT POKÉMON POPUP
-   ============================================================ */
-function getRandomUncaught() {
-    const uncaught = tasks.filter(t => !t.completed);
-    if (uncaught.length === 0) {
-        alert("🎉 Congratulations! You've completed your entire Living Dex!");
-        return;
-    }
-    const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
-    const popup = document.getElementById("randomPopup");
-    const spriteDiv = document.getElementById("randomSprite");
-    const nameEl = document.getElementById("randomName");
-    const shiny = shinyToggle.checked;
-    const url = shiny 
-        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${randomTask.dexRaw}.png`
-        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomTask.dexRaw}.png`;
-    spriteDiv.innerHTML = `<img src="${url}">`;
-    nameEl.textContent = `#${randomTask.dex} — ${formatPokemonName(randomTask.name)}`;
-    popup.classList.remove("hidden");
-
-    document.getElementById("randomTakeMe").onclick = () => {
-        popup.classList.add("hidden");
-        renderTasks();
-        const card = Array.from(taskList.children).find(c => c.querySelector("strong").textContent === `#${randomTask.dex}`);
-        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
-    };
-    document.getElementById("randomRollAgain").onclick = () => {
-        popup.classList.add("hidden");
-        setTimeout(getRandomUncaught, 300);
-    };
-    document.getElementById("randomClose").onclick = () => popup.classList.add("hidden");
-}
 
 /* ============================================================
    EVENT LISTENERS
@@ -441,15 +469,16 @@ function getRandomUncaught() {
 searchBar.addEventListener("input", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 shinyToggle.addEventListener("change", renderTasks);
-randomBtn.addEventListener("click", getRandomUncaught);
 
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
 async function init() {
     startLoadingDots();
+
     const start = performance.now();
     loadTasksFromStorage();
+
     if (tasks.length === 0) {
         await importFromSheet();
     } else {
@@ -458,9 +487,12 @@ async function init() {
         }
         renderTasks();
     }
+
     const elapsed = performance.now() - start;
     const min = 5000;
     if (elapsed < min) await new Promise(r => setTimeout(r, min - elapsed));
+
     await finishLoadingAnimation();
 }
+
 init();
