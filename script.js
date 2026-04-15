@@ -16,7 +16,7 @@ const loadingScreen = document.getElementById("loadingScreen");
 const loadingText = document.getElementById("loadingText");
 const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
-const pokeballCenter = document.querySelector(".pokeball-center");
+const pokeballCenter = document.querySelector(".pokeball-button");
 
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
