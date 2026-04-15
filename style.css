@@ -782,54 +782,31 @@ body.dark .evoBox {
     15%  { transform: scale(1.08); }
     100% { transform: scale(1); }
 }
-/* FLOATING RANDOM BOX + Shiny/Dark toggles - side-by-side at bottom-right */
-#floatingRandom,
+/* Make the floating toggles box a bit wider to fit the random button nicely */
 #floatingToggles {
-    position: fixed;
-    bottom: 20px;
-    background: rgba(255, 255, 255, 0.95);
+    min-width: 320px;           /* fits both toggles + random button */
     padding: 14px 18px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
+    gap: 12px;                  /* space between items */
+    flex-wrap: wrap;            /* button will sit nicely next to toggles */
     justify-content: center;
 }
 
-#floatingRandom {
-    right: 20px;
-    min-width: 240px;
-}
-
-#floatingToggles {
-    right: 280px;   /* this lines up the two boxes perfectly next to each other */
-}
-
-body.dark #floatingRandom,
-body.dark #floatingToggles {
-    background: rgba(30, 30, 30, 0.95);
-    color: white;
-}
-
-/* Random button style */
+/* Random button style (clean and matches your theme) */
 .random-btn {
     background: #4ade80;
     color: #111;
     border: none;
-    padding: 14px 28px;
+    padding: 12px 24px;
     border-radius: 9999px;
     font-size: 1.05rem;
     font-weight: bold;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: all 0.2s ease;
-    width: 100%;
     white-space: nowrap;
 }
 
 .random-btn:hover {
     background: #22c55e;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(74, 222, 128, 0.5);
+    transform: translateY(-2px);
 }
