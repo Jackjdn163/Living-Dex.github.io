@@ -782,3 +782,51 @@ body.dark .evoBox {
     15%  { transform: scale(1.08); }
     100% { transform: scale(1); }
 }
+/* FLOATING RANDOM BOX - next to Shiny/Dark Mode */
+#floatingRandom {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 240px;
+    z-index: 9999;
+}
+
+body.dark #floatingRandom {
+    background: rgba(30, 30, 30, 0.9);
+    color: white;
+}
+
+/* Button inside the random box */
+.random-btn {
+    background: #4ade80;
+    color: #111;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    font-size: 1.05rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.2s ease;
+    width: 100%;
+    white-space: nowrap;
+}
+
+.random-btn:hover {
+    background: #22c55e;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(74, 222, 128, 0.5);
+}
+
+/* Move Shiny/Dark toggles so the two small boxes sit neatly next to each other */
+#floatingToggles {
+    right: 280px;   /* this makes the total width of both boxes ≈ 300px (matches percent box) */
+    bottom: 20px;
+}
