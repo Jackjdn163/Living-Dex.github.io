@@ -1,5 +1,3 @@
-<!-- Paste this FULL script.js over your current script.js -->
-<script>
 /* ============================================================
    ELEMENT REFERENCES
    ============================================================ */
@@ -17,7 +15,7 @@ const loadingText = document.getElementById("loadingText");
 const loadingDots = document.getElementById("loadingDots");
 const pokeball = document.querySelector(".pokeball");
 const pokeballCenter = document.querySelector(".pokeball-center");
-const randomBtn = document.getElementById("randomBtn");
+const randomBtn = document.getElementById("randomBtn");   // safe reference
 
 const GOOGLE_SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPMOWM7uf_nOXIMcGzvL5tOyCk1MLvSKE03jR5r0qJp9j5NdtWfYobBDAmzMmEL2aVsb4Z2uqIwpPD/pub?output=csv";
@@ -149,7 +147,7 @@ function getSortedTasks() {
 }
 
 /* ============================================================
-   RENDER – 3-COLUMN RESPONSIVE GRID (keeps everything you had)
+   RENDER – 3-COLUMN RESPONSIVE GRID
    ============================================================ */
 function renderTasks() {
     const search = searchBar.value.toLowerCase();
@@ -180,21 +178,17 @@ function renderTasks() {
             <button class="more-btn">⋮</button>
         `;
 
-        // Click anywhere on card (except ⋮) to toggle caught
         card.addEventListener("click", (e) => {
             if (e.target.classList.contains("more-btn")) return;
             const wasCompleted = task.completed;
             task.completed = !task.completed;
-
             card.classList.remove("check-anim", "uncheck-anim");
             void card.offsetWidth;
             card.classList.add(wasCompleted ? "uncheck-anim" : "check-anim");
-
             saveTasks();
             setTimeout(() => preserveScroll(renderTasks), 250);
         });
 
-        // ⋮ button opens info panel
         card.querySelector(".more-btn").addEventListener("click", e => {
             e.stopPropagation();
             openInfoPanel(task);
@@ -208,7 +202,7 @@ function renderTasks() {
 }
 
 /* ============================================================
-   LOADING SCREEN (polished text + keeps your animation)
+   LOADING SCREEN
    ============================================================ */
 function startLoadingDots() {
     let count = 1;
@@ -233,7 +227,7 @@ async function finishLoadingAnimation() {
 }
 
 /* ============================================================
-   EVOLUTION FETCHING (kept 100% original)
+   EVOLUTION FETCHING
    ============================================================ */
 async function fetchEvolutionData(dexNumber) {
     try {
@@ -287,7 +281,7 @@ function formatEvolutionMethod(method) {
 }
 
 /* ============================================================
-   IMPORT FROM SHEET (kept 100% original)
+   IMPORT FROM SHEET
    ============================================================ */
 async function importFromSheet() {
     const csv = await (await fetch(GOOGLE_SHEET_URL)).text();
@@ -310,7 +304,7 @@ async function importFromSheet() {
 }
 
 /* ============================================================
-   RESET POPUP – now with nice grid fade animation
+   RESET POPUP – with grid fade animation
    ============================================================ */
 resetBtn.addEventListener("click", () =>
     resetPopup.classList.remove("hidden")
@@ -320,7 +314,7 @@ cancelReset.addEventListener("click", () =>
 );
 confirmReset.addEventListener("click", async () => {
     resetPopup.classList.add("hidden");
-    taskList.classList.add("resetting");           // triggers CSS fade
+    taskList.classList.add("resetting");
     localStorage.removeItem("tasks");
     tasks = [];
     await importFromSheet();
@@ -328,7 +322,7 @@ confirmReset.addEventListener("click", async () => {
 });
 
 /* ============================================================
-   DARK MODE (kept 100% original)
+   DARK MODE
    ============================================================ */
 darkToggle.addEventListener("change", () => {
     const isDark = darkToggle.checked;
@@ -342,7 +336,7 @@ if (localStorage.getItem("darkMode") === "1") {
 }
 
 /* ============================================================
-   INFO PANEL (kept 100% original)
+   INFO PANEL
    ============================================================ */
 async function openInfoPanel(task) {
     const panel = document.getElementById("infoPanel");
@@ -420,7 +414,7 @@ document.getElementById("closeInfoPanel").addEventListener("click", () => {
 });
 
 /* ============================================================
-   RANDOM UNCAUGHT POKÉMON BUTTON
+   RANDOM UNCAUGHT POKÉMON
    ============================================================ */
 function getRandomUncaught() {
     const uncaught = tasks.filter(t => !t.completed);
@@ -447,14 +441,14 @@ function getRandomUncaught() {
 searchBar.addEventListener("input", renderTasks);
 sortSelect.addEventListener("change", renderTasks);
 shinyToggle.addEventListener("change", renderTasks);
-randomBtn.addEventListener("click", getRandomUncaught);
+if (randomBtn) randomBtn.addEventListener("click", getRandomUncaught);
 
 /* ============================================================
    INITIAL LOAD
    ============================================================ */
 async function init() {
     startLoadingDots();
-    loadingText.textContent = "Catching Pokémon for your Living Dex..."; // nicer themed text
+    loadingText.textContent = "Catching Pokémon for your Living Dex...";
     const start = performance.now();
     loadTasksFromStorage();
     if (tasks.length === 0) {
@@ -472,4 +466,3 @@ async function init() {
 }
 
 init();
-</script>
