@@ -493,5 +493,38 @@ async function init() {
 
     await finishLoadingAnimation();
 }
+// ====================== RANDOM UNCAUGHT FEATURE ======================
+function pickRandomUncaught() {
+    const uncaught = tasks.filter(t => !t.completed);
+    
+    if (uncaught.length === 0) {
+        alert("🎉 Congratulations! You've caught everything!");
+        return;
+    }
 
+    const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
+
+    renderTasks();
+
+    setTimeout(() => {
+        const listItems = document.querySelectorAll('#taskList li');
+        const targetLi = Array.from(listItems).find(li => 
+            li.textContent.includes(`#${randomTask.dex} —`)
+        );
+
+        if (targetLi) {
+            targetLi.scrollIntoView({ behavior: "smooth", block: "center" });
+            targetLi.classList.add("highlight-flash");
+            setTimeout(() => targetLi.classList.remove("highlight-flash"), 1800);
+        }
+    }, 100);
+}
+
+// Safe event listener (won’t break loading even if button is missing)
+const randomBtn = document.getElementById("randomUncaughtBtn");
+if (randomBtn) {
+    randomBtn.addEventListener("click", pickRandomUncaught);
+} else {
+    console.warn("Random button not found in HTML yet");
+}
 init();
