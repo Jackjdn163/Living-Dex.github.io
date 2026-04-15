@@ -690,3 +690,92 @@ body.dark .evoBox {
     font-size: 14px;
     opacity: 0.8;
 }
+/* ====================== RANDOM MODAL ====================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+.modal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+}
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 380px;
+    border-radius: 20px;
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    position: relative;
+}
+body.dark .modal-content {
+    background: #2a2a2a;
+    color: white;
+}
+.close-modal {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 32px;
+    cursor: pointer;
+    color: #666;
+    line-height: 1;
+}
+body.dark .close-modal {
+    color: #bbb;
+}
+.modal-sprite {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+}
+.modal-sprite img {
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+}
+#modalName {
+    font-size: 1.4rem;
+    margin-bottom: 24px;
+    font-weight: 800;
+}
+.modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+.modal-reroll-btn,
+.modal-goto-btn {
+    padding: 14px 24px;
+    border-radius: 9999px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex: 1;
+}
+.modal-reroll-btn {
+    background: #4ade80;
+    color: #111;
+    border: none;
+}
+.modal-goto-btn {
+    background: #3b82f6;
+    color: white;
+    border: none;
+}
+.modal-reroll-btn:hover { transform: scale(1.05); background: #22c55e; }
+.modal-goto-btn:hover   { transform: scale(1.05); background: #2563eb; }
