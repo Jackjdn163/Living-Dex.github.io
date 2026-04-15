@@ -464,5 +464,48 @@ async function init() {
     if (elapsed < min) await new Promise(r => setTimeout(r, min - elapsed));
     await finishLoadingAnimation();
 }
+/* ============================================================
+   NEW: Random Uncaught Popup (keeps all your original code intact)
+   ============================================================ */
+function getRandomUncaught() {
+    const uncaught = tasks.filter(t => !t.completed);
+    if (uncaught.length === 0) {
+        alert("🎉 You've caught everything! Amazing living dex!");
+        return;
+    }
+    const randomTask = uncaught[Math.floor(Math.random() * uncaught.length)];
+    
+    const popup = document.getElementById("randomPopup");
+    const spriteDiv = document.getElementById("randomSprite");
+    const nameEl = document.getElementById("randomName");
+    
+    const shiny = shinyToggle.checked;
+    const url = shiny 
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${randomTask.dexRaw}.png`
+        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${randomTask.dexRaw}.png`;
+    
+    spriteDiv.innerHTML = `<img src="${url}">`;
+    nameEl.textContent = `#${randomTask.dex} — ${formatPokemonName(randomTask.name)}`;
+    
+    popup.classList.remove("hidden");
 
+    document.getElementById("randomTakeMe").onclick = () => {
+        popup.classList.add("hidden");
+        renderTasks();
+        const card = Array.from(taskList.children).find(c => 
+            c.querySelector("strong").textContent === `#${randomTask.dex}`
+        );
+        if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+    };
+
+    document.getElementById("randomRollAgain").onclick = () => {
+        popup.classList.add("hidden");
+        setTimeout(getRandomUncaught, 280);
+    };
+
+    document.getElementById("randomClose").onclick = () => popup.classList.add("hidden");
+}
+
+/* Make sure the random button works */
+randomBtn.addEventListener("click", getRandomUncaught);
 init();
