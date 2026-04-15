@@ -1,25 +1,30 @@
 /* ============================================================
    GLOBAL RESET + BASE
    ============================================================ */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: Arial, Helvetica, sans-serif;
 }
+
 body {
     background: #f5f5f5;
     color: #222;
     padding-bottom: 120px;
     transition: background 0.3s ease, color 0.3s ease;
 }
+
 body.dark {
     background: #1a1a1a;
     color: #eee;
 }
+
 /* ============================================================
    LOADING SCREEN
    ============================================================ */
+
 #loadingScreen {
     position: fixed;
     top: 0;
@@ -37,21 +42,26 @@ body.dark {
     will-change: opacity;
     contain: layout paint size;
 }
+
 body.dark #loadingScreen {
     background: #1a1a1a;
 }
+
 #loadingScreen.fade-out {
     opacity: 0;
 }
+
 .loading-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 18px;
 }
+
 /* ============================
    ORIGINAL WORKING POKEBALL
    ============================ */
+
 .pokeball {
     width: 120px;
     height: 120px;
@@ -61,6 +71,7 @@ body.dark #loadingScreen {
     animation: spin 1.4s linear infinite;
     box-shadow: 0 0 0 4px black;
 }
+
 /* Top half */
 .pokeball-top {
     position: absolute;
@@ -70,6 +81,7 @@ body.dark #loadingScreen {
     height: 50%;
     background: #ff0000;
 }
+
 /* Bottom half */
 .pokeball-bottom {
     position: absolute;
@@ -79,6 +91,7 @@ body.dark #loadingScreen {
     height: 50%;
     background: white;
 }
+
 /* Black band */
 .pokeball-band {
     position: absolute;
@@ -90,6 +103,7 @@ body.dark #loadingScreen {
     transform: translateY(-50%);
     z-index: 2;
 }
+
 /* Center button */
 .pokeball-button {
     position: absolute;
@@ -103,21 +117,25 @@ body.dark #loadingScreen {
     transform: translate(-50%, -50%);
     z-index: 3;
 }
+
 /* Green catch glow */
 .pokeball-button.catch {
     background: #4ade80;
     box-shadow: 0 0 12px #4ade80;
 }
+
 /* Spin animation */
 @keyframes spin {
     from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    to   { transform: rotate(360deg); }
 }
+
 .pokeball.finish-spin {
     animation: none;
     transform: rotate(0deg);
     transition: transform 0.4s ease;
 }
+
 /* Shake animation */
 @keyframes shake {
     0% { transform: translateX(0); }
@@ -126,44 +144,56 @@ body.dark #loadingScreen {
     75% { transform: translateX(-4px); }
     100% { transform: translateX(0); }
 }
+
 .pokeball.shake {
     animation: shake 0.35s ease;
 }
+
+
 /* ============================================================
    LOADING TEXT
    ============================================================ */
+
 #loadingText {
     font-size: 22px;
     font-weight: bold;
     opacity: 1;
     transition: opacity 0.25s ease;
 }
+
 body.dark #loadingText {
     color: #ffffff;
 }
+
 #loadingText.fade-out {
     opacity: 0;
 }
+
 #loadingDots {
     display: inline-block;
     width: 24px;
     text-align: left;
 }
+
 /* ============================================================
    MAIN CONTAINER
    ============================================================ */
+
 .container {
     max-width: 600px;
     margin: 40px auto;
     padding: 0 20px;
 }
+
 h1 {
     text-align: center;
     margin-bottom: 20px;
 }
+
 /* ============================================================
    SEARCH BAR
    ============================================================ */
+
 #searchBar {
     width: 100%;
     padding: 12px 14px;
@@ -174,36 +204,45 @@ h1 {
     outline: none;
     transition: border 0.2s ease;
 }
+
 #searchBar:focus {
     border-color: #4ade80;
 }
+
 body.dark #searchBar {
     background: #2a2a2a;
     border-color: #555;
     color: white;
 }
+
 /* ============================================================
    CHECK ANIMATION
    ============================================================ */
+
 @keyframes catchPop {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.08); background-color: rgba(74, 222, 128, 0.25); }
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.08); background-color: rgba(74, 222, 128, 0.25); }
     100% { transform: scale(1); }
 }
+
 @keyframes uncatchFade {
-    0% { transform: scale(1); }
-    40% { transform: scale(0.96); background-color: rgba(239, 68, 68, 0.15); }
+    0%   { transform: scale(1); }
+    40%  { transform: scale(0.96); background-color: rgba(239, 68, 68, 0.15); }
     100% { transform: scale(1); }
 }
+
 li.check-anim {
     animation: catchPop 0.35s ease;
 }
+
 li.uncheck-anim {
     animation: uncatchFade 0.35s ease;
 }
+
 /* ============================================================
    SORT + RESET
    ============================================================ */
+
 #sortSelect {
     width: 100%;
     padding: 10px;
@@ -212,6 +251,7 @@ li.uncheck-anim {
     border: 2px solid #ccc;
     margin-bottom: 15px;
 }
+
 #resetBtn {
     width: 100%;
     padding: 12px;
@@ -224,18 +264,22 @@ li.uncheck-anim {
     margin-bottom: 20px;
     transition: background 0.2s ease;
 }
+
 #resetBtn:hover {
     background: #dc2626;
 }
+
 /* ============================================================
    TASK LIST
    ============================================================ */
+
 #taskList {
     list-style: none;
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
+
 #taskList li {
     background: white;
     padding: 12px 14px;
@@ -247,19 +291,24 @@ li.uncheck-anim {
     transition: background 0.2s ease, opacity 0.2s ease;
     will-change: transform, opacity;
 }
+
 body.dark #taskList li {
     background: #2a2a2a;
 }
+
 #taskList li.completed {
     opacity: 0.45;
 }
+
 .sprite {
     width: 50px;
     height: 50px;
 }
+
 /* ============================================================
    THREE DOTS BUTTON
    ============================================================ */
+
 .more-btn {
     margin-left: auto;
     background: none;
@@ -269,9 +318,11 @@ body.dark #taskList li {
     padding: 0 8px;
     color: inherit;
 }
+
 /* ============================================================
    FLOATING STATS BOX
    ============================================================ */
+
 #floatingStats {
     position: fixed;
     top: 20px;
@@ -288,28 +339,34 @@ body.dark #taskList li {
     z-index: 9999;
     color: #111;
 }
+
 body.dark #floatingStats {
     background: rgba(30, 30, 30, 0.35);
     border: 1px solid rgba(255, 255, 255, 0.15);
     box-shadow: 0 4px 12px rgba(0,0,0,0.55), 0 0 18px rgba(255,255,255,0.08) inset;
     color: white;
 }
+
 /* ============================================================
    TOTAL HEADER
    ============================================================ */
+
 #totalHeader {
     text-align: center;
     margin-bottom: 18px;
 }
+
 .totalTitle {
     font-size: 20px;
     font-weight: 800;
     letter-spacing: 0.5px;
     opacity: 0.9;
 }
+
 /* ============================================================
    FULL POKEDEX BAR
    ============================================================ */
+
 .fullDexRow {
     display: grid;
     grid-template-columns: 50px 1fr 45px;
@@ -317,10 +374,12 @@ body.dark #floatingStats {
     gap: 8px;
     margin-bottom: 14px;
 }
+
 .fullDexLabel {
     font-weight: 800;
     font-size: 14px;
 }
+
 .fullDexBar {
     position: relative;
     width: 100%;
@@ -329,6 +388,7 @@ body.dark #floatingStats {
     border-radius: 8px;
     overflow: hidden;
 }
+
 .fullDexFill {
     height: 100%;
     width: 0%;
@@ -336,6 +396,7 @@ body.dark #floatingStats {
     border-radius: 8px;
     transition: width 0.4s ease;
 }
+
 .fullDexCrown {
     position: absolute;
     top: 50%;
@@ -346,21 +407,26 @@ body.dark #floatingStats {
     pointer-events: none;
     font-size: 18px;
 }
+
 .fullDexRow.completed .fullDexFill {
     box-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80;
 }
+
 .fullDexRow.completed .fullDexCrown {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
+
 .fullDexPercent {
     font-size: 13px;
     font-weight: 700;
     text-align: right;
 }
+
 /* ============================================================
    GENERATION BARS
    ============================================================ */
+
 .genBarsTitle {
     text-align: center;
     font-size: 16px;
@@ -369,22 +435,26 @@ body.dark #floatingStats {
     opacity: 0.85;
     letter-spacing: 0.4px;
 }
+
 .genBars {
     display: flex;
     flex-direction: column;
     gap: 10px;
     margin-top: 10px;
 }
+
 .genRow {
     display: grid;
     grid-template-columns: 50px 1fr 45px;
     align-items: center;
     gap: 8px;
 }
+
 .genLabel {
     font-weight: 700;
     font-size: 13px;
 }
+
 .genBar {
     width: 100%;
     height: 10px;
@@ -392,6 +462,7 @@ body.dark #floatingStats {
     border-radius: 6px;
     overflow: hidden;
 }
+
 .genFill {
     height: 100%;
     width: 0%;
@@ -399,6 +470,7 @@ body.dark #floatingStats {
     border-radius: 6px;
     transition: width 0.4s ease;
 }
+
 /* Color-coded fills */
 .genRow[data-gen="1"] .genFill { background: #ff6b6b; }
 .genRow[data-gen="2"] .genFill { background: #f7b731; }
@@ -409,14 +481,17 @@ body.dark #floatingStats {
 .genRow[data-gen="7"] .genFill { background: #fa8231; }
 .genRow[data-gen="8"] .genFill { background: #eb3b5a; }
 .genRow[data-gen="9"] .genFill { background: #8854d0; }
+
 .genPercent {
     font-size: 12px;
     font-weight: 700;
     text-align: right;
 }
+
 /* ============================================================
    FLOATING TOGGLES
    ============================================================ */
+
 #floatingToggles {
     position: fixed;
     bottom: 20px;
@@ -429,13 +504,16 @@ body.dark #floatingStats {
     gap: 12px;
     z-index: 9999;
 }
+
 body.dark #floatingToggles {
     background: rgba(30, 30, 30, 0.9);
     color: white;
 }
+
 /* ============================================================
    SWITCHES
    ============================================================ */
+
 .switch {
     display: flex;
     align-items: center;
@@ -443,9 +521,11 @@ body.dark #floatingToggles {
     cursor: pointer;
     user-select: none;
 }
+
 .switch input {
     display: none;
 }
+
 .slider {
     width: 52px;
     height: 28px;
@@ -454,6 +534,7 @@ body.dark #floatingToggles {
     position: relative;
     transition: background 0.3s ease;
 }
+
 .slider::before {
     content: "";
     position: absolute;
@@ -466,22 +547,28 @@ body.dark #floatingToggles {
     transition: transform 0.3s ease;
     box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
+
 .switch input:checked + .slider {
     background: #4ade80;
     box-shadow: 0 0 8px #4ade80;
 }
+
 .switch input:checked + .slider::before {
     transform: translateX(24px);
 }
+
 .switch-label {
     font-size: 15px;
 }
+
 /* ============================================================
    RESET POPUP
    ============================================================ */
+
 .popup.hidden {
     display: none;
 }
+
 .popup {
     position: fixed;
     top: 0;
@@ -494,6 +581,7 @@ body.dark #floatingToggles {
     align-items: center;
     z-index: 999999;
 }
+
 .popup-box {
     background: white;
     padding: 25px;
@@ -503,15 +591,18 @@ body.dark #floatingToggles {
     text-align: center;
     box-shadow: 0 4px 14px rgba(0,0,0,0.3);
 }
+
 body.dark .popup-box {
     background: #2a2a2a;
     color: white;
 }
+
 .popup-buttons {
     margin-top: 20px;
     display: flex;
     justify-content: space-between;
 }
+
 .popup-buttons button {
     padding: 10px 18px;
     border-radius: 8px;
@@ -519,16 +610,20 @@ body.dark .popup-box {
     cursor: pointer;
     font-size: 15px;
 }
+
 .popup-buttons .danger {
     background: #ef4444;
     color: white;
 }
+
 .popup-buttons #cancelReset {
     background: #ccc;
 }
+
 /* ============================================================
    INFO PANEL
    ============================================================ */
+
 #infoPanel {
     position: fixed;
     top: 0;
@@ -543,21 +638,26 @@ body.dark .popup-box {
     transition: transform 0.35s ease, opacity 0.35s ease;
     z-index: 99999;
 }
+
 body.dark #infoPanel {
     background: rgba(30,30,30,0.95);
     color: white;
 }
+
 #infoPanel.open {
     transform: translateX(0);
     opacity: 1;
 }
+
 #infoContent {
     opacity: 1;
     transition: opacity 0.25s ease;
 }
+
 #infoContent.fading {
     opacity: 0;
 }
+
 .closeInfoBtn {
     position: absolute;
     top: 12px;
@@ -570,9 +670,11 @@ body.dark #infoPanel {
    .closeInfoBtn:hover {
     opacity: 1;
 }
+
 /* ============================================================
    SPRITE + TYPE BADGES
    ============================================================ */
+
 #infoTopRow {
     display: flex;
     align-items: center;
@@ -580,18 +682,22 @@ body.dark #infoPanel {
     gap: 16px;
     margin-bottom: 10px;
 }
+
 #infoSprite img {
     width: 120px;
     height: 120px;
 }
+
 #infoTypes {
     display: flex;
     flex-direction: row;
     gap: 8px;
 }
+
 /* ============================================================
    TYPE BADGES
    ============================================================ */
+
 .typeBadge {
     width: 42px;
     height: 42px;
@@ -600,40 +706,49 @@ body.dark #infoPanel {
     align-items: center;
     justify-content: center;
 }
+
 .typeBadge img {
     width: 24px;
     height: 24px;
 }
+
 /* ============================================================
    NAME + GAMES
    ============================================================ */
+
 #infoName {
     text-align: center;
     margin-bottom: 20px;
 }
+
 #infoGames {
     margin-bottom: 25px;
     min-height: 40px;
     border-bottom: 1px solid rgba(0,0,0,0.2);
     padding-bottom: 10px;
 }
+
 body.dark #infoGames {
     border-color: rgba(255,255,255,0.2);
 }
+
 /* ============================================================
    EVOLUTION SECTION
    ============================================================ */
+
 .evoLabel {
     font-weight: bold;
     margin-top: 10px;
     margin-bottom: 4px;
     opacity: 0.8;
 }
+
 #infoEvolutions {
     display: flex;
     flex-direction: column;
     gap: 14px;
 }
+
 .evoBox {
     display: flex;
     align-items: center;
@@ -642,159 +757,17 @@ body.dark #infoGames {
     padding: 10px;
     border-radius: 10px;
 }
+
 body.dark .evoBox {
     background: rgba(255,255,255,0.08);
 }
+
 .evoBox img {
     width: 60px;
     height: 60px;
 }
+
 .evoMethod {
     font-size: 14px;
     opacity: 0.8;
-}
-
-/* ============================================================
-   NEW FEATURES ADDED (nothing from your original CSS was removed)
-   ============================================================ */
-
-/* Random Uncaught Button */
-.random-btn {
-    width: 100%;
-    padding: 16px;
-    margin: 10px 0 20px;
-    background: linear-gradient(90deg, #4ade80, #22c55e);
-    color: #111;
-    border: none;
-    border-radius: 14px;
-    font-size: 17px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 6px 16px rgba(74, 222, 128, 0.4);
-    transition: all 0.2s ease;
-}
-.random-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 24px rgba(74, 222, 128, 0.5);
-}
-
-/* 3-Column Responsive Grid – smaller cards */
-.dex-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-    gap: 18px;
-    padding: 10px 0;
-}
-@media (min-width: 900px) {
-    .dex-grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (max-width: 600px) {
-    .dex-grid { grid-template-columns: 1fr; }
-}
-
-/* Pokémon Card styling */
-.pokemon-card {
-    background: white;
-    border-radius: 20px;
-    padding: 16px 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-body.dark .pokemon-card {
-    background: #2a2a2a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-}
-.pokemon-card:hover {
-    transform: translateY(-4px) scale(1.04);
-}
-.pokemon-card .sprite {
-    width: 96px;
-    height: 96px;
-}
-.card-info {
-    text-align: center;
-    width: 100%;
-}
-.card-info strong {
-    font-size: 1.1em;
-    display: block;
-}
-.card-info span {
-    font-size: 0.95em;
-    opacity: 0.9;
-}
-
-/* NEW: Grayed-out + green backlight for completed Pokémon */
-.pokemon-card.completed {
-    opacity: 0.78;
-    background: rgba(74, 222, 128, 0.12);
-    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.4),
-                0 0 20px rgba(74, 222, 128, 0.3);
-}
-
-/* 3 dots button – always visible */
-.more-btn {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: inherit;
-    z-index: 10;
-    padding: 4px 8px;
-}
-
-/* Cleaner progress percentages */
-.fullDexPercent,
-.genPercent {
-    font-size: 12.5px;
-    font-weight: 700;
-    white-space: nowrap;
-    opacity: 0.9;
-}
-.fullDexRow.completed .fullDexPercent,
-.genRow.completed .genPercent {
-    color: #4ade80;
-    text-shadow: 0 0 8px #4ade80;
-}
-
-/* Refined Random Popup */
-.random-popup-box {
-    max-width: 380px;
-    text-align: center;
-    padding: 30px 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(74, 222, 128, 0.3);
-}
-#randomSprite img {
-    width: 160px;
-    height: 160px;
-    filter: drop-shadow(0 8px 16px rgba(0,0,0,.2));
-}
-#randomName {
-    font-size: 1.45em;
-    margin: 18px 0 28px;
-}
-.popup-buttons button {
-    padding: 14px 24px;
-    margin: 6px;
-    border-radius: 12px;
-    font-size: 15px;
-    font-weight: 600;
-}
-#randomTakeMe { background: #4ade80; color: #111; }
-#randomRollAgain { background: #22c55e; color: #111; }
-
-/* Reset animation */
-.dex-grid.resetting {
-    opacity: 0.2;
-    transition: opacity 400ms ease;
 }
